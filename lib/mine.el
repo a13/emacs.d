@@ -8,6 +8,7 @@
       (lwarn 'emacs :warning "feature %s not found" (symbol-name feature)))))
 
 (defun install-absent ()
+  "If possible, try to absent packages failed to load and reload config"
   (interactive)
   (unless package-archive-contents
        (package-refresh-contents))
@@ -18,7 +19,7 @@
       (when pkg-desc
         (package-install name)
         (load-file path)
-        (when (require name nil t)
+        (when (memq name features)
           (setq absent-features (remove name-path absent-features)))))))
 
 (with-feature cl
