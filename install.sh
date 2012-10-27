@@ -10,3 +10,5 @@ cd $CONFDIR/conf.d
 cat enabled | while read prio file; do
     test "$file" && ln -sf  ../conf.avail/${file}.el ${prio}${file}.el
 done
+
+mkdir -p $CONFDIR/elpa
