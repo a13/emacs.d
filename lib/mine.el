@@ -1,8 +1,25 @@
+(defvar absent-features nil)
 (defmacro with-feature (feature &rest body)
   (declare (indent 1) (debug t))
   (if (require feature nil t)
       (cons 'progn body)
-    (lwarn 'emacs :warning "feature %s not found" (symbol-name feature))))
+    (progn 
+      (add-to-list 'absent-features `(,feature . ,load-file-name))
+      (lwarn 'emacs :warning "feature %s not found" (symbol-name feature)))))
+
+(defun install-absent ()
+  (interactive)
+  (unless package-archive-contents
+       (package-refresh-contents))
+  (dolist (name-path absent-features)
+    (let* ((name (car name-path))
+           (path (cdr name-path))
+           (pkg-desc (assq name package-archive-contents)))
+      (when pkg-desc
+        (package-install name)
+        (load-file path)
+        (when (require name nil t)
+          (setq absent-features (remove name-path absent-features)))))))
 
 (with-feature cl
   (defun* quote-region (&optional (left-quote "«") (right-quote "»"))
