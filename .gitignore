@@ -14,3 +14,4 @@ lib/*
 # custom file
 conf.d/*
 !conf.d/99custom.el
+!conf.d/enabled
