@@ -1,6 +1,5 @@
 elpa
 auto-save-list
-conf.d
 eshell
 tramp
 abbrev_defs
@@ -12,3 +11,6 @@ url
 lib/*
 !lib/mine.el
 
+# custom file
+conf.d/*
+!conf.d/99custom.el
