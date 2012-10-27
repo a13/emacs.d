@@ -1,0 +1,14 @@
+elpa
+auto-save-list
+conf.d
+eshell
+tramp
+abbrev_defs
+url
+
+# backups
+*~
+# do not track external libraries 
+lib/*
+!lib/mine.el
+
