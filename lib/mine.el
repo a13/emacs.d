@@ -18,8 +18,8 @@
            (pkg-desc (assq name package-archive-contents)))
       (when pkg-desc
         (package-install name)
-        (and (> (length user-str) 0)
-             (file-readable-p user-str)
+        (and (> (length path) 0)
+             (file-readable-p path)
              (load-file path))
         (when (memq name features)
           (setq absent-features (remove name-path absent-features)))))))

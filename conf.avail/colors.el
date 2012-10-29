@@ -48,8 +48,8 @@
 (set-face-foreground 'font-lock-preprocessor-face "#ed8778") ;; red
 
 (set-face-foreground 'minibuffer-prompt "#8ac6f2")
-(set-face-background 'modeline "gray80")
-(set-face-background 'modeline-inactive "gray10")
+(set-face-background 'mode-line "gray80")
+(set-face-background 'mode-line-inactive "gray10")
 ;;(set-face-background 'header-line "gray30")
 
 (when (fboundp show-paren-mode)
