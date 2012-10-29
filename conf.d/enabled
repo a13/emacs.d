@@ -2,6 +2,8 @@
 10 colors
 10 lang
 20 keymap
+30 ibuffer
+40 work
 50 jabber
 50 wl
 

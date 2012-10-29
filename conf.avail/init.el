@@ -1,5 +1,4 @@
 (require 'mine)
-(require 'uniquify)
 
 ;; modes
 (tool-bar-mode -1)
@@ -54,6 +53,9 @@
                            ("gnu" . "http://elpa.gnu.org/packages/")
                            ("melpa" . "http://melpa.milkbox.net/packages/")
                            ("marmalade" . "http://marmalade-repo.org/packages/"))))
+;; conf/uniquify
+(require 'uniquify)
+(setq uniquify-buffer-name-style 'forward)
 
 ;; conf/eshell
 (require 'eshell)
