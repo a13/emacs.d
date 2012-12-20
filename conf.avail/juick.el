@@ -1,13 +1,13 @@
 ;; juick plugin
 (add-to-list 'load-path "~/git/emacs-juick-el/")
 (with-feature juick
-  (setq juick-icon-mode nil)
+  (setq juick-icon-mode t)
   (setq juick-quote-regex "\n\\(>\\(.\\|\n\\)+?.*?\\)\n\\(\\(ht\\|f\\)tps?:\\|#\\|\n\\|\\[\\)")
 
   (defun xmms2-status ()
     (let ((format "${playback_status}\"${artist}\"${duration}\"0\"xmms2\"${title}\"${position}\"${url}"))
       (with-temp-buffer 
-        (call-process "nyxmms2" nil t nil "status" "-f" format)
+        (call-process "nyxmms2" nil t nil "current" "-f" format)
         (let ((output (split-string (buffer-string) "\"" t)))
           (if (string= (car output) "Stopped")
               (make-list 7 nil)
