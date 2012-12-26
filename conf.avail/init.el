@@ -14,6 +14,7 @@
 (setq inhibit-splash-screen t)
 (setq dired-bind-jump nil) ; do not bind C-x C-j
 (setq require-final-newline t)
+(setq use-dialog-box nil)
 
 (put 'narrow-to-region 'disabled nil)
 
