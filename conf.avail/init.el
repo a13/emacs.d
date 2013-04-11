@@ -65,3 +65,8 @@
 (setq eshell-where-to-jump 'begin)
 (setq eshell-review-quick-commands nil)
 (setq eshell-smart-space-goes-to-end t)
+
+;; rainbow-delimiters
+;; TODO: ?
+(with-feature rainbow-delimiters
+  (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
