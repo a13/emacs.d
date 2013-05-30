@@ -57,3 +57,5 @@
    wl-thread-vertical-str             "|"
    wl-thread-youngest-child-str       "+"))
 
+(setq 
+  elmo-maildir-folder-path "~/Maildir")
