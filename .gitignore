@@ -1,3 +1,4 @@
+# -*-	mode: conf; -*-	
 elpa
 auto-save-list
 eshell
@@ -8,6 +9,9 @@ places
 ido.last
 # backups
 *~
+\#*\#
+# compiled files
+*.elc
 # do not track external libraries 
 lib/*
 !lib/mine.el
