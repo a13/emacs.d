@@ -4,7 +4,8 @@ eshell
 tramp
 abbrev_defs
 url
-
+places
+ido.last
 # backups
 *~
 # do not track external libraries 
