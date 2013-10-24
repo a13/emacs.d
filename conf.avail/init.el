@@ -22,17 +22,14 @@
 (setq-default indent-tabs-mode nil)
 (setq-default c-basic-offset 4)
 
-;; conf/edit-server
-(with-feature edit-server
-  (edit-server-start))
-
 ;; conf/tramp
-(setq tramp-default-method "ssh")
+
 (with-feature tramp
+  (setq tramp-default-method "ssh")
   (add-to-list 'tramp-default-proxies-alist
                '(nil "\\`root\\'" "/ssh:%h:"))
   (add-to-list 'tramp-default-proxies-alist
-               '((regexp-quote (system-name)) nil nil)))
+               `((regexp-quote ,(system-name)) nil nil)))
 
 ;; conf/web
 (with-feature browse-url
