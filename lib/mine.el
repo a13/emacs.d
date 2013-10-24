@@ -46,7 +46,8 @@
   "Add tramp prefix to filename"
   (and (bound-and-true-p root-prefix)
        (yes-or-no-p "Use root privileges? ")
-       (setq filename (concat root-prefix filename))))
+       (unless (file-writable-p filename)
+         (setq filename (concat root-prefix filename)))))
 
 (ad-activate 'find-file-noselect)
 
@@ -59,8 +60,10 @@
 (defun find-current-as-root ()
   "Reopen current file as root"
   (interactive)
-  (set-visited-file-name (concat find-file-root-prefix (buffer-file-name)))
-  (setq buffer-read-only nil))
+  (let ((filename (buffer-file-name)))
+    (unless (file-writable-p filename)
+      (set-visited-file-name (concat find-file-root-prefix filename))
+      (setq buffer-read-only nil))))
 
 (global-set-key (kbd "M-s C-x C-f") 'find-file-as-root)
 (global-set-key (kbd "M-s C-x C-v") 'find-current-as-root)
