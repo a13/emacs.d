@@ -11,7 +11,7 @@ cd $CONFDIR/conf.d
 /bin/ls -1 *.el | grep -v 99custom.el | xargs rm -fv
 
 cat enabled | while read prio file; do
-    test "$file" && ln -sf  ../conf.avail/${file}.el ${prio}${file}.el
+    test "$file" && ln -vsf  ../conf.avail/${file}.el ${prio}${file}.el
 done
 
 mkdir -p $CONFDIR/elpa

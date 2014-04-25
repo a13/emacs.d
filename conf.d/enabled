@@ -2,6 +2,7 @@
 10 colors
 10 lang
 20 keymap
+30 layout
 30 ibuffer
 40 work
 50 jabber
@@ -9,3 +10,4 @@
 50 wl
 50 w3m
 50 zsh
+60 google-this
