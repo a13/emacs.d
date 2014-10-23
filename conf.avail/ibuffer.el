@@ -5,15 +5,20 @@
       (quote (("default"
 	       ("work" (or (filename . "/perforce/")
                            (filename . "/export/git")))
+	       ("dired" (mode . dired-mode))
+               ("scheme" (or (mode . scheme-mode)
+                             (mode . geiser-repl-mode)))
+
+               ("search" (or (mode . grep-mode)
+                             (mode . occur-mode)))
 	       ("c/c++" (or (mode . c++-mode)
 			    (mode . c-mode)))
-	       ("jabber" (or (mode . jabber-chat-mode)
-			     (mode . jabber-roster-mode)))
                ("mail" (or
                         (name . "Summary")
                         (name . "Folder")))
+	       ("jabber" (or (mode . jabber-chat-mode)
+			     (mode . jabber-roster-mode)))
                ("dotfiles" (filename . "/git/dotfiles"))
-	       ("dired" (mode . dired-mode))
                ("w3m" (mode . w3m-mode))
 	       ("emacs" (or
 			 (name . "^\\*scratch\\*$")

@@ -13,9 +13,9 @@
               (make-list 7 nil)
               (cdr output))))))
 
-  (setq tune-timer 
-        (run-at-time nil 5 '(lambda ()
-                             (apply 'jabber-pep-tune-send (xmms2-status)))))
+  ;; (setq tune-timer 
+  ;;       (run-at-time nil 5 '(lambda ()
+  ;;                            (apply 'jabber-pep-tune-send (xmms2-status)))))
 
   (custom-set-variables
    '(juick-id-face ((t (:foreground "light green" :weight bold))))

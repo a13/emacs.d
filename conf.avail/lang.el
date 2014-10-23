@@ -3,4 +3,4 @@
 (setq default-input-method "russian-computer")
 ;; use default font for cp1251
 (set-fontset-font "fontset-default" 'cyrillic
-                  (font-spec :registry "iso10646-1" :script 'cyrillic))                                                                       
+                  (font-spec :registry "iso10646-1" :script 'cyrillic))

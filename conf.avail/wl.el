@@ -45,8 +45,8 @@
    wl-insert-message-id nil
    wl-message-id-domain "example.com"
    wl-message-ignored-field-list '("^.*")
-   wl-message-sort-field-list    wl-message-visible-field-list
    wl-message-visible-field-list '("^From:" "^To:" "^Cc:" "^Date:" "^Subject:" "^User-Agent:" "^X-Mailer:")
+   wl-message-sort-field-list  wl-message-visible-field-list
    wl-message-window-size '(1 . 3)
    wl-summary-line-format "%n%T%P%1@%M/%D(%W)%h:%m %t%[%17(%c %f%) %] %s"
    wl-summary-width	nil

@@ -2,6 +2,7 @@
 10 colors
 10 lang
 20 keymap
+30 smex
 30 layout
 30 ibuffer
 40 work
