@@ -3,11 +3,10 @@
 10 lang
 20 keymap
 30 smex
+40 anzu
 30 layout
 30 ibuffer
-40 work
 50 jabber
-51 juick
 50 wl
 50 w3m
 50 zsh
