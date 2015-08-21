@@ -53,3 +53,28 @@
    '(jabber-title-large ((t (:inherit variable-pitch :weight bold :height 2.0 :width ultra-expanded))))
    '(jabber-title-medium ((t (:inherit variable-pitch :foreground "#E8E8E8" :weight bold :height 1.2 :width expanded))))
    '(jabber-title-small ((t (:inherit variable-pitch :foreground "#adc4e3" :weight bold :height 0.7 :width semi-expanded))))))
+
+
+
+
+(defun jabber-chat-print-encrypted (xml-data who mode)
+  "Decrypts and prints encrypted message"
+  (let ((foundp nil))
+    (dolist (x (jabber-xml-node-children xml-data))
+      (when (and (listp x) (eq (jabber-xml-node-name x) 'x)
+                 (string= (jabber-xml-get-xmlns x) "jabber:x:encrypted"))
+        (setq foundp t)
+
+        (when (eql mode :insert)
+          (let* ((enc-b64-multi (car (split-string (caddr x) "\n=")))
+                 (enc-b64 (replace-regexp-in-string "\n" "" enc-b64-multi))
+                 (enc (base64-decode-string enc-b64))
+                 (context (epg-make-context epa-protocol))
+                 (dec (epg-decrypt-string context enc)))
+            (insert "\n"
+                    (jabber-propertize
+                     "encrypted message: " 'face 'jabber-chat-prompt-system)
+                    (format "%s" (jabber-unhex dec)))))))
+    foundp))
+
+(add-to-list 'jabber-chat-printers 'jabber-chat-print-encrypted)
