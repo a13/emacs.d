@@ -1,7 +1,7 @@
 ;; init stuff
 
 (setq
-;; conf-available (concat user-emacs-directory "conf.avail")
+ conf-available (concat user-emacs-directory "conf.avail")
  conf-enabled (concat user-emacs-directory "conf.d")
  custom-file (concat conf-enabled "/99custom.el")
  lib-dir (concat user-emacs-directory "lib"))
@@ -49,7 +49,7 @@
     (package-refresh-contents)
     (package-install package)))
 
-(package-install-if-not 'use-package)1
+(package-install-if-not 'use-package)
 
 (setq package-enable-at-startup nil)
 
