@@ -12,10 +12,6 @@ ido.last
 \#*\#
 # compiled files
 *.elc
-# do not track external libraries 
-lib/*
-!lib/mine.el
-
 # custom file
 conf.d/*
 !conf.d/99custom.el
