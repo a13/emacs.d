@@ -1,4 +1,4 @@
-;; init stuff
+;;; init.el stuff
 
 (setq
  conf-available (concat user-emacs-directory "conf.avail")
@@ -18,6 +18,8 @@
 (eval-and-compile
   (add-to-list 'load-path (expand-file-name "lib" user-emacs-directory)))
 
+(add-to-list 'exec-path "~/bin/")
+
 (setq url-request-method "GET")
 (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
                          ("melpa" . "https://melpa.org/packages/")
@@ -33,16 +35,6 @@
 
 (require 'package)
 (package-initialize)
-
-;; (defun require* (package)
-;;   (unless (require package nil t)
-;;     (unless package-archive-contents
-;;       (package-refresh-contents))
-;;     (let ((pkg-desc (assq package package-archive-contents)))
-;;       (when pkg-desc
-;;         (package-initialize)
-;;         (package-install package)
-;;         (require package)))))
 
 (defun package-install-if-not (package)
   (unless (package-installed-p package)
@@ -62,8 +54,6 @@
 (require 'root-edit)
 (remove-hook 'after-make-frame-functions #'reverse-russian-computer)
 (activate-reverse-im "russian-unipunct")
-
-
 
 (use-package smex
   :config
@@ -86,7 +76,6 @@
   :bind
   (("M-%" . anzu-query-replace)
    ("C-M-%" . anzu-query-replace-regexp)))
-
 
 (use-package jabber
   :init
@@ -169,31 +158,59 @@
   (keyfreq-mode 1)
   (keyfreq-autosave-mode 1))
 
-(use-package ace-jump-mode
+(use-package avy
   :config
-  ;; Make a simple regexp-base jump mode
-  (defmacro ace-jump-make-regexp-mode (mode-name re &optional doc)
-    "Create simple regexp-base AceJump mode
-Example: (ace-jump-make-regexp-mode my-ace-jump-line-mode \"^\" \"AceJump line mode.\\n Marked each no empty line and move there\")"
-    (let ((doc (or doc (concat "AceJump " (symbol-name mode-name)))))
-      `(defun ,mode-name ()
-         ,doc
-         (interactive)
-         (if ace-jump-current-mode (ace-jump-done))
-         (setq ace-jump-current-mode mode-name)
-         (ace-jump-do ,re))))
-  (ace-jump-make-regexp-mode ace-jump-url-mode "\\(f\\|ht\\)tps?://")
-  (define-key global-map (kbd "C-c f") 'ace-jump-url-mode))
+  (avy-setup-default)
+  (global-set-key (kbd "C-:") 'avy-goto-char)
+  ;; (global-set-key (kbd "C-'") 'avy-goto-char-2)
+  (global-set-key (kbd "M-g M-g") 'avy-goto-line)
+  (global-set-key (kbd "M-g w") 'avy-goto-word-1))
 
 (use-package quelpa)
 (use-package quelpa-use-package)
 
-(use-package point
-  :ensure nil
-  :quelpa
-  (point :url "https://raw.githubusercontent.com/rayslava/emacs-point-el/master/point.el" :fetcher url :version original)
+(use-package geiser)
+
+(use-package projectile)
+(use-package clojure-mode)
+(use-package cider)
+
+(use-package company
   :config
-  (setq point-icon-mode nil)
-  (setq point-reply-id-add-plus nil))
+  (add-hook 'after-init-hook 'global-company-mode))
+
+(use-package ibuffer-vc
+  :config
+  (add-hook 'ibuffer-hook
+            (lambda ()
+              (ibuffer-vc-set-filter-groups-by-vc-root)
+              (unless (eq ibuffer-sorting-mode 'alphabetic)
+                (ibuffer-do-sort-by-alphabetic)))))
+
+(use-package rainbow-delimiters
+  :config
+  (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
+
+(use-package rainbow-identifiers
+  :config
+  (add-hook 'prog-mode-hook #'rainbow-identifiers-mode))
+
+(use-package rainbow-mode
+  :config
+  (add-hook 'prog-mode-hook #'rainbow-mode))
+
+(use-package magit)
+
+;; (use-package point
+;;   :ensure nil
+;;   :quelpa
+;;   (point :url "https://raw.githubusercontent.com/rayslava/emacs-point-el/master/point.el" :fetcher url :version original)
+;;   :config
+;;   (setq point-icon-mode nil)
+;;   (setq point-reply-id-add-plus nil))
+
 
 (load-file custom-file)
+
+(provide 'init)
+;;; init.el ends
