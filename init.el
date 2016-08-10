@@ -49,11 +49,13 @@
 (put 'use-package 'lisp-indent-function 1)
 (setq use-package-always-ensure t)
 
+(require 'root-edit)
 (require 'layout)
 (require 'unipunct)
-(require 'root-edit)
-(remove-hook 'after-make-frame-functions #'reverse-russian-computer)
+
+;; (remove-hook 'after-make-frame-functions #'reverse-russian-computer)
 (activate-reverse-im "russian-unipunct")
+
 
 (use-package smex
   :config
@@ -146,12 +148,17 @@
   (setq w3m-enable-google-feeling-lucky t)
   (setq w3m-use-header-line-title t)
   (defun set-external-browser (orig-fun &rest args)
-  (let ((browse-url-browser-function
-         (if (eq browse-url-browser-function 'w3m-browse-url)
-             'browse-url-generic
-           browse-url-browser-function)))
-    (apply orig-fun args)))
+    (let ((browse-url-browser-function
+           (if (eq browse-url-browser-function 'w3m-browse-url)
+               'browse-url-generic
+             browse-url-browser-function)))
+      (apply orig-fun args)))
   (advice-add 'w3m-view-url-with-browse-url :around #'set-external-browser))
+
+(use-package eww-lnum
+  :config
+  (define-key eww-mode-map "f" 'eww-lnum-follow)
+  (define-key eww-mode-map "F" 'eww-lnum-universal))
 
 (use-package keyfreq
   :config
@@ -187,6 +194,16 @@
               (unless (eq ibuffer-sorting-mode 'alphabetic)
                 (ibuffer-do-sort-by-alphabetic)))))
 
+(use-package magit)
+
+(use-package diff-hl
+  :config
+  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
+  (add-hook 'prog-mode-hook #'diff-hl-mode)
+  (add-hook 'dired-mode-hook #'diff-hl-dired-mode))
+
+(use-package edit-indirect)
+
 (use-package rainbow-delimiters
   :config
   (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
@@ -199,15 +216,19 @@
   :config
   (add-hook 'prog-mode-hook #'rainbow-mode))
 
-(use-package magit)
+(use-package spaceline
+  :config
+  (require 'spaceline-config)
+  (spaceline-emacs-theme))
 
-;; (use-package point
-;;   :ensure nil
-;;   :quelpa
-;;   (point :url "https://raw.githubusercontent.com/rayslava/emacs-point-el/master/point.el" :fetcher url :version original)
-;;   :config
-;;   (setq point-icon-mode nil)
-;;   (setq point-reply-id-add-plus nil))
+(use-package point
+  :ensure nil
+  :quelpa
+  (point :repo "a13/point.el" :fetcher github :version original)
+  :config
+  (setq point-reply-id-add-plus nil))
+
+
 
 
 (load-file custom-file)
