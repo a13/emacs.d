@@ -109,7 +109,8 @@
 	    (ibuffer-switch-to-saved-filter-groups "default")))
 
 ;;; Zsh
-(add-to-list 'auto-mode-alist '("zshecl" . shell-script-mode))
+(add-to-list 'auto-mode-alist '("zshecl" . sh-mode))
+(add-to-list 'auto-mode-alist '("\\.zsh\\'" . sh-mode))
 (setq system-uses-terminfo nil)
 
 ;;; keys

@@ -7,6 +7,10 @@ abbrev_defs
 url
 places
 ido.last
+jabber-otr
+quelpa
+request
+recentf
 # backups
 *~
 \#*\#
