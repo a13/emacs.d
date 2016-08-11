@@ -50,12 +50,6 @@
 (setq use-package-always-ensure t)
 
 (require 'root-edit)
-(require 'layout)
-(require 'unipunct)
-
-;; (remove-hook 'after-make-frame-functions #'reverse-russian-computer)
-(activate-reverse-im "russian-unipunct")
-
 
 (use-package smex
   :config
@@ -228,8 +222,13 @@
   :config
   (setq point-reply-id-add-plus nil))
 
-
-
+(use-package reverse-im
+  :ensure nil
+  :quelpa
+  (reverse-im :repo "a13/reverse-im.el" :fetcher github :version original)
+  :config
+  (require 'unipunct)
+  (activate-reverse-im "russian-unipunct"))
 
 (load-file custom-file)
 
