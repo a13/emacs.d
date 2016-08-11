@@ -1,5 +1,6 @@
 ;;; init.el stuff
 
+;;; Code:
 (setq
  conf-available (concat user-emacs-directory "conf.avail")
  conf-enabled (concat user-emacs-directory "conf.d")
@@ -227,6 +228,7 @@
   :quelpa
   (reverse-im :repo "a13/reverse-im.el" :fetcher github :version original)
   :config
+  (add-to-list 'load-path "~/.xkb/contrib")
   (require 'unipunct)
   (activate-reverse-im "russian-unipunct"))
 
