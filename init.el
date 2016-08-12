@@ -216,12 +216,13 @@
   (require 'spaceline-config)
   (spaceline-emacs-theme))
 
-(use-package point
+(use-package point-im
   :ensure nil
   :quelpa
-  (point :repo "a13/point.el" :fetcher github :version original)
+  (point-im :repo "a13/point-im.el" :fetcher github :version original)
   :config
-  (setq point-reply-id-add-plus nil))
+  (setq point-im-reply-id-add-plus nil)
+  (point-im-mode t))
 
 (use-package reverse-im
   :ensure nil
