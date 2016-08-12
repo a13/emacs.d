@@ -229,8 +229,9 @@
   (reverse-im :repo "a13/reverse-im.el" :fetcher github :version original)
   :config
   (add-to-list 'load-path "~/.xkb/contrib")
-  (require 'unipunct)
-  (activate-reverse-im "russian-unipunct"))
+  (if (require 'unipunct nil t)
+      (reverse-im-activate "russian-unipunct")
+    (reverse-im-activate "russian-computer")))
 
 (load-file custom-file)
 
