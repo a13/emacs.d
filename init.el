@@ -225,9 +225,6 @@
   (point-im-mode t))
 
 (use-package reverse-im
-  :ensure nil
-  :quelpa
-  (reverse-im :repo "a13/reverse-im.el" :fetcher github :version original)
   :config
   (add-to-list 'load-path "~/.xkb/contrib")
   (if (require 'unipunct nil t)
