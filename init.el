@@ -223,7 +223,7 @@
   (point-im :repo "a13/point-im.el" :fetcher github :version original)
   :config
   (setq point-im-reply-id-add-plus nil)
-  (point-im-mode t))
+  (add-hook 'jabber-chat-mode-hook #'point-im-mode))
 
 (use-package reverse-im
   :config
