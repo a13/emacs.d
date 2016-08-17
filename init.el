@@ -166,7 +166,31 @@
   (global-set-key (kbd "C-:") 'avy-goto-char)
   ;; (global-set-key (kbd "C-'") 'avy-goto-char-2)
   (global-set-key (kbd "M-g M-g") 'avy-goto-line)
-  (global-set-key (kbd "M-g w") 'avy-goto-word-1))
+  (global-set-key (kbd "M-g w") 'avy-goto-word-1)
+  ;; TODO: pull request to avy
+  (defun quail-reverse-translate (char)
+    "Reverse translate CHAR."
+    (or
+     (pcase (quail-map)
+       (`(,_ ,maps)
+        (dolist (map maps)
+          (when (and (consp map)
+                     (equal (second map)
+                            (vector (char-to-string char))))
+            (return (first map))))))
+     char))
+
+  (defun read-char-translated (orig-read-char &rest args)
+    (let ((char (apply orig-read-char args)))
+      (and char (quail-reverse-translate char))))
+
+  (defun avy--read-char-override (orig-fun &rest args)
+    (advice-add 'read-char :around #'read-char-translated)
+    (apply orig-fun args)
+    (advice-remove 'read-char #'read-char-translated))
+
+  (advice-add 'avy--read-candidates :around #'avy--read-char-override))
+
 
 (use-package quelpa)
 (use-package quelpa-use-package)
