@@ -172,11 +172,17 @@
 (use-package quelpa)
 (use-package quelpa-use-package)
 
-(use-package geiser)
 
 (use-package projectile)
+
+;; scheme
+(use-package geiser)
+;; clojure
 (use-package clojure-mode)
 (use-package cider)
+;; scala
+(use-package ensime)
+
 
 (use-package company
   :config
@@ -212,10 +218,10 @@
   :config
   (add-hook 'prog-mode-hook #'rainbow-mode))
 
-(use-package spaceline
-  :config
-  (require 'spaceline-config)
-  (spaceline-emacs-theme))
+;; (use-package spaceline
+;;   :config
+;;   (require 'spaceline-config)
+;;   (spaceline-emacs-theme))
 
 (use-package point-im
   :ensure nil
