@@ -27,6 +27,40 @@
 ;; (setq browse-url-browser-function 'w3m-browse-url
 (setq browse-url-browser-function 'browse-url-generic
       browse-url-generic-program "x-www-browser")
+
+(defun feh-browse (url &rest ignore)
+  "Browse image using feh."
+  (interactive (browse-url-interactive-arg "URL: "))
+  (start-process (concat "feh " url) nil "feh" url))
+
+(defun mpv-browse (url &rest ignore)
+  "Browse video using mpv."
+  (interactive (browse-url-interactive-arg "URL: "))
+  (start-process (concat "mpv --loop-file=inf" url) nil "mpv" "--loop-file=inf" url))
+
+(defvar browse-url-images-re
+  '("\\.\\(jpe?g\\|png\\)\\(:large\\|:orig\\)?\\(\\?.*\\)?$"
+    "^https?://img-fotki\\.yandex\\.ru/get/"
+    "^https?://pics\\.livejournal\\.com/.*/pic/"
+    "^https?://l-userpic\\.livejournal\\.com/"
+    "^https?://img\\.leprosorium\\.com/[0-9]+$")
+  "Image URLs regular expressions list.")
+
+(defvar browse-url-videos-re
+  '("\\.\\(gifv?\\|avi\\|AVI\\|mp[4g]\\|MP4\\|webm\\)$"
+    "^https?://\\(www\\.youtube\\.com\\|youtu\\.be\\|coub\\.com\\|vimeo\\.com\\|www\\.liveleak\\.com\\)/"
+    "^https?://www\\.facebook\\.com/.*/videos?/"))
+
+(setq browse-url-browser-function
+      (append
+       (mapcar (lambda (re)
+                 (cons re #'feh-browse))
+               browse-url-images-re)
+       (mapcar (lambda (re)
+                 (cons re #'mpv-browse))
+               browse-url-videos-re)
+       '(("." . browse-url-xdg-open))))
+
 (global-set-key [f5] 'browse-url)
 
 (require 'webjump)
@@ -68,6 +102,7 @@
 (setq display-buffer-alist default-frame-alist)
 (setq custom-enabled-themes '(deeper-blue))
 (load-theme 'deeper-blue)
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 ;;; language/keyboard etc
 (set-language-environment "UTF-8")
@@ -139,7 +174,7 @@
 (add-to-list 'tramp-default-proxies-alist
              '("10\\.199\\." nil nil))
 (add-to-list 'tramp-default-proxies-alist
-             '("10\\.0\\." nil nil))  
+             '("10\\.0\\." nil nil))
 (add-to-list 'tramp-default-proxies-alist
              `((regexp-quote ,(system-name)) nil nil))
 
