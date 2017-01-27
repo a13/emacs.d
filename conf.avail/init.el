@@ -67,6 +67,7 @@
 (setq initial-frame-alist default-frame-alist)
 (setq display-buffer-alist default-frame-alist)
 (setq custom-enabled-themes '(deeper-blue))
+(load-theme 'deeper-blue)
 
 ;;; language/keyboard etc
 (set-language-environment "UTF-8")
@@ -141,3 +142,16 @@
              '("10\\.0\\." nil nil))  
 (add-to-list 'tramp-default-proxies-alist
              `((regexp-quote ,(system-name)) nil nil))
+
+(setq ispell-local-dictionary-alist
+      '(("russian"
+         "[АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯабвгдеёжзийклмнопрстуфхцчшщьыъэюяіїєґ’A-Za-z]"
+         "[^АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯабвгдеёжзийклмнопрстуфхцчшщьыъэюяіїєґ’A-Za-z]"
+         "[-']"  nil ("-d" "uk_UA,ru_RU,en_US") nil utf-8))
+      ispell-program-name "hunspell"
+      ispell-dictionary "russian"
+      ispell-really-aspell nil
+      ispell-really-hunspell t
+      ispell-encoding8-command t
+      ispell-silently-savep t
+      flyspell-delay 1)
