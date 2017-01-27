@@ -24,7 +24,7 @@
 (setq url-request-method "GET")
 (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
                          ("melpa" . "https://melpa.org/packages/")
-                         ("marmalade" . "https://marmalade-repo.org/packages/")
+;;                         ("marmalade" . "https://marmalade-repo.org/packages/")
                          ("org" . "http://orgmode.org/elpa/")
                          ("sunrise" . "http://joseito.republika.pl/sunrise-commander/")))
 
@@ -174,14 +174,29 @@
 
 
 (use-package projectile)
+(use-package yasnippet
+  :init
+  (yas-reload-all)
+  (add-hook 'prog-mode-hook #'yas-minor-mode))
+
+(use-package nameless
+  :config
+  (add-hook 'emacs-lisp-mode-hook #'nameless-mode)
+  (setq nameless-private-prefix t))
 
 ;; scheme
 (use-package geiser)
 ;; clojure
 (use-package clojure-mode)
+(use-package clojure-snippets)
 (use-package cider)
+
 ;; scala
-(use-package ensime)
+(use-package ensime
+  :bind (:map ensime-mode-map
+              ("C-x C-e" . ensime-inf-eval-region)))
+
+
 
 
 (use-package company
