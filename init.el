@@ -7,15 +7,6 @@
  custom-file (concat conf-enabled "/99custom.el")
  lib-dir (concat user-emacs-directory "lib"))
 
-
-;; (dolist (path '(lib-dir (concat base-directory "/elpa")))
-;;   (when path
-;;     (let ((default-directory (eval path)))
-;;       (normal-top-level-add-to-load-path '("."))
-;;       (normal-top-level-add-subdirs-to-load-path))))
-
-;; (debian-run-directories conf-enabled)
-
 (eval-and-compile
   (add-to-list 'load-path (expand-file-name "lib" user-emacs-directory)))
 
@@ -59,6 +50,11 @@
   :bind
   (("M-x" . smex)
    ("M-X" . smex-major-mode-commands)))
+
+(use-package ido-describe-bindings
+  :bind
+  (:map help-map
+        ("b" . ido-describe-bindings)))
 
 (use-package anzu
   :config
@@ -150,34 +146,58 @@
       (apply orig-fun args)))
   (advice-add 'w3m-view-url-with-browse-url :around #'set-external-browser))
 
-(use-package eww-lnum
-  :config
-  (define-key eww-mode-map "f" 'eww-lnum-follow)
-  (define-key eww-mode-map "F" 'eww-lnum-universal))
-
 (use-package keyfreq
   :config
   (keyfreq-mode 1)
   (keyfreq-autosave-mode 1))
 
+;; avy-based stuff
 (use-package avy
   :config
   (avy-setup-default)
-  (global-set-key (kbd "C-:") 'avy-goto-char)
-  ;; (global-set-key (kbd "C-'") 'avy-goto-char-2)
-  (global-set-key (kbd "M-g M-g") 'avy-goto-line)
-  (global-set-key (kbd "M-g w") 'avy-goto-word-1))
+  :bind
+  (("C-:" . avy-goto-char)
+   ;; ("C-'" . avy-goto-char-2)
+   ("M-g M-g" . avy-goto-line)
+   ("M-g w" . avy-goto-word-1)))
 
+(use-package ace-jump-buffer
+  :bind
+  (("M-g b" . ace-jump-buffer)))
+
+
+(use-package ace-window
+  :config
+  (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
+  :bind
+  (("M-o" . ace-window)))
+
+(use-package ace-link
+  :config
+  (ace-link-setup-default))
+
+(use-package link-hint
+  :ensure t
+  :bind
+  (("C-c l o" . link-hint-open-link)
+   ("C-c l c" . link-hint-copy-link)))
 
 (use-package quelpa)
 (use-package quelpa-use-package)
-
 
 (use-package projectile)
 (use-package yasnippet
   :init
   (yas-reload-all)
   (add-hook 'prog-mode-hook #'yas-minor-mode))
+
+(use-package flycheck
+  :config
+  (add-hook 'prog-mode-hook #'flycheck-mode))
+
+(use-package avy-flycheck
+  :config
+  (avy-flycheck-setup))
 
 (use-package nameless
   :config
@@ -196,12 +216,20 @@
   :bind (:map ensime-mode-map
               ("C-x C-e" . ensime-inf-eval-region)))
 
-
-
-
+;; company-based plugins
 (use-package company
   :config
   (add-hook 'after-init-hook 'global-company-mode))
+
+(use-package company-emoji
+  :config
+  (add-to-list 'company-backends 'company-emoji)
+  (set-fontset-font t 'symbol
+                    (font-spec :family
+                               (if (eq system-type 'darwin)
+                                   "Apple Color Emoji"
+                                 "Symbola"))
+                               nil 'prepend))
 
 (use-package ibuffer-vc
   :config
@@ -233,10 +261,10 @@
   :config
   (add-hook 'prog-mode-hook #'rainbow-mode))
 
-;; (use-package spaceline
-;;   :config
-;;   (require 'spaceline-config)
-;;   (spaceline-emacs-theme))
+(use-package spaceline
+  :config
+  (require 'spaceline-config)
+  (spaceline-emacs-theme))
 
 (use-package point-im
   :ensure nil

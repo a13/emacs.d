@@ -54,7 +54,7 @@
 (setq browse-url-browser-function
       (append
        (mapcar (lambda (re)
-                 (cons re #'feh-browse))
+                 (cons re #'eww-browse-url))
                browse-url-images-re)
        (mapcar (lambda (re)
                  (cons re #'mpv-browse))
@@ -110,10 +110,6 @@
 ;; use default font for cp1251
 (set-fontset-font "fontset-default" 'cyrillic
                   (font-spec :registry "iso10646-1" :script 'cyrillic))
-;; emojis 😺
-(set-fontset-font
- t 'symbol
- (font-spec :family "Symbola") nil 'prepend)
 
 ;;; ibuffer
 (global-set-key (kbd "C-x C-b") 'ibuffer)
