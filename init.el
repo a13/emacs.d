@@ -2,10 +2,8 @@
 
 ;;; Code:
 (setq
- conf-available (concat user-emacs-directory "conf.avail")
  conf-enabled (concat user-emacs-directory "conf.d")
- custom-file (concat conf-enabled "/99custom.el")
- lib-dir (concat user-emacs-directory "lib"))
+ custom-file (concat conf-enabled "/99custom.el"))
 
 (eval-and-compile
   (add-to-list 'load-path (expand-file-name "lib" user-emacs-directory)))
@@ -29,6 +27,7 @@
 (package-initialize)
 
 (defun package-install-if-not (package)
+  "Install PACKAGE if it's not installed yet."
   (unless (package-installed-p package)
     (package-refresh-contents)
     (package-install package)))
@@ -187,7 +186,7 @@
 
 (use-package projectile)
 (use-package yasnippet
-  :init
+  :config
   (yas-reload-all)
   (add-hook 'prog-mode-hook #'yas-minor-mode))
 
@@ -220,6 +219,10 @@
 (use-package company
   :config
   (add-hook 'after-init-hook 'global-company-mode))
+
+(use-package company-shell
+  :config
+  (add-to-list 'company-backends 'company-shell))
 
 (use-package company-emoji
   :config
@@ -284,4 +287,5 @@
 (load-file custom-file)
 
 (provide 'init)
-;;; init.el ends
+
+;;; init.el ends here
