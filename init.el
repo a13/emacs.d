@@ -51,6 +51,9 @@
    ("M-X" . smex-major-mode-commands)))
 
 (use-package ido-describe-bindings
+  :config
+  (ido-mode t)
+  (ido-everywhere 1)
   :bind
   (:map help-map
         ("b" . ido-describe-bindings)))
@@ -252,6 +255,8 @@
 
 (use-package edit-indirect)
 
+;; interface
+
 (use-package rainbow-delimiters
   :config
   (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
@@ -280,9 +285,11 @@
 (use-package reverse-im
   :config
   (add-to-list 'load-path "~/.xkb/contrib")
-  (if (require 'unipunct nil t)
-      (reverse-im-activate "russian-unipunct")
-    (reverse-im-activate "russian-computer")))
+  (reverse-im-activate
+   (if (require 'unipunct nil t)
+       "russian-unipunct"
+     "russian-computer")))
+
 
 (load-file custom-file)
 
