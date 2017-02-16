@@ -282,6 +282,14 @@
   (setq point-im-reply-id-add-plus nil)
   (add-hook 'jabber-chat-mode-hook #'point-im-mode))
 
+(use-package eshell-toggle
+  :ensure nil
+  :quelpa
+  (eshell-toggle :repo "4DA/eshell-toggle" :fetcher github :version original)
+  :bind
+  (("M-`" . eshell-toggle)))
+
+
 (use-package reverse-im
   :config
   (add-to-list 'load-path "~/.xkb/contrib")
