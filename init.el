@@ -45,32 +45,28 @@
 (use-package smex
   :config
   (setq smex-save-file "~/.cache/emacs/smex-items")
-  (smex-initialize)
-  :bind
-  (("M-x" . smex)
-   ("M-X" . smex-major-mode-commands)))
+  (smex-initialize))
 
-(use-package ido-describe-bindings
+(use-package ivy
   :config
-  (ido-mode t)
-  (ido-everywhere 1)
+;;  (setq ivy-re-builders-alist '((t . ivy--regex-fuzzy)))
+  (ivy-mode t)
+  (setq ivy-count-format "%d/%d ")
   :bind
-  (:map help-map
-        ("b" . ido-describe-bindings)))
+  (("C-c C-r" . ivy-resume)))
 
-(use-package anzu
+(use-package counsel
   :config
-  (global-anzu-mode +1)
-  (set-face-attribute 'anzu-mode-line nil
-                      :foreground "firebrick" :weight 'bold)
-  (custom-set-variables
-   '(anzu-mode-lighter "")
-   '(anzu-deactivate-region t)
-   '(anzu-search-threshold 1000)
-   '(anzu-replace-to-string-separator " => "))
   :bind
-  (("M-%" . anzu-query-replace)
-   ("C-M-%" . anzu-query-replace-regexp)))
+  (("M-x" . counsel-M-x)))
+
+(use-package swiper
+  :bind
+  (("C-s" . swiper)))
+
+(use-package ivy-rich
+  :config
+  (ivy-set-display-transformer 'ivy-switch-buffer 'ivy-rich-switch-buffer-transformer))
 
 (use-package jabber
   :init
