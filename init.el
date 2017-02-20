@@ -17,7 +17,6 @@
                          ("org" . "http://orgmode.org/elpa/")
                          ("sunrise" . "http://joseito.republika.pl/sunrise-commander/")))
 
-
 ;;(load-file internal-config) ;; init?
 ;;(load-file interface-config) ;;colors
 
@@ -66,6 +65,7 @@
 
 (use-package ivy-rich
   :config
+  (setq ivy-rich-switch-buffer-name-max-length 45)
   (ivy-set-display-transformer 'ivy-switch-buffer 'ivy-rich-switch-buffer-transformer))
 
 (use-package jabber
@@ -187,6 +187,7 @@
 (use-package yasnippet
   :config
   (yas-reload-all)
+  (setq yas-prompt-functions '(yas-completing-prompt yas-ido-prompt))
   (add-hook 'prog-mode-hook #'yas-minor-mode))
 
 (use-package flycheck
