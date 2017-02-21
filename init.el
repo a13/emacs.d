@@ -17,7 +17,6 @@
                          ("org" . "http://orgmode.org/elpa/")
                          ("sunrise" . "http://joseito.republika.pl/sunrise-commander/")))
 
-
 ;;(load-file internal-config) ;; init?
 ;;(load-file interface-config) ;;colors
 
@@ -61,12 +60,35 @@
   (("M-x" . counsel-M-x)))
 
 (use-package swiper
+  :config
+  (defun counsel-grep-or-isearch-or-swiper ()
+    "Call `swiper' for small buffers and `counsel-grep'/`isearch-forward' for large ones."
+    (interactive)
+    (let ((big (> (buffer-size)
+                  (if (eq major-mode 'org-mode)
+                      (/ counsel-grep-swiper-limit 4)
+                    counsel-grep-swiper-limit)))
+          (local (and (buffer-file-name)
+                      (not (buffer-narrowed-p))
+                      (not (ignore-errors
+                             (file-remote-p (buffer-file-name))))
+                      (not (string-match
+                            counsel-compressed-file-regex
+                            (buffer-file-name))))))
+      (if big
+          (if local
+              (progn
+                (save-buffer)
+                (counsel-grep))
+            (call-interactively #'isearch-forward))
+        (swiper--ivy (swiper--candidates)))))
   :bind
-  (("C-s" . swiper)))
+  (("C-s" . counsel-grep-or-isearch-or-swiper)))
 
 (use-package ivy-rich
   :config
   (setq ivy-rich-abbreviate-paths t)
+  (setq ivy-rich-switch-buffer-name-max-length 45)
   (ivy-set-display-transformer 'ivy-switch-buffer 'ivy-rich-switch-buffer-transformer))
 
 (use-package jabber
@@ -188,6 +210,7 @@
 (use-package yasnippet
   :config
   (yas-reload-all)
+  (setq yas-prompt-functions '(yas-completing-prompt yas-ido-prompt))
   (add-hook 'prog-mode-hook #'yas-minor-mode))
 
 (use-package flycheck
