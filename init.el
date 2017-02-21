@@ -66,6 +66,7 @@
 
 (use-package ivy-rich
   :config
+  (setq ivy-rich-abbreviate-paths t)
   (ivy-set-display-transformer 'ivy-switch-buffer 'ivy-rich-switch-buffer-transformer))
 
 (use-package jabber
