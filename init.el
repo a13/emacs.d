@@ -293,6 +293,14 @@
   (require 'spaceline-config)
   (spaceline-emacs-theme))
 
+(use-package diminish
+  :config
+  (diminish 'ivy-mode)
+  (diminish 'auto-revert-mode)
+  (diminish 'rainbow-mode "🌈")
+  (diminish 'projectile-mode)
+  (diminish 'yas-minor-mode))
+
 (use-package point-im
   :ensure nil
   :quelpa
