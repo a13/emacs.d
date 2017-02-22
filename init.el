@@ -206,7 +206,10 @@
 (use-package quelpa)
 (use-package quelpa-use-package)
 
-(use-package projectile)
+(use-package projectile
+  :config
+  (projectile-global-mode))
+
 (use-package yasnippet
   :config
   (yas-reload-all)
