@@ -208,7 +208,7 @@
 
 (use-package projectile
   :config
-  (projectile-global-mode))
+  (projectile-mode))
 
 (use-package yasnippet
   :config
@@ -278,6 +278,12 @@
 
 (use-package edit-indirect)
 
+(use-package conkeror-minor-mode
+  :config
+  (add-hook 'js-mode-hook (lambda ()
+                          (when (string-match "conkeror" (buffer-file-name))
+                            (conkeror-minor-mode 1)))))
+
 ;; interface
 
 (use-package rainbow-delimiters
@@ -302,6 +308,7 @@
   (diminish 'ivy-mode)
   (diminish 'auto-revert-mode)
   (diminish 'rainbow-mode "🌈")
+  (diminish 'company-mode "𝍎")
   (diminish 'projectile-mode)
   (diminish 'yas-minor-mode))
 
