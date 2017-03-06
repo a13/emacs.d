@@ -82,8 +82,24 @@
                 (counsel-grep))
             (call-interactively #'isearch-forward))
         (swiper--ivy (swiper--candidates)))))
+
+  (defun counsel-xmms2 ()
+    "Jump to \"xmms2\" track."
+    (interactive)
+    (let ((cands
+           (split-string
+            (shell-command-to-string "xmms2 list") "\n" t)))
+      (ivy-read "xmms2: " cands
+                :action (lambda (x)
+                          (string-match "^\s*\\(->\\)?\\[\\([0-9]+\\)/[0-9]+\\]\s+\\w+" x)
+                          (let ((n (match-string 2 x)))
+                            (call-process-shell-command
+                             (format "xmms2 jump %s" n))
+                            (message x)))
+                :caller 'counsel-xmms2)))
   :bind
-  (("C-s" . counsel-grep-or-isearch-or-swiper)))
+  (("C-s" . counsel-grep-or-isearch-or-swiper)
+   ("s-p" . counsel-xmms2)))
 
 (use-package ivy-rich
   :config
@@ -208,7 +224,7 @@
 
 (use-package projectile
   :config
-  (projectile-global-mode))
+  (projectile-mode))
 
 (use-package yasnippet
   :config
@@ -283,6 +299,12 @@
 
 (use-package edit-indirect)
 
+(use-package conkeror-minor-mode
+  :config
+  (add-hook 'js-mode-hook (lambda ()
+                          (when (string-match "conkeror" (buffer-file-name))
+                            (conkeror-minor-mode 1)))))
+
 ;; interface
 
 (use-package rainbow-delimiters
@@ -323,6 +345,7 @@
   (diminish 'ivy-mode)
   (diminish 'auto-revert-mode)
   (diminish 'rainbow-mode "🌈")
+  (diminish 'company-mode "𝍎")
   (diminish 'projectile-mode)
   (diminish 'company-mode)
   (diminish 'nameless-mode ":")
