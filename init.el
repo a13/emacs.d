@@ -73,7 +73,7 @@
                       (not (ignore-errors
                              (file-remote-p (buffer-file-name))))
                       (not (string-match
-                            counsel-compressed-file-regex
+                            counsel-Compressed-file-regex
                             (buffer-file-name))))))
       (if big
           (if local
@@ -246,6 +246,11 @@
   :config
   (add-hook 'after-init-hook 'global-company-mode))
 
+(use-package company-quickhelp
+  :config
+  (company-quickhelp-mode 1)
+  (setq company-quickhelp-delay 3))
+
 (use-package company-shell
   :config
   (add-to-list 'company-backends 'company-shell))
@@ -297,13 +302,36 @@
   (require 'spaceline-config)
   (spaceline-emacs-theme))
 
+;; (use-package dim
+;;   :config
+;;   (dim-major-names
+;;    '((emacs-lisp-mode           "EL")
+;;      (inferior-emacs-lisp-mode  "EL>")
+;;      (help-mode "🄷")
+;;      (calendar-mode             "📆")))
+;;   (dim-minor-names
+;;    '((visual-line-mode   " ↩")
+;;      (auto-fill-function " ↵")
+;;      (eldoc-mode         ""    eldoc)
+;;      (whitespace-mode    " _"  whitespace)
+;;      (paredit-mode       " ()" paredit))))
+
 (use-package diminish
   :config
+  (diminish 'visual-line-mode   " ↩")
+  (diminish 'auto-fill-function " ↵")
   (diminish 'ivy-mode)
   (diminish 'auto-revert-mode)
   (diminish 'rainbow-mode "🌈")
   (diminish 'projectile-mode)
+  (diminish 'company-mode)
+  (diminish 'nameless-mode ":")
+  (diminish 'flycheck-mode "☑")
   (diminish 'yas-minor-mode))
+
+(use-package fancy-battery
+  :config
+  (add-hook 'after-init-hook #'fancy-battery-mode))
 
 (use-package point-im
   :ensure nil
