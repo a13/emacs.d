@@ -134,7 +134,6 @@
   ;; customized
   (custom-set-variables
    '(jabber-auto-reconnect t)
-   '(jabber-avatar-set t)
    '(jabber-chat-buffer-format "*-jc-%n-*")
    '(jabber-default-status "")
    '(jabber-groupchat-buffer-format "*-jg-%n-*")
@@ -233,6 +232,7 @@
   (add-hook 'prog-mode-hook #'yas-minor-mode))
 
 (use-package flycheck
+  :diminish "🗸"
   :config
   (add-hook 'prog-mode-hook #'flycheck-mode))
 
@@ -256,6 +256,9 @@
 (use-package ensime
   :bind (:map ensime-mode-map
               ("C-x C-e" . ensime-inf-eval-region)))
+
+;; lua
+(use-package lua-mode)
 
 ;; company-based plugins
 (use-package company
