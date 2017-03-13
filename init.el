@@ -1,28 +1,21 @@
 ;;; init.el
 
 ;;; Code:
-(setq
- conf-enabled (concat user-emacs-directory "conf.d")
- custom-file (concat conf-enabled "/99custom.el"))
 
 (eval-and-compile
   (add-to-list 'load-path (expand-file-name "lib" user-emacs-directory)))
 
-(add-to-list 'exec-path "~/bin/")
+(setq custom-file (concat user-emacs-directory "custom.el"))
+(load-file (concat user-emacs-directory "internal.el"))
 
-(setq url-request-method "GET")
+;; use-package installation
+(require 'package)
 (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
                          ("melpa" . "https://melpa.org/packages/")
-;;                         ("marmalade" . "https://marmalade-repo.org/packages/")
+                         ;; ("marmalade" . "https://marmalade-repo.org/packages/")
                          ("org" . "http://orgmode.org/elpa/")
                          ("sunrise" . "http://joseito.republika.pl/sunrise-commander/")))
 
-;;(load-file internal-config) ;; init?
-;;(load-file interface-config) ;;colors
-
-(load-file (concat conf-enabled "/00init.el"))
-
-(require 'package)
 (package-initialize)
 
 (defun package-install-if-not (package)
@@ -46,7 +39,7 @@
   (diminish 'auto-revert-mode))
 
 ;; :bind keyword
-(require 'bind-key)
+(use-package bind-key)
 
 ;; :quelpa keyword
 (use-package quelpa)

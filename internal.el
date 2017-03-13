@@ -2,6 +2,8 @@
 
 ;;; Code:
 
+(add-to-list 'exec-path "~/bin/")
+
 (setq scroll-step 1)
 
 (setq inhibit-splash-screen t)
