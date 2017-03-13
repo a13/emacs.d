@@ -15,8 +15,6 @@
 (setq-default indent-tabs-mode nil)
 (setq-default c-basic-offset 4)
 
-;;; internal packages setup
-
 ;;; interface
 
 (use-package tool-bar
@@ -211,10 +209,10 @@
 
 (use-package sh-script
   :ensure nil
+  :mode (("zshecl" . sh-mode)
+         ("\\.zsh\\'" . sh-mode))
   :config
   ;; zsh
-  (add-to-list 'auto-mode-alist '("zshecl" . sh-mode))
-  (add-to-list 'auto-mode-alist '("\\.zsh\\'" . sh-mode))
   (setq system-uses-terminfo nil))
 
 

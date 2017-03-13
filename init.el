@@ -43,7 +43,6 @@
 (use-package quelpa-use-package
   :defines quelpa-use-package-inhibit-loading-quelpa)
 
-
 ;;; load internal packages w/settings
 (load-file (concat user-emacs-directory "internal.el"))
 
