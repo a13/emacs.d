@@ -2,9 +2,6 @@
 
 ;;; Code:
 
-;; load internal packages settings
-(load-file (concat user-emacs-directory "internal.el"))
-
 ;;; package system init
 (require 'package)
 (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
@@ -43,12 +40,18 @@
 
 ;; :quelpa keyword
 (use-package quelpa)
-(use-package quelpa-use-package)
+(use-package quelpa-use-package
+  :defines quelpa-use-package-inhibit-loading-quelpa)
+
+
+;;; load internal packages w/settings
+(load-file (concat user-emacs-directory "internal.el"))
 
 ;;; External packages
 
 ;; usability packages
 (use-package smex
+  :defines smex-save-file
   :config
   (setq smex-save-file "~/.cache/emacs/smex-items")
   (smex-initialize))
@@ -110,6 +113,7 @@
    ("s-p" . counsel-xmms2)))
 
 (use-package ivy-rich
+  :defines ivy-rich-abbreviate-paths ivy-rich-switch-buffer-name-max-length
   :config
   (setq ivy-rich-abbreviate-paths t)
   (setq ivy-rich-switch-buffer-name-max-length 45)
@@ -351,6 +355,7 @@
 
 (use-package point-im
   :ensure nil
+  :defines point-im-reply-id-add-plus
   :quelpa
   (point-im :repo "a13/point-im.el" :fetcher github :version original)
   :config
@@ -383,8 +388,9 @@
      "russian-computer")))
 
 
+;; load custom-file
 ;; defined in internal.el
-(when custom-file
+(when (and custom-file (file-exists-p custom-file))
   (load-file custom-file))
 
 (provide 'init)
