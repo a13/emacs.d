@@ -46,14 +46,9 @@
   (set-frame-font default-font)
   (add-to-list 'default-frame-alist `(font . ,default-font))
   (setq initial-frame-alist default-frame-alist)
+  (setq display-buffer-alist default-frame-alist)
   (set-fontset-font "fontset-default" 'cyrillic
                     (font-spec :registry "iso10646-1" :script 'cyrillic)))
-
-(use-package window
-  :ensure nil
-  :config
-  ;; daemon specific settings
-  (setq display-buffer-alist default-frame-alist))
 
 (use-package custom
   :ensure nil
