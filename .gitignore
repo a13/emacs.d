@@ -1,4 +1,5 @@
 # -*-	mode: conf; -*-
+custom.el
 elpa
 auto-save-list
 eshell
