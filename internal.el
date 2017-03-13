@@ -301,5 +301,9 @@
                 webjump-sample-sites)))
 
 
+(use-package cus-edit
+  :ensure nil
+  :config
+  (setq custom-file (concat user-emacs-directory "custom.el")))
 
 ;;;

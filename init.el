@@ -2,13 +2,10 @@
 
 ;;; Code:
 
-(eval-and-compile
-  (add-to-list 'load-path (expand-file-name "lib" user-emacs-directory)))
-
-(setq custom-file (concat user-emacs-directory "custom.el"))
+;; load internal packages settings
 (load-file (concat user-emacs-directory "internal.el"))
 
-;; use-package installation
+;;; package system init
 (require 'package)
 (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
                          ("melpa" . "https://melpa.org/packages/")
@@ -17,6 +14,9 @@
                          ("sunrise" . "http://joseito.republika.pl/sunrise-commander/")))
 
 (package-initialize)
+
+;;; use-package installation
+;; TODO: move to separate file
 
 (defun package-install-if-not (package)
   "Install PACKAGE if it's not installed yet."
@@ -45,9 +45,7 @@
 (use-package quelpa)
 (use-package quelpa-use-package)
 
-;; local packages
-;; TODO: create separate package
-(require 'root-edit)
+;;; External packages
 
 ;; usability packages
 (use-package smex
@@ -58,7 +56,7 @@
 (use-package ivy
   :diminish ivy-mode
   :config
-;;  (setq ivy-re-builders-alist '((t . ivy--regex-fuzzy)))
+  ;; (setq ivy-re-builders-alist '((t . ivy--regex-fuzzy)))
   (ivy-mode t)
   (setq ivy-count-format "%d/%d ")
   :bind
@@ -354,6 +352,16 @@
   (setq point-im-reply-id-add-plus nil)
   (add-hook 'jabber-chat-mode-hook #'point-im-mode))
 
+;; TODO
+(use-package root-edit
+  :disabled
+  :ensure nil
+  :quelpa
+  (root-edit :repo "a13/root-edit.el" :fetcher github :version original)
+  :bind
+  ("M-s C-x C-f" . find-file-as-root)
+  ("M-s C-x C-v" . find-current-as-root))
+
 (use-package eshell-toggle
   :ensure nil
   :quelpa
@@ -369,7 +377,10 @@
        "russian-unipunct"
      "russian-computer")))
 
-(load-file custom-file)
+
+;; defined in internal.el
+(when custom-file
+  (load-file custom-file))
 
 (provide 'init)
 
