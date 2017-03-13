@@ -1,4 +1,4 @@
-;;; init.el stuff
+;;; init.el
 
 ;;; Code:
 (setq
@@ -35,18 +35,35 @@
 
 (setq package-enable-at-startup nil)
 
-(require 'use-package)
+(eval-when-compile
+  (require 'use-package))
 (put 'use-package 'lisp-indent-function 1)
 (setq use-package-always-ensure t)
 
+;; :diminish keyword
+(use-package diminish
+  :config
+  (diminish 'auto-revert-mode))
+
+;; :bind keyword
+(require 'bind-key)
+
+;; :quelpa keyword
+(use-package quelpa)
+(use-package quelpa-use-package)
+
+;; local packages
+;; TODO: create separate package
 (require 'root-edit)
 
+;; usability packages
 (use-package smex
   :config
   (setq smex-save-file "~/.cache/emacs/smex-items")
   (smex-initialize))
 
 (use-package ivy
+  :diminish ivy-mode
   :config
 ;;  (setq ivy-re-builders-alist '((t . ivy--regex-fuzzy)))
   (ivy-mode t)
@@ -107,9 +124,38 @@
   (setq ivy-rich-switch-buffer-name-max-length 45)
   (ivy-set-display-transformer 'ivy-switch-buffer 'ivy-rich-switch-buffer-transformer))
 
+;; avy-based stuff
+(use-package avy
+  :config
+  (avy-setup-default)
+  :bind
+  (("C-:" . avy-goto-char)
+   ;; ("C-'" . avy-goto-char-2)
+   ("M-g M-g" . avy-goto-line)
+   ("M-g w" . avy-goto-word-1)))
+
+(use-package ace-jump-buffer
+  :bind
+  (("M-g b" . ace-jump-buffer)))
+
+(use-package ace-window
+  :config
+  (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
+  :bind
+  (("M-o" . ace-window)))
+
+(use-package ace-link
+  :config
+  (ace-link-setup-default))
+
+(use-package link-hint
+  :ensure t
+  :bind
+  (("C-c l o" . link-hint-open-link)
+   ("C-c l c" . link-hint-copy-link)))
+
+;; jabber
 (use-package jabber
-  :init
-  (setq dired-bind-jump nil)
   :config
   (setq jabber-history-enabled t
         jabber-use-global-history nil
@@ -166,9 +212,11 @@
 
 (use-package jabber-otr)
 
+;; w3m
 (use-package w3m
   :config
   (add-hook 'w3m-mode-hook 'w3m-lnum-mode)
+  (setq w3m-use-cookies t)
   (setq w3m-use-tab nil)
   (setq w3m-use-title-buffer-name t)
   (setq w3m-use-filter t)
@@ -182,50 +230,24 @@
       (apply orig-fun args)))
   (advice-add 'w3m-view-url-with-browse-url :around #'set-external-browser))
 
+(use-package w3m-cookie
+  :ensure nil
+  :config
+  (setq w3m-cookie-accept-bad-cookies 'ask)
+  (setq w3m-cookie-accept-domains '("ofm" "m.last.fm" ".last.fm")))
+
 (use-package keyfreq
   :config
   (keyfreq-mode 1)
   (keyfreq-autosave-mode 1))
 
-;; avy-based stuff
-(use-package avy
-  :config
-  (avy-setup-default)
-  :bind
-  (("C-:" . avy-goto-char)
-   ;; ("C-'" . avy-goto-char-2)
-   ("M-g M-g" . avy-goto-line)
-   ("M-g w" . avy-goto-word-1)))
-
-(use-package ace-jump-buffer
-  :bind
-  (("M-g b" . ace-jump-buffer)))
-
-
-(use-package ace-window
-  :config
-  (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
-  :bind
-  (("M-o" . ace-window)))
-
-(use-package ace-link
-  :config
-  (ace-link-setup-default))
-
-(use-package link-hint
-  :ensure t
-  :bind
-  (("C-c l o" . link-hint-open-link)
-   ("C-c l c" . link-hint-copy-link)))
-
-(use-package quelpa)
-(use-package quelpa-use-package)
-
 (use-package projectile
+  :diminish projectile-mode
   :config
   (projectile-mode))
 
 (use-package yasnippet
+  :diminish yas-minor-mode
   :config
   (yas-reload-all)
   (setq yas-prompt-functions '(yas-completing-prompt yas-ido-prompt))
@@ -247,10 +269,17 @@
 
 ;; scheme
 (use-package geiser)
+
 ;; clojure
 (use-package clojure-mode)
 (use-package clojure-snippets)
 (use-package cider)
+
+;; CL
+(use-package slime
+  :disabled
+  :config
+  (setq slime-net-coding-system 'utf-8-unix))
 
 ;; scala
 (use-package ensime
@@ -262,6 +291,7 @@
 
 ;; company-based plugins
 (use-package company
+  :diminish (company-mode . "𝍎")
   :config
   (add-hook 'after-init-hook 'global-company-mode))
 
@@ -314,6 +344,7 @@
   (add-hook 'prog-mode-hook #'rainbow-identifiers-mode))
 
 (use-package rainbow-mode
+  :diminish (rainbow-mode . "🌈")
   :config
   (add-hook 'prog-mode-hook #'rainbow-mode))
 
@@ -321,15 +352,6 @@
   :config
   (require 'spaceline-config)
   (spaceline-emacs-theme))
-
-(use-package diminish
-  :config
-  (diminish 'ivy-mode)
-  (diminish 'auto-revert-mode)
-  (diminish 'rainbow-mode "🌈")
-  (diminish 'company-mode "𝍎")
-  (diminish 'projectile-mode)
-  (diminish 'yas-minor-mode))
 
 (use-package point-im
   :ensure nil
@@ -346,7 +368,6 @@
   :bind
   (("M-`" . eshell-toggle)))
 
-
 (use-package reverse-im
   :config
   (add-to-list 'load-path "~/.xkb/contrib")
@@ -354,7 +375,6 @@
    (if (require 'unipunct nil t)
        "russian-unipunct"
      "russian-computer")))
-
 
 (load-file custom-file)
 
