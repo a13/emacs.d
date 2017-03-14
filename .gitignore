@@ -1,4 +1,5 @@
-# -*-	mode: conf; -*-	
+# -*-	mode: conf; -*-
+custom.el
 elpa
 auto-save-list
 eshell
@@ -16,7 +17,4 @@ recentf
 \#*\#
 # compiled files
 *.elc
-# custom file
-conf.d/*
-!conf.d/99custom.el
-!conf.d/enabled
+projectile-bookmarks.eld

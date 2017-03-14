@@ -1,29 +1,19 @@
-;;; init.el stuff
+;;; init.el
 
 ;;; Code:
-(setq
- conf-enabled (concat user-emacs-directory "conf.d")
- custom-file (concat conf-enabled "/99custom.el"))
 
-(eval-and-compile
-  (add-to-list 'load-path (expand-file-name "lib" user-emacs-directory)))
-
-(add-to-list 'exec-path "~/bin/")
-
-(setq url-request-method "GET")
+;;; package system init
+(require 'package)
 (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
                          ("melpa" . "https://melpa.org/packages/")
-;;                         ("marmalade" . "https://marmalade-repo.org/packages/")
+                         ;; ("marmalade" . "https://marmalade-repo.org/packages/")
                          ("org" . "http://orgmode.org/elpa/")
                          ("sunrise" . "http://joseito.republika.pl/sunrise-commander/")))
 
-;;(load-file internal-config) ;; init?
-;;(load-file interface-config) ;;colors
-
-(load-file (concat conf-enabled "/00init.el"))
-
-(require 'package)
 (package-initialize)
+
+;;; use-package installation
+;; TODO: move to separate file
 
 (defun package-install-if-not (package)
   "Install PACKAGE if it's not installed yet."
@@ -35,20 +25,40 @@
 
 (setq package-enable-at-startup nil)
 
-(require 'use-package)
+(eval-when-compile
+  (require 'use-package))
 (put 'use-package 'lisp-indent-function 1)
 (setq use-package-always-ensure t)
 
-(require 'root-edit)
+;; :diminish keyword
+(use-package diminish
+  :config
+  (diminish 'auto-revert-mode))
 
+;; :bind keyword
+(use-package bind-key)
+
+;; :quelpa keyword
+(use-package quelpa)
+(use-package quelpa-use-package
+  :defines quelpa-use-package-inhibit-loading-quelpa)
+
+;;; load internal packages w/settings
+(load-file (concat user-emacs-directory "internal.el"))
+
+;;; External packages
+
+;; usability packages
 (use-package smex
+  :defines smex-save-file
   :config
   (setq smex-save-file "~/.cache/emacs/smex-items")
   (smex-initialize))
 
 (use-package ivy
+  :diminish ivy-mode
   :config
-;;  (setq ivy-re-builders-alist '((t . ivy--regex-fuzzy)))
+  ;; (setq ivy-re-builders-alist '((t . ivy--regex-fuzzy)))
   (ivy-mode t)
   (setq ivy-count-format "%d/%d ")
   :bind
@@ -102,14 +112,44 @@
    ("s-p" . counsel-xmms2)))
 
 (use-package ivy-rich
+  :defines ivy-rich-abbreviate-paths ivy-rich-switch-buffer-name-max-length
   :config
   (setq ivy-rich-abbreviate-paths t)
   (setq ivy-rich-switch-buffer-name-max-length 45)
   (ivy-set-display-transformer 'ivy-switch-buffer 'ivy-rich-switch-buffer-transformer))
 
+;; avy-based stuff
+(use-package avy
+  :config
+  (avy-setup-default)
+  :bind
+  (("C-:" . avy-goto-char)
+   ;; ("C-'" . avy-goto-char-2)
+   ("M-g M-g" . avy-goto-line)
+   ("M-g w" . avy-goto-word-1)))
+
+(use-package ace-jump-buffer
+  :bind
+  (("M-g b" . ace-jump-buffer)))
+
+(use-package ace-window
+  :config
+  (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
+  :bind
+  (("M-o" . ace-window)))
+
+(use-package ace-link
+  :config
+  (ace-link-setup-default))
+
+(use-package link-hint
+  :ensure t
+  :bind
+  (("C-c l o" . link-hint-open-link)
+   ("C-c l c" . link-hint-copy-link)))
+
+;; jabber
 (use-package jabber
-  :init
-  (setq dired-bind-jump nil)
   :config
   (setq jabber-history-enabled t
         jabber-use-global-history nil
@@ -166,9 +206,11 @@
 
 (use-package jabber-otr)
 
+;; w3m
 (use-package w3m
   :config
   (add-hook 'w3m-mode-hook 'w3m-lnum-mode)
+  (setq w3m-use-cookies t)
   (setq w3m-use-tab nil)
   (setq w3m-use-title-buffer-name t)
   (setq w3m-use-filter t)
@@ -182,50 +224,24 @@
       (apply orig-fun args)))
   (advice-add 'w3m-view-url-with-browse-url :around #'set-external-browser))
 
+(use-package w3m-cookie
+  :ensure nil
+  :config
+  (setq w3m-cookie-accept-bad-cookies 'ask)
+  (setq w3m-cookie-accept-domains '("ofm" "m.last.fm" ".last.fm")))
+
 (use-package keyfreq
   :config
   (keyfreq-mode 1)
   (keyfreq-autosave-mode 1))
 
-;; avy-based stuff
-(use-package avy
-  :config
-  (avy-setup-default)
-  :bind
-  (("C-:" . avy-goto-char)
-   ;; ("C-'" . avy-goto-char-2)
-   ("M-g M-g" . avy-goto-line)
-   ("M-g w" . avy-goto-word-1)))
-
-(use-package ace-jump-buffer
-  :bind
-  (("M-g b" . ace-jump-buffer)))
-
-
-(use-package ace-window
-  :config
-  (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
-  :bind
-  (("M-o" . ace-window)))
-
-(use-package ace-link
-  :config
-  (ace-link-setup-default))
-
-(use-package link-hint
-  :ensure t
-  :bind
-  (("C-c l o" . link-hint-open-link)
-   ("C-c l c" . link-hint-copy-link)))
-
-(use-package quelpa)
-(use-package quelpa-use-package)
-
 (use-package projectile
+  :diminish projectile-mode
   :config
   (projectile-mode))
 
 (use-package yasnippet
+  :diminish yas-minor-mode
   :config
   (yas-reload-all)
   (setq yas-prompt-functions '(yas-completing-prompt yas-ido-prompt))
@@ -247,10 +263,22 @@
 
 ;; scheme
 (use-package geiser)
+
 ;; clojure
 (use-package clojure-mode)
 (use-package clojure-snippets)
 (use-package cider)
+
+;; CL
+(use-package slime
+  :disabled
+  :config
+  (setq inferior-lisp-program "/usr/bin/sbcl"
+        lisp-indent-function 'common-lisp-indent-function
+        slime-complete-symbol-function 'slime-fuzzy-complete-symbol
+        slime-startup-animation nil)
+  (slime-setup '(slime-fancy))
+  (setq slime-net-coding-system 'utf-8-unix))
 
 ;; scala
 (use-package ensime
@@ -262,6 +290,7 @@
 
 ;; company-based plugins
 (use-package company
+  :diminish (company-mode . "𝍎")
   :config
   (add-hook 'after-init-hook 'global-company-mode))
 
@@ -319,6 +348,7 @@
   (add-hook 'prog-mode-hook #'rainbow-identifiers-mode))
 
 (use-package rainbow-mode
+  :diminish (rainbow-mode . "🌈")
   :config
   (add-hook 'prog-mode-hook #'rainbow-mode))
 
@@ -327,45 +357,43 @@
   (require 'spaceline-config)
   (spaceline-emacs-theme))
 
-;; (use-package dim
+;; (use-package diminish
 ;;   :config
-;;   (dim-major-names
-;;    '((emacs-lisp-mode           "EL")
-;;      (inferior-emacs-lisp-mode  "EL>")
-;;      (help-mode "🄷")
-;;      (calendar-mode             "📆")))
-;;   (dim-minor-names
-;;    '((visual-line-mode   " ↩")
-;;      (auto-fill-function " ↵")
-;;      (eldoc-mode         ""    eldoc)
-;;      (whitespace-mode    " _"  whitespace)
-;;      (paredit-mode       " ()" paredit))))
-
-(use-package diminish
-  :config
-  (diminish 'visual-line-mode   " ↩")
-  (diminish 'auto-fill-function " ↵")
-  (diminish 'ivy-mode)
-  (diminish 'auto-revert-mode)
-  (diminish 'rainbow-mode "🌈")
-  (diminish 'company-mode "𝍎")
-  (diminish 'projectile-mode)
-  (diminish 'company-mode)
-  (diminish 'nameless-mode ":")
-  (diminish 'flycheck-mode "☑")
-  (diminish 'yas-minor-mode))
+;;   (diminish 'visual-line-mode   " ↩")
+;;   (diminish 'auto-fill-function " ↵")
+;;   (diminish 'ivy-mode)
+;;   (diminish 'auto-revert-mode)
+;;   (diminish 'rainbow-mode "🌈")
+;;   (diminish 'company-mode "𝍎")
+;;   (diminish 'projectile-mode)
+;;   (diminish 'company-mode)
+;;   (diminish 'nameless-mode ":")
+;;   (diminish 'flycheck-mode "☑")
+;;   (diminish 'yas-minor-mode))
 
 (use-package fancy-battery
   :config
   (add-hook 'after-init-hook #'fancy-battery-mode))
 
+
 (use-package point-im
   :ensure nil
+  :defines point-im-reply-id-add-plus
   :quelpa
   (point-im :repo "a13/point-im.el" :fetcher github :version original)
   :config
   (setq point-im-reply-id-add-plus nil)
   (add-hook 'jabber-chat-mode-hook #'point-im-mode))
+
+;; TODO
+(use-package root-edit
+  :disabled
+  :ensure nil
+  :quelpa
+  (root-edit :repo "a13/root-edit.el" :fetcher github :version original)
+  :bind
+  ("M-s C-x C-f" . find-file-as-root)
+  ("M-s C-x C-v" . find-current-as-root))
 
 (use-package eshell-toggle
   :ensure nil
@@ -373,7 +401,6 @@
   (eshell-toggle :repo "4DA/eshell-toggle" :fetcher github :version original)
   :bind
   (("M-`" . eshell-toggle)))
-
 
 (use-package reverse-im
   :config
@@ -384,7 +411,10 @@
      "russian-computer")))
 
 
-(load-file custom-file)
+;; load custom-file
+;; defined in internal.el
+(when (and custom-file (file-exists-p custom-file))
+  (load-file custom-file))
 
 (provide 'init)
 
