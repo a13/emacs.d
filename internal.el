@@ -147,6 +147,10 @@
    ("C-x C-k" . kill-region)
    ("C-h" . delete-backward-char)))
 
+(use-package smerge-mode
+  :ensure nil
+  :diminish smerge-mode)
+
 (use-package autorevert
   :ensure nil
   :diminish auto-revert-mode)

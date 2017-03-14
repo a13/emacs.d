@@ -31,9 +31,7 @@
 (setq use-package-always-ensure t)
 
 ;; :diminish keyword
-(use-package diminish
-  :config
-  (diminish 'auto-revert-mode))
+(use-package diminish)
 
 ;; :bind keyword
 (use-package bind-key)
