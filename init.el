@@ -83,7 +83,7 @@
                       (not (ignore-errors
                              (file-remote-p (buffer-file-name))))
                       (not (string-match
-                            counsel-Compressed-file-regex
+                            counsel-compressed-file-regex
                             (buffer-file-name))))))
       (if big
           (if local
@@ -356,20 +356,6 @@
   :config
   (require 'spaceline-config)
   (spaceline-emacs-theme))
-
-;; (use-package diminish
-;;   :config
-;;   (diminish 'visual-line-mode   " ↩")
-;;   (diminish 'auto-fill-function " ↵")
-;;   (diminish 'ivy-mode)
-;;   (diminish 'auto-revert-mode)
-;;   (diminish 'rainbow-mode "🌈")
-;;   (diminish 'company-mode "𝍎")
-;;   (diminish 'projectile-mode)
-;;   (diminish 'company-mode)
-;;   (diminish 'nameless-mode ":")
-;;   (diminish 'flycheck-mode "☑")
-;;   (diminish 'yas-minor-mode))
 
 (use-package fancy-battery
   :config

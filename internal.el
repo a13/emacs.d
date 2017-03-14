@@ -135,6 +135,9 @@
 
 (use-package simple
   :ensure nil
+  :diminish
+  ((visual-line-mode . " ↩")
+   (auto-fill-function . " ↵"))
   :config
   (column-number-mode t)
   (toggle-truncate-lines 1)
@@ -143,6 +146,11 @@
   (("C-w" . backward-kill-word)
    ("C-x C-k" . kill-region)
    ("C-h" . delete-backward-char)))
+
+(use-package autorevert
+  :ensure nil
+  :diminish auto-revert-mode)
+
 
 (use-package isearch
   :ensure nil
