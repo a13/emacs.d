@@ -34,10 +34,21 @@
   :bind
   (([f9] . menu-bar-mode)))
 
+(use-package time
+  :ensure nil
+  :config
+  (setq display-time-default-load-average nil)
+  (setq display-time-24hr-format t)
+  (display-time-mode t))
+
+
 ;;; fonts & colors
 
 (use-package frame
   :ensure nil
+  ;; disable suspending on C-z
+  :bind
+  (("C-z" . nil))
   :init
   (defvar default-font "Consolas-10")
   :config
