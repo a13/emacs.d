@@ -48,6 +48,85 @@
 
 ;;; External packages
 
+;; EXWM
+
+(use-package exwm
+  :disabled
+  :config
+  (defun exwm-config--rename-buffer ()
+    (exwm-workspace-rename-buffer
+     (if exwm-title
+         (if (<= (length exwm-title) 55) exwm-title
+           (concat (substring exwm-title 0 54) "…"))
+       exwm-class-name)))
+
+  (setq exwm-workspace-show-all-buffers t)
+  (setq exwm-workspace-number 6)
+  (add-hook 'exwm-update-class-hook 'exwm-config--rename-buffer)
+  (add-hook 'exwm-update-title-hook 'exwm-config--rename-buffer)
+
+  (exwm-input-set-key (kbd "s-d") #'exwm-reset)
+  ;; TODO: use avy
+  (exwm-input-set-key (kbd "s-w") #'exwm-workspace-switch)
+  ;; 's-N': Switch to certain workspace
+  (dotimes (i 10)
+    (exwm-input-set-key (kbd (format "s-%d" i))
+                        `(lambda ()
+                           (interactive)
+                           (exwm-workspace-switch-create ,i))))
+  ;; 's-r': Launch application
+  (exwm-input-set-key (kbd "s-r")
+                      (lambda (command)
+                        (interactive (list (read-shell-command "$ ")))
+                        (start-process-shell-command command nil command)))
+  ;; s-R: Launch gui app.
+  ;; TODO: use prefix argument to choose/hotkey to choose between launchers
+  (exwm-input-set-key (kbd "s-R") #'counsel-linux-app)
+  ;; Line-editing shortcuts
+  (exwm-input-set-simulation-keys
+   `(([?\C-b] . left)
+     ([?\C-f] . right)
+     ([?\C-p] . up)
+     ([?\C-n] . down)
+     ([?\C-a] . home)
+     ([?\C-e] . end)
+     ([?\M-v] . prior)
+     ([?\C-v] . next)
+     ([?\C-d] . delete)
+     ([?\M-b] . C-left)
+     ([?\M-f] . C-right)
+     ([?\M-{] . C-up)
+     ([?\M-}] . C-down)
+     ;; Move cursor to top/bottom of entry field
+     ;; ([???] . C-home
+     ;; ([???] . C-end
+     ;; undo
+     ([\?C-_] . C-z)
+     ([?\M-d] . (S-C-right delete))
+     ([?\C-k] . (S-end delete))
+     ([?\C-h] . backspace)
+     ([?\C-w] . C-backspace)
+     ([?\C-g] . escape)
+     ([?\C-s] . ?\C-f)
+     ([?\M-w] . ?\C-c)
+     ([?\C-y] . ?\C-v)))
+
+  (add-hook 'exwm-manage-finish-hook
+          (lambda ()
+            (when (and exwm-class-name
+                       (string= exwm-class-name "Conkeror"))
+              (exwm-input-set-local-simulation-keys nil))))
+
+  (exwm-enable))
+
+(use-package exwm-systemtray
+  :disabled
+  :ensure nil
+  :config
+  (setq exwm-systemtray-icon-gap 1)
+  (setq exwm-systemtray-height 28)
+  (exwm-systemtray-enable))
+
 ;; usability packages
 (use-package smex
   :defines smex-save-file
@@ -171,6 +250,22 @@
 
   (ad-activate 'jabber-connect-all)
 
+  (defun jabber-chat-html-body (xml-data who mode)
+    "Render HTML content in jabber buffer."
+    (if (string-equal "html" (nth 2 (assq 'message_format (cdr (assq 'x (cdr xml-data))))))
+        (if (eq mode :printp)
+            t
+          (let ((parsed (with-temp-buffer
+                          (insert (nth 1 (cdr (assq 'body (cdr xml-data)))))
+                          (libxml-parse-html-region (point-min) (point-max)))))
+            (shr-insert-document parsed)
+            t))
+      nil))
+
+  (add-to-list 'jabber-body-printers 'jabber-print-html-body)
+  (jabber-disco-advertise-feature "http://jabber.org/protocol/xhtml-im")
+  ;; (setq jabber-debug-log-xml t)
+
   ;; customized
   (custom-set-variables
    '(jabber-auto-reconnect t)
@@ -244,7 +339,7 @@
   :diminish yas-minor-mode
   :config
   (yas-reload-all)
-  (setq yas-prompt-functions '(yas-completing-prompt yas-ido-prompt))
+  (setq yas-prompt-functions '(yas-completing-prompt))
   (add-hook 'prog-mode-hook #'yas-minor-mode))
 
 (use-package flycheck
@@ -328,9 +423,10 @@
 
 (use-package conkeror-minor-mode
   :config
-  (add-hook 'js-mode-hook (lambda ()
-                          (when (string-match "conkeror" (buffer-file-name))
-                            (conkeror-minor-mode 1)))))
+  (add-hook 'js-mode-hook
+            (lambda ()
+              (when (string-match "conkeror" (buffer-file-name))
+                (conkeror-minor-mode 1)))))
 
 ;; interface
 
@@ -351,6 +447,8 @@
   :config
   (require 'spaceline-config)
   (spaceline-emacs-theme))
+
+;;; quelpa packages
 
 (use-package point-im
   :ensure nil
