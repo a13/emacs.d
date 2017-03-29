@@ -32,7 +32,7 @@
   :config
   (menu-bar-mode -1)
   :bind
-  (([f9] . menu-bar-mode)))
+  (([S-f10] . menu-bar-mode)))
 
 (use-package time
   :ensure nil
