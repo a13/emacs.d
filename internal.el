@@ -161,6 +161,11 @@
   (:map isearch-mode-map
         ("C-h" . isearch-delete-char)))
 
+(use-package delsel
+  :ensure nil
+  :bind
+  (("C-c C-g" . minibuffer-keyboard-quit)))
+
 
 ;;; tramp
 
