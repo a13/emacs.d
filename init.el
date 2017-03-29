@@ -31,9 +31,7 @@
 (setq use-package-always-ensure t)
 
 ;; :diminish keyword
-(use-package diminish
-  :config
-  (diminish 'auto-revert-mode))
+(use-package diminish)
 
 ;; :bind keyword
 (use-package bind-key)
@@ -294,6 +292,11 @@
   :config
   (add-hook 'after-init-hook 'global-company-mode))
 
+(use-package company-quickhelp
+  :config
+  (company-quickhelp-mode 1)
+  (setq company-quickhelp-delay 3))
+
 (use-package company-shell
   :config
   (add-to-list 'company-backends 'company-shell))
@@ -351,6 +354,11 @@
   :config
   (require 'spaceline-config)
   (spaceline-emacs-theme))
+
+(use-package fancy-battery
+  :config
+  (add-hook 'after-init-hook #'fancy-battery-mode))
+
 
 (use-package point-im
   :ensure nil
