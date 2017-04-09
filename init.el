@@ -7,7 +7,7 @@
 (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
                          ("melpa" . "https://melpa.org/packages/")
                          ;; ("marmalade" . "https://marmalade-repo.org/packages/")
-                         ("org" . "http://orgmode.org/elpa/")
+                         ;; ("org" . "http://orgmode.org/elpa/")
                          ("sunrise" . "http://joseito.republika.pl/sunrise-commander/")))
 
 (package-initialize)
@@ -320,6 +320,14 @@
                 (ibuffer-do-sort-by-alphabetic)))))
 
 (use-package magit)
+
+(use-package org-password-manager
+  :config
+  (add-hook 'org-mode-hook 'org-password-manager-key-bindings))
+
+(use-package org-jira
+  :config
+  (setq jiralib-url "http://jira:8080"))
 
 (use-package diff-hl
   :config
