@@ -265,7 +265,11 @@
 ;; clojure
 (use-package clojure-mode)
 (use-package clojure-snippets)
-(use-package cider)
+(use-package cider
+  :init
+  ;; sadly, we can't use diminish here
+  (setq cider-mode-line
+        '(:eval (format " 🍏[%s]" (cider--modeline-info)))))
 
 ;; CL
 (use-package slime
@@ -353,11 +357,17 @@
 (use-package spaceline
   :config
   (require 'spaceline-config)
-  (spaceline-emacs-theme))
+  (spaceline-spacemacs-theme))
 
 (use-package fancy-battery
   :config
   (add-hook 'after-init-hook #'fancy-battery-mode))
+
+(use-package mu4e-alert
+  :init
+  (mu4e-alert-set-default-style 'notifications)
+  (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display)
+  (add-hook 'after-init-hook #'mu4e-alert-enable-notifications))
 
 
 (use-package point-im
