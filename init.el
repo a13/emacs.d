@@ -364,10 +364,18 @@
   (add-hook 'after-init-hook #'fancy-battery-mode))
 
 (use-package mu4e-alert
+  :after mu4e
   :init
   (mu4e-alert-set-default-style 'notifications)
   (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display)
   (add-hook 'after-init-hook #'mu4e-alert-enable-notifications))
+
+(use-package mu4e-maildirs-extension
+  :after mu4e
+  :init
+  (mu4e-maildirs-extension)
+  ;; don't draw a newline
+  (setq mu4e-maildirs-extension-before-insert-maildir-hook '()))
 
 
 (use-package point-im
