@@ -38,8 +38,7 @@
 
 ;; :quelpa keyword
 (use-package quelpa)
-(use-package quelpa-use-package
-  :defines quelpa-use-package-inhibit-loading-quelpa)
+(use-package quelpa-use-package)
 
 ;;; load internal packages w/settings
 (load-file (concat user-emacs-directory "internal.el"))
@@ -63,9 +62,9 @@
   (("C-c C-r" . ivy-resume)))
 
 (use-package counsel
-  :config
   :bind
-  (("M-x" . counsel-M-x)))
+  (("M-x" . counsel-M-x)
+   ("C-x 8 RET" . counsel-unicode-char)))
 
 (use-package swiper)
 
@@ -176,8 +175,7 @@
 (use-package w3m-cookie
   :ensure nil
   :config
-  (setq w3m-cookie-accept-bad-cookies 'ask)
-  (setq w3m-cookie-accept-domains '("ofm" "m.last.fm" ".last.fm")))
+  (setq w3m-cookie-accept-bad-cookies t))
 
 (use-package keyfreq
   :config
@@ -215,12 +213,15 @@
 
 ;; clojure
 (use-package clojure-mode)
+(use-package clojure-mode-extra-font-locking)
 (use-package clojure-snippets)
 (use-package cider
   :init
   ;; sadly, we can't use diminish here
   (setq cider-mode-line
         '(:eval (format " 🍏[%s]" (cider--modeline-info)))))
+
+(use-package kibit-helper)
 
 ;; CL
 (use-package slime
@@ -326,9 +327,11 @@
   :defines mu4e-maildirs-extension-before-insert-maildir-hook
   :init
   (mu4e-maildirs-extension)
+  :config
   ;; don't draw a newline
   (setq mu4e-maildirs-extension-before-insert-maildir-hook '()))
 
+(use-package clipmon)
 
 (use-package point-im
   :ensure nil

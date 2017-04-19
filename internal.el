@@ -327,9 +327,6 @@
   :config
   (setq custom-file (concat user-emacs-directory "custom.el")))
 
-(use-package mu4e
-  :ensure nil)
-
 (use-package mu4e-vars
   :load-path "/usr/share/emacs/site-lisp/mu4e"
   :ensure nil
@@ -361,7 +358,7 @@
   ;;set up queue for offline email
   ;;use mu mkdir  ~/Maildir/queue to set up first
   (setq smtpmail-queue-mail nil  ;; start in normal mode
-        smtpmail-queue-dir   "~/Maildir/queue/cur"))
+        smtpmail-queue-dir "~/Maildir/queue/cur"))
 
 
 ;;;
