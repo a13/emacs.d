@@ -327,16 +327,16 @@
   :config
   (setq custom-file (concat user-emacs-directory "custom.el")))
 
-(use-package mu4e
+(use-package mu4e-vars
+  :load-path "/usr/share/emacs/site-lisp/mu4e"
   :ensure nil
-  :init
+  :config
   ;;location of my maildir
   ;; enable inline images
   (setq mu4e-view-show-images t)
   ;; use imagemagick, if available
   (when (fboundp 'imagemagick-register-types)
     (imagemagick-register-types))
-
 
   (setq mu4e-maildir (expand-file-name "~/.mail/work"))
   ;; ivy does all the work
@@ -350,15 +350,15 @@
 
   ;;rename files when moving
   ;;NEEDED FOR MBSYNC
-  (setq mu4e-change-filenames-when-moving t)
+  (setq mu4e-change-filenames-when-moving t))
 
+(use-package smtpmail
+  :ensure nil
+  :config
   ;;set up queue for offline email
   ;;use mu mkdir  ~/Maildir/queue to set up first
   (setq smtpmail-queue-mail nil  ;; start in normal mode
-        smtpmail-queue-dir   "~/Maildir/queue/cur"))
-
-
-
+        smtpmail-queue-dir "~/Maildir/queue/cur"))
 
 
 ;;;

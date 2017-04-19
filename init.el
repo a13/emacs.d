@@ -38,8 +38,7 @@
 
 ;; :quelpa keyword
 (use-package quelpa)
-(use-package quelpa-use-package
-  :defines quelpa-use-package-inhibit-loading-quelpa)
+(use-package quelpa-use-package)
 
 ;;; load internal packages w/settings
 (load-file (concat user-emacs-directory "internal.el"))
@@ -63,51 +62,19 @@
   (("C-c C-r" . ivy-resume)))
 
 (use-package counsel
-  :config
   :bind
-  (("M-x" . counsel-M-x)))
+  (("M-x" . counsel-M-x)
+   ("C-x 8 RET" . counsel-unicode-char)))
 
-(use-package swiper
-  :config
-  (defun counsel-grep-or-isearch-or-swiper ()
-    "Call `swiper' for small buffers and `counsel-grep'/`isearch-forward' for large ones."
-    (interactive)
-    (let ((big (> (buffer-size)
-                  (if (eq major-mode 'org-mode)
-                      (/ counsel-grep-swiper-limit 4)
-                    counsel-grep-swiper-limit)))
-          (local (and (buffer-file-name)
-                      (not (buffer-narrowed-p))
-                      (not (ignore-errors
-                             (file-remote-p (buffer-file-name))))
-                      (not (string-match
-                            counsel-compressed-file-regex
-                            (buffer-file-name))))))
-      (if big
-          (if local
-              (progn
-                (save-buffer)
-                (counsel-grep))
-            (call-interactively #'isearch-forward))
-        (swiper--ivy (swiper--candidates)))))
+(use-package swiper)
 
-  (defun counsel-xmms2 ()
-    "Jump to \"xmms2\" track."
-    (interactive)
-    (let ((cands
-           (split-string
-            (shell-command-to-string "xmms2 list") "\n" t)))
-      (ivy-read "xmms2: " cands
-                :action (lambda (x)
-                          (string-match "^\s*\\(->\\)?\\[\\([0-9]+\\)/[0-9]+\\]\s+\\w+" x)
-                          (let ((n (match-string 2 x)))
-                            (call-process-shell-command
-                             (format "xmms2 jump %s" n))
-                            (message x)))
-                :caller 'counsel-xmms2)))
+(use-package counsel-extras
+  :ensure nil
+  :quelpa
+  (counsel-extras :repo "a13/counsel-extras" :fetcher github :version original)
   :bind
-  (("C-s" . counsel-grep-or-isearch-or-swiper)
-   ("s-p" . counsel-xmms2)))
+  (("C-s" . counsel-extras-grep-or-isearch-or-swiper)
+   ("s-p" . counsel-extras-xmms2-jump)))
 
 (use-package ivy-rich
   :defines ivy-rich-abbreviate-paths ivy-rich-switch-buffer-name-max-length
@@ -173,7 +140,6 @@
   (custom-set-variables
    '(jabber-auto-reconnect t)
    '(jabber-chat-buffer-format "*-jc-%n-*")
-   '(jabber-default-status "")
    '(jabber-groupchat-buffer-format "*-jg-%n-*")
    '(jabber-chat-foreign-prompt-format "▼ [%t] %n> ")
    '(jabber-chat-local-prompt-format "▲ [%t] %n> ")
@@ -187,20 +153,7 @@
    '(jabber-roster-show-title nil)
    '(jabber-roster-sort-functions (quote (jabber-roster-sort-by-status jabber-roster-sort-by-displayname jabber-roster-sort-by-group)))
    '(jabber-show-offline-contacts nil)
-   '(jabber-show-resources nil))
-
-  (custom-set-faces
-   '(jabber-chat-prompt-foreign ((t (:foreground "#8ac6f2" :weight bold))))
-   '(jabber-chat-prompt-local ((t (:foreground "#95e454" :weight bold))))
-   '(jabber-chat-prompt-system ((t (:foreground "darkgreen" :weight bold))))
-   '(jabber-rare-time-face ((t (:inherit erc-timestamp-face))))
-   '(jabber-roster-user-away ((t (:foreground "LightSteelBlue3" :slant italic :weight normal))))
-   '(jabber-roster-user-error ((t (:foreground "firebrick3" :slant italic :weight light))))
-   '(jabber-roster-user-online ((t (:foreground "gray  78" :slant normal :weight bold))))
-   '(jabber-roster-user-xa ((((background dark)) (:foreground "DodgerBlue3" :slant italic :weight normal))))
-   '(jabber-title-large ((t (:inherit variable-pitch :weight bold :height 2.0 :width ultra-expanded))))
-   '(jabber-title-medium ((t (:inherit variable-pitch :foreground "#E8E8E8" :weight bold :height 1.2 :width expanded))))
-   '(jabber-title-small ((t (:inherit variable-pitch :foreground "#adc4e3" :weight bold :height 0.7 :width semi-expanded))))))
+   '(jabber-show-resources nil)))
 
 (use-package jabber-otr)
 
@@ -208,11 +161,8 @@
 (use-package w3m
   :config
   (add-hook 'w3m-mode-hook 'w3m-lnum-mode)
-  (setq w3m-use-cookies t)
   (setq w3m-use-tab nil)
   (setq w3m-use-title-buffer-name t)
-  (setq w3m-use-filter t)
-  (setq w3m-enable-google-feeling-lucky t)
   (setq w3m-use-header-line-title t)
   (defun set-external-browser (orig-fun &rest args)
     (let ((browse-url-browser-function
@@ -225,8 +175,7 @@
 (use-package w3m-cookie
   :ensure nil
   :config
-  (setq w3m-cookie-accept-bad-cookies 'ask)
-  (setq w3m-cookie-accept-domains '("ofm" "m.last.fm" ".last.fm")))
+  (setq w3m-cookie-accept-bad-cookies t))
 
 (use-package keyfreq
   :config
@@ -264,12 +213,15 @@
 
 ;; clojure
 (use-package clojure-mode)
+(use-package clojure-mode-extra-font-locking)
 (use-package clojure-snippets)
 (use-package cider
   :init
   ;; sadly, we can't use diminish here
   (setq cider-mode-line
         '(:eval (format " 🍏[%s]" (cider--modeline-info)))))
+
+(use-package kibit-helper)
 
 ;; CL
 (use-package slime
@@ -344,8 +296,8 @@
 (use-package conkeror-minor-mode
   :config
   (add-hook 'js-mode-hook (lambda ()
-                          (when (string-match "conkeror" (buffer-file-name))
-                            (conkeror-minor-mode 1)))))
+                            (when (string-match "conkeror" (buffer-file-name))
+                              (conkeror-minor-mode 1)))))
 
 ;; interface
 
@@ -372,11 +324,22 @@
   (add-hook 'after-init-hook #'fancy-battery-mode))
 
 (use-package mu4e-alert
+  :after mu4e
   :init
   (mu4e-alert-set-default-style 'notifications)
   (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display)
   (add-hook 'after-init-hook #'mu4e-alert-enable-notifications))
 
+(use-package mu4e-maildirs-extension
+  :after mu4e
+  :defines mu4e-maildirs-extension-before-insert-maildir-hook
+  :init
+  (mu4e-maildirs-extension)
+  :config
+  ;; don't draw a newline
+  (setq mu4e-maildirs-extension-before-insert-maildir-hook '()))
+
+(use-package clipmon)
 
 (use-package point-im
   :ensure nil
