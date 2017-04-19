@@ -183,8 +183,12 @@
   (keyfreq-autosave-mode 1))
 
 (use-package projectile
-  :diminish projectile-mode
+  ;;  :diminish projectile-mode
   :config
+  (diminish 'projectile-mode '(:eval
+                               (let ((ppn (projectile-project-name)))
+                                 (unless (string= ppn "-")
+                                   (format " 📂%s" ppn)))))
   (projectile-mode))
 
 (use-package yasnippet
@@ -195,7 +199,7 @@
   (add-hook 'prog-mode-hook #'yas-minor-mode))
 
 (use-package flycheck
-  :diminish "🗸"
+  :diminish flycheck-mode
   :config
   (add-hook 'prog-mode-hook #'flycheck-mode))
 
@@ -217,9 +221,9 @@
 (use-package clojure-snippets)
 (use-package cider
   :init
-  ;; sadly, we can't use diminish here
-  (setq cider-mode-line
-        '(:eval (format " 🍏[%s]" (cider--modeline-info)))))
+  ;; sadly, we can't use :diminish keyword here, yet
+  (diminish 'cider-mode
+            '(:eval (format " 🍏%s" (cider--modeline-info)))))
 
 (use-package kibit-helper)
 
@@ -310,7 +314,7 @@
   (add-hook 'prog-mode-hook #'rainbow-identifiers-mode))
 
 (use-package rainbow-mode
-  :diminish (rainbow-mode . "🌈")
+  :diminish rainbow-mode
   :config
   (add-hook 'prog-mode-hook #'rainbow-mode))
 
