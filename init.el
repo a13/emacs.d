@@ -141,7 +141,6 @@
   (custom-set-variables
    '(jabber-auto-reconnect t)
    '(jabber-chat-buffer-format "*-jc-%n-*")
-   '(jabber-default-status "")
    '(jabber-groupchat-buffer-format "*-jg-%n-*")
    '(jabber-chat-foreign-prompt-format "▼ [%t] %n> ")
    '(jabber-chat-local-prompt-format "▲ [%t] %n> ")
@@ -155,20 +154,7 @@
    '(jabber-roster-show-title nil)
    '(jabber-roster-sort-functions (quote (jabber-roster-sort-by-status jabber-roster-sort-by-displayname jabber-roster-sort-by-group)))
    '(jabber-show-offline-contacts nil)
-   '(jabber-show-resources nil))
-
-  (custom-set-faces
-   '(jabber-chat-prompt-foreign ((t (:foreground "#8ac6f2" :weight bold))))
-   '(jabber-chat-prompt-local ((t (:foreground "#95e454" :weight bold))))
-   '(jabber-chat-prompt-system ((t (:foreground "darkgreen" :weight bold))))
-   '(jabber-rare-time-face ((t (:inherit erc-timestamp-face))))
-   '(jabber-roster-user-away ((t (:foreground "LightSteelBlue3" :slant italic :weight normal))))
-   '(jabber-roster-user-error ((t (:foreground "firebrick3" :slant italic :weight light))))
-   '(jabber-roster-user-online ((t (:foreground "gray  78" :slant normal :weight bold))))
-   '(jabber-roster-user-xa ((((background dark)) (:foreground "DodgerBlue3" :slant italic :weight normal))))
-   '(jabber-title-large ((t (:inherit variable-pitch :weight bold :height 2.0 :width ultra-expanded))))
-   '(jabber-title-medium ((t (:inherit variable-pitch :foreground "#E8E8E8" :weight bold :height 1.2 :width expanded))))
-   '(jabber-title-small ((t (:inherit variable-pitch :foreground "#adc4e3" :weight bold :height 0.7 :width semi-expanded))))))
+   '(jabber-show-resources nil)))
 
 (use-package jabber-otr)
 
@@ -176,11 +162,8 @@
 (use-package w3m
   :config
   (add-hook 'w3m-mode-hook 'w3m-lnum-mode)
-  (setq w3m-use-cookies t)
   (setq w3m-use-tab nil)
   (setq w3m-use-title-buffer-name t)
-  (setq w3m-use-filter t)
-  (setq w3m-enable-google-feeling-lucky t)
   (setq w3m-use-header-line-title t)
   (defun set-external-browser (orig-fun &rest args)
     (let ((browse-url-browser-function
@@ -304,8 +287,8 @@
 (use-package conkeror-minor-mode
   :config
   (add-hook 'js-mode-hook (lambda ()
-                          (when (string-match "conkeror" (buffer-file-name))
-                            (conkeror-minor-mode 1)))))
+                            (when (string-match "conkeror" (buffer-file-name))
+                              (conkeror-minor-mode 1)))))
 
 ;; interface
 
@@ -340,6 +323,7 @@
 
 (use-package mu4e-maildirs-extension
   :after mu4e
+  :defines mu4e-maildirs-extension-before-insert-maildir-hook
   :init
   (mu4e-maildirs-extension)
   ;; don't draw a newline
