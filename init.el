@@ -67,47 +67,15 @@
   :bind
   (("M-x" . counsel-M-x)))
 
-(use-package swiper
-  :config
-  (defun counsel-grep-or-isearch-or-swiper ()
-    "Call `swiper' for small buffers and `counsel-grep'/`isearch-forward' for large ones."
-    (interactive)
-    (let ((big (> (buffer-size)
-                  (if (eq major-mode 'org-mode)
-                      (/ counsel-grep-swiper-limit 4)
-                    counsel-grep-swiper-limit)))
-          (local (and (buffer-file-name)
-                      (not (buffer-narrowed-p))
-                      (not (ignore-errors
-                             (file-remote-p (buffer-file-name))))
-                      (not (string-match
-                            counsel-compressed-file-regex
-                            (buffer-file-name))))))
-      (if big
-          (if local
-              (progn
-                (save-buffer)
-                (counsel-grep))
-            (call-interactively #'isearch-forward))
-        (swiper--ivy (swiper--candidates)))))
+(use-package swiper)
 
-  (defun counsel-xmms2 ()
-    "Jump to \"xmms2\" track."
-    (interactive)
-    (let ((cands
-           (split-string
-            (shell-command-to-string "xmms2 list") "\n" t)))
-      (ivy-read "xmms2: " cands
-                :action (lambda (x)
-                          (string-match "^\s*\\(->\\)?\\[\\([0-9]+\\)/[0-9]+\\]\s+\\w+" x)
-                          (let ((n (match-string 2 x)))
-                            (call-process-shell-command
-                             (format "xmms2 jump %s" n))
-                            (message x)))
-                :caller 'counsel-xmms2)))
+(use-package counsel-extras
+  :ensure nil
+  :quelpa
+  (counsel-extras :repo "a13/counsel-extras" :fetcher github :version original)
   :bind
-  (("C-s" . counsel-grep-or-isearch-or-swiper)
-   ("s-p" . counsel-xmms2)))
+  (("C-s" . counsel-extras-grep-or-isearch-or-swiper)
+   ("s-p" . counsel-extras-xmms2-jump)))
 
 (use-package ivy-rich
   :defines ivy-rich-abbreviate-paths ivy-rich-switch-buffer-name-max-length
