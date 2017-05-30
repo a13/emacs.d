@@ -111,7 +111,9 @@
   :ensure t
   :bind
   (("C-c l o" . link-hint-open-link)
-   ("C-c l c" . link-hint-copy-link)))
+   ("<XF86Search>" . link-hint-open-link)
+   ("C-c l c" . link-hint-copy-link)
+   ("S-<XF86Search>" . link-hint-copy-link)))
 
 ;; jabber
 (use-package jabber
@@ -176,6 +178,17 @@
   :ensure nil
   :config
   (setq w3m-cookie-accept-bad-cookies t))
+
+(use-package shr-tag-pre-highlight
+  :after shr
+  :config
+  (add-to-list 'shr-external-rendering-functions
+               '(pre . shr-tag-pre-highlight))
+
+  (when (version< emacs-version "26")
+    (with-eval-after-load 'eww
+      (advice-add 'eww-display-html :around
+                  'eww-display-html--override-shr-external-rendering-functions))))
 
 (use-package keyfreq
   :config
