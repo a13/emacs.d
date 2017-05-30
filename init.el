@@ -45,6 +45,10 @@
 
 ;;; External packages
 
+(use-package paradox
+  :init
+  (paradox-enable))
+
 ;; usability packages
 (use-package smex
   :defines smex-save-file
