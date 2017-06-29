@@ -271,6 +271,12 @@
 
 ;; web
 
+(use-package eww
+  :ensure nil
+  :config
+  (setq shr-use-fonts nil)
+  (setq eww-search-prefix "https://duckduckgo.com/html/?kd=-1&q="))
+
 (use-package browse-url
   :ensure nil
   :bind
@@ -359,6 +365,10 @@
   ;;use mu mkdir  ~/Maildir/queue to set up first
   (setq smtpmail-queue-mail nil  ;; start in normal mode
         smtpmail-queue-dir "~/Maildir/queue/cur"))
+
+(use-package org
+  :config
+  (setq org-src-tab-acts-natively t))
 
 
 ;;;
