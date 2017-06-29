@@ -18,3 +18,4 @@ recentf
 # compiled files
 *.elc
 projectile-bookmarks.eld
+*.html

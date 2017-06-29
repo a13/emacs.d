@@ -1,19 +1,12 @@
-;;; init.el
-
-;;; Code:
-
-;;; package system init
 (require 'package)
 (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
                          ("melpa" . "https://melpa.org/packages/")
                          ;; ("marmalade" . "https://marmalade-repo.org/packages/")
                          ;; ("org" . "http://orgmode.org/elpa/")
-                         ("sunrise" . "http://joseito.republika.pl/sunrise-commander/")))
+                         ;; ("sunrise" . "http://joseito.republika.pl/sunrise-commander/")))
+                         )
 
-(package-initialize)
-
-;;; use-package installation
-;; TODO: move to separate file
+      (package-initialize)
 
 (defun package-install-if-not (package)
   "Install PACKAGE if it's not installed yet."
@@ -40,16 +33,12 @@
 (use-package quelpa)
 (use-package quelpa-use-package)
 
-;;; load internal packages w/settings
 (load-file (concat user-emacs-directory "internal.el"))
-
-;;; External packages
 
 (use-package paradox
   :init
   (paradox-enable))
 
-;; usability packages
 (use-package smex
   :defines smex-save-file
   :config
@@ -87,7 +76,6 @@
   (setq ivy-rich-switch-buffer-name-max-length 45)
   (ivy-set-display-transformer 'ivy-switch-buffer 'ivy-rich-switch-buffer-transformer))
 
-;; avy-based stuff
 (use-package avy
   :config
   (avy-setup-default)
@@ -119,13 +107,12 @@
    ("C-c l c" . link-hint-copy-link)
    ("S-<XF86Search>" . link-hint-copy-link)))
 
-;; jabber
 (use-package jabber
   :config
   (setq jabber-history-enabled t
         jabber-use-global-history nil
         fsm-debug nil)
-    ;; load jabber-account-list from encrypted file
+  ;; load jabber-account-list from encrypted file
   (defgroup jabber-local nil
     "Local settings"
     :group 'jabber)
@@ -163,25 +150,11 @@
 
 (use-package jabber-otr)
 
-;; w3m
-(use-package w3m
-  :config
-  (add-hook 'w3m-mode-hook 'w3m-lnum-mode)
-  (setq w3m-use-tab nil)
-  (setq w3m-use-title-buffer-name t)
-  (setq w3m-use-header-line-title t)
-  (defun set-external-browser (orig-fun &rest args)
-    (let ((browse-url-browser-function
-           (if (eq browse-url-browser-function 'w3m-browse-url)
-               'browse-url-generic
-             browse-url-browser-function)))
-      (apply orig-fun args)))
-  (advice-add 'w3m-view-url-with-browse-url :around #'set-external-browser))
+(use-package eww-lnum
+  :bind (:map eww-mode-map
+              ("f" . eww-lnum-follow)
+              ("F" . eww-lnum-universal)))
 
-(use-package w3m-cookie
-  :ensure nil
-  :config
-  (setq w3m-cookie-accept-bad-cookies t))
 
 (use-package shr-tag-pre-highlight
   :after shr
@@ -194,10 +167,44 @@
       (advice-add 'eww-display-html :around
                   'eww-display-html--override-shr-external-rendering-functions))))
 
+(use-package mu4e-alert
+  :after mu4e
+  :init
+  (mu4e-alert-set-default-style 'notifications)
+  (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display)
+  (add-hook 'after-init-hook #'mu4e-alert-enable-notifications))
+
+(use-package mu4e-maildirs-extension
+  :after mu4e
+  :defines mu4e-maildirs-extension-before-insert-maildir-hook
+  :init
+  (mu4e-maildirs-extension)
+  :config
+  ;; don't draw a newline
+  (setq mu4e-maildirs-extension-before-insert-maildir-hook '()))
+
 (use-package keyfreq
   :config
   (keyfreq-mode 1)
   (keyfreq-autosave-mode 1))
+
+(use-package ibuffer-vc
+  :config
+  (add-hook 'ibuffer-hook
+            (lambda ()
+              (ibuffer-vc-set-filter-groups-by-vc-root)
+              (unless (eq ibuffer-sorting-mode 'alphabetic)
+                (ibuffer-do-sort-by-alphabetic)))))
+
+(use-package magit)
+
+(use-package diff-hl
+  :config
+  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
+  (add-hook 'prog-mode-hook #'diff-hl-mode)
+  (add-hook 'dired-mode-hook #'diff-hl-dired-mode))
+
+(use-package edit-indirect)
 
 (use-package projectile
   ;;  :diminish projectile-mode
@@ -229,10 +236,8 @@
   (add-hook 'emacs-lisp-mode-hook #'nameless-mode)
   (setq nameless-private-prefix t))
 
-;; scheme
 (use-package geiser)
 
-;; clojure
 (use-package clojure-mode)
 (use-package clojure-mode-extra-font-locking)
 (use-package clojure-snippets)
@@ -244,7 +249,6 @@
 
 (use-package kibit-helper)
 
-;; CL
 (use-package slime
   :disabled
   :config
@@ -255,15 +259,18 @@
   (slime-setup '(slime-fancy))
   (setq slime-net-coding-system 'utf-8-unix))
 
-;; scala
 (use-package ensime
   :bind (:map ensime-mode-map
               ("C-x C-e" . ensime-inf-eval-region)))
 
-;; lua
 (use-package lua-mode)
 
-;; company-based plugins
+(use-package conkeror-minor-mode
+  :config
+  (add-hook 'js-mode-hook (lambda ()
+                            (when (string-match "conkeror" (buffer-file-name))
+                              (conkeror-minor-mode 1)))))
+
 (use-package company
   :diminish (company-mode . "𝍎")
   :config
@@ -286,17 +293,13 @@
                                (if (eq system-type 'darwin)
                                    "Apple Color Emoji"
                                  "Symbola"))
-                               nil 'prepend))
+                    nil 'prepend))
 
-(use-package ibuffer-vc
+(use-package htmlize
   :config
-  (add-hook 'ibuffer-hook
-            (lambda ()
-              (ibuffer-vc-set-filter-groups-by-vc-root)
-              (unless (eq ibuffer-sorting-mode 'alphabetic)
-                (ibuffer-do-sort-by-alphabetic)))))
+  (setq org-html-htmlize-output-type 'css)
+  (setq org-html-htmlize-font-prefix "org-"))
 
-(use-package magit)
 
 (use-package org-password-manager
   :config
@@ -305,22 +308,6 @@
 (use-package org-jira
   :config
   (setq jiralib-url "http://jira:8080"))
-
-(use-package diff-hl
-  :config
-  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
-  (add-hook 'prog-mode-hook #'diff-hl-mode)
-  (add-hook 'dired-mode-hook #'diff-hl-dired-mode))
-
-(use-package edit-indirect)
-
-(use-package conkeror-minor-mode
-  :config
-  (add-hook 'js-mode-hook (lambda ()
-                            (when (string-match "conkeror" (buffer-file-name))
-                              (conkeror-minor-mode 1)))))
-
-;; interface
 
 (use-package rainbow-delimiters
   :config
@@ -344,21 +331,6 @@
   :config
   (add-hook 'after-init-hook #'fancy-battery-mode))
 
-(use-package mu4e-alert
-  :after mu4e
-  :init
-  (mu4e-alert-set-default-style 'notifications)
-  (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display)
-  (add-hook 'after-init-hook #'mu4e-alert-enable-notifications))
-
-(use-package mu4e-maildirs-extension
-  :after mu4e
-  :defines mu4e-maildirs-extension-before-insert-maildir-hook
-  :init
-  (mu4e-maildirs-extension)
-  :config
-  ;; don't draw a newline
-  (setq mu4e-maildirs-extension-before-insert-maildir-hook '()))
 
 (use-package clipmon)
 
@@ -391,17 +363,17 @@
 (use-package reverse-im
   :config
   (add-to-list 'load-path "~/.xkb/contrib")
-  (reverse-im-activate
-   (if (require 'unipunct nil t)
-       "russian-unipunct"
-     "russian-computer")))
+  (add-to-list 'reverse-im-modifiers 'super)
+  (add-to-list 'reverse-im-input-methods
+               (if (require 'unipunct nil t)
+                   "russian-unipunct"
+                 "russian-computer"))
+  (reverse-im-mode t))
 
-
-;; load custom-file
 ;; defined in internal.el
 (when (and custom-file (file-exists-p custom-file))
   (load-file custom-file))
 
-(provide 'init)
-
-;;; init.el ends here
+;; Local Variables:
+;; eval: (add-hook 'after-save-hook (lambda ()(org-babel-tangle)) nil t)
+;; End:
