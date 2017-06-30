@@ -3,10 +3,10 @@
                          ("melpa" . "https://melpa.org/packages/")
                          ;; ("marmalade" . "https://marmalade-repo.org/packages/")
                          ;; ("org" . "http://orgmode.org/elpa/")
-                         ;; ("sunrise" . "http://joseito.republika.pl/sunrise-commander/")))
-                         )
+                         ;; ("sunrise" . "http://joseito.republika.pl/sunrise-commander/")
+                         ))
 
-      (package-initialize)
+(package-initialize)
 
 (defun package-install-if-not (package)
   "Install PACKAGE if it's not installed yet."
