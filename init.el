@@ -57,7 +57,12 @@
 (use-package counsel
   :bind
   (("M-x" . counsel-M-x)
-   ("C-x 8 RET" . counsel-unicode-char)))
+   :map iso-transl-ctl-x-8-map
+   ("RET" . counsel-unicode-char)
+   :map help-map
+   ("f" . counsel-describe-function)
+   ("v" . counsel-describe-variable)
+   ("b" . counsel-descbinds)))
 
 (use-package swiper)
 
