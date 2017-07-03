@@ -36,7 +36,7 @@
 (load-file (concat user-emacs-directory "internal.el"))
 
 (use-package paradox
-  :init
+  :config
   (paradox-enable))
 
 (use-package smex
@@ -55,6 +55,8 @@
   (("C-c C-r" . ivy-resume)))
 
 (use-package counsel
+  :init
+  (require 'iso-transl)
   :bind
   (("M-x" . counsel-M-x)
    :map iso-transl-ctl-x-8-map
