@@ -195,6 +195,14 @@
   (keyfreq-mode 1)
   (keyfreq-autosave-mode 1))
 
+(use-package restclient)
+
+(use-package ob-restclient)
+
+(use-package company-restclient
+  :init
+  (add-to-list 'company-backends 'company-restclient))
+
 (use-package ibuffer-vc
   :config
   (add-hook 'ibuffer-hook

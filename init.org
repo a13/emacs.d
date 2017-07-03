@@ -254,6 +254,16 @@
 
 ** Programming-related
 
+*** HTTP
+    #+begin_src emacs-lisp :tangle yes
+      (use-package restclient)
+
+      (use-package ob-restclient)
+
+      (use-package company-restclient
+        :init
+        (add-to-list 'company-backends 'company-restclient))
+    #+end_src
 *** Common stuff
 
     #+begin_src emacs-lisp :tangle yes
