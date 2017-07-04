@@ -59,6 +59,10 @@
   (require 'iso-transl)
   :bind
   (("M-x" . counsel-M-x)
+   ("M-y" . counsel-yank-pop)
+   ("C-x C-f" . counsel-find-file)
+   ("C-c C-SPC" . counsel-mark-ring)
+   ("<f10>" . counsel-tmm)
    :map iso-transl-ctl-x-8-map
    ("RET" . counsel-unicode-char)
    :map help-map
@@ -195,12 +199,18 @@
   (keyfreq-mode 1)
   (keyfreq-autosave-mode 1))
 
+(use-package which-key
+  :init
+  (which-key-mode))
+
+(use-package helpful)
+
 (use-package restclient)
 
 (use-package ob-restclient)
 
 (use-package company-restclient
-  :init
+  :config
   (add-to-list 'company-backends 'company-restclient))
 
 (use-package ibuffer-vc
@@ -250,6 +260,8 @@
   :config
   (add-hook 'emacs-lisp-mode-hook #'nameless-mode)
   (setq nameless-private-prefix t))
+
+(use-package suggest)
 
 (use-package geiser)
 
