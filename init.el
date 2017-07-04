@@ -178,6 +178,11 @@
       (advice-add 'eww-display-html :around
                   'eww-display-html--override-shr-external-rendering-functions))))
 
+(use-package google-this
+  :diminish google-this-mode
+  :config
+  (google-this-mode 1))
+
 (use-package mu4e-alert
   :after mu4e
   :init
@@ -200,6 +205,7 @@
   (keyfreq-autosave-mode 1))
 
 (use-package which-key
+  :diminish which-key-mode
   :init
   (which-key-mode))
 
