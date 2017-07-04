@@ -52,6 +52,7 @@
      (use-package quelpa-use-package)
    #+end_src
 * Load internal packages with settings
+** TODO Convert internal.el to org
   #+begin_src emacs-lisp :tangle yes
     (load-file (concat user-emacs-directory "internal.el"))
   #+end_src
@@ -338,9 +339,15 @@
    [[https://xkcd.com/297/][https://imgs.xkcd.com/comics/lisp_cycles.png]]
 
 *** Emacs Lisp
+
     #+begin_src emacs-lisp :tangle yes
       (use-package suggest)
+
+      (use-package ipretty
+        :config
+        (ipretty-mode 1))
     #+end_src
+
 *** Scheme
     #+begin_src emacs-lisp :tangle yes
 
@@ -437,12 +444,27 @@
 ** Org goodies
 
    #+begin_src emacs-lisp :tangle yes
+     (use-package org
+       :config
+       (setq org-src-tab-acts-natively t))
+
+     (use-package org-bullets
+       :init
+       ;; org-bullets-bullet-list
+       ;; default: "◉ ○ ✸ ✿"
+       ;; large: ♥ ● ◇ ✚ ✜ ☯ ◆ ♠ ♣ ♦ ☢ ❀ ◆ ◖ ▶
+       ;; Small: ► • ★ ▸
+       (setq org-bullets-bullet-list '("•"))
+       ;; others: ▼, ↴, ⬎, ⤷,…, and ⋱.
+       ;; (setq org-ellipsis "⤵")
+       (setq org-ellipsis "…")
+       :config
+       (add-hook 'org-mode-hook #'org-bullets-mode))
 
      (use-package htmlize
        :config
        (setq org-html-htmlize-output-type 'css)
        (setq org-html-htmlize-font-prefix "org-"))
-
 
      (use-package org-password-manager
        :config

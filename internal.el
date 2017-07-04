@@ -366,9 +366,4 @@
   (setq smtpmail-queue-mail nil  ;; start in normal mode
         smtpmail-queue-dir "~/Maildir/queue/cur"))
 
-(use-package org
-  :config
-  (setq org-src-tab-acts-natively t))
-
-
 ;;;

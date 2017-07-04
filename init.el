@@ -269,6 +269,10 @@
 
 (use-package suggest)
 
+(use-package ipretty
+  :config
+  (ipretty-mode 1))
+
 (use-package geiser)
 
 (use-package clojure-mode)
@@ -328,11 +332,27 @@
                                  "Symbola"))
                     nil 'prepend))
 
+(use-package org
+  :config
+  (setq org-src-tab-acts-natively t))
+
+(use-package org-bullets
+  :init
+  ;; org-bullets-bullet-list
+  ;; default: "◉ ○ ✸ ✿"
+  ;; large: ♥ ● ◇ ✚ ✜ ☯ ◆ ♠ ♣ ♦ ☢ ❀ ◆ ◖ ▶
+  ;; Small: ► • ★ ▸
+  (setq org-bullets-bullet-list '("•"))
+  ;; others: ▼, ↴, ⬎, ⤷,…, and ⋱.
+  ;; (setq org-ellipsis "⤵")
+  (setq org-ellipsis "…")
+  :config
+  (add-hook 'org-mode-hook #'org-bullets-mode))
+
 (use-package htmlize
   :config
   (setq org-html-htmlize-output-type 'css)
   (setq org-html-htmlize-font-prefix "org-"))
-
 
 (use-package org-password-manager
   :config
