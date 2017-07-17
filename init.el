@@ -211,6 +211,8 @@
 
 (use-package helpful)
 
+(use-package emamux)
+
 (use-package restclient)
 
 (use-package ob-restclient)
@@ -238,6 +240,8 @@
 (use-package edit-indirect)
 
 (use-package projectile
+  :init
+  (setq projectile-completion-system 'ivy)
   ;;  :diminish projectile-mode
   :config
   (diminish 'projectile-mode '(:eval
@@ -279,7 +283,7 @@
 (use-package clojure-mode-extra-font-locking)
 (use-package clojure-snippets)
 (use-package cider
-  :init
+  :config
   ;; sadly, we can't use :diminish keyword here, yet
   (diminish 'cider-mode
             '(:eval (format " 🍏%s" (cider--modeline-info)))))
@@ -295,6 +299,22 @@
         slime-startup-animation nil)
   (slime-setup '(slime-fancy))
   (setq slime-net-coding-system 'utf-8-unix))
+
+(use-package scala-mode)
+
+(use-package sbt-mode
+  :commands sbt-start sbt-command
+  :config
+  ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
+  ;; allows using SPACE when in the minibuffer
+  (substitute-key-definition
+   'minibuffer-complete-word
+   'self-insert-command
+   minibuffer-local-completion-map))
+
+
+(use-package flycheck-scala-sbt)
+;; Call flycheck-scala-sbt-init from your scala-mode-hook
 
 (use-package ensime
   :bind (:map ensime-mode-map
@@ -333,7 +353,7 @@
                     nil 'prepend))
 
 (use-package org
-  :config
+  :init
   (setq org-src-tab-acts-natively t))
 
 (use-package org-bullets
@@ -385,7 +405,9 @@
   (add-hook 'after-init-hook #'fancy-battery-mode))
 
 
-(use-package clipmon)
+(use-package clipmon
+  :config
+  (clipmon-mode))
 
 (use-package point-im
   :ensure nil
@@ -395,6 +417,15 @@
   :config
   (setq point-im-reply-id-add-plus nil)
   (add-hook 'jabber-chat-mode-hook #'point-im-mode))
+
+(use-package iqa
+  :ensure nil
+  :quelpa
+  (iqa :repo "a13/iqa.el" :fetcher github :version original)
+  :init
+  (setq iqa-user-init-file (concat user-emacs-directory "init.org"))
+  :config
+  (iqa-setup-default))
 
 ;; TODO
 (use-package root-edit
