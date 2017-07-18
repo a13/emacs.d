@@ -71,6 +71,10 @@
        :config
        (setq smex-save-file "~/.cache/emacs/smex-items")
        (smex-initialize))
+
+     (use-package expand-region
+       :bind
+       ("C-=" . er/expand-region))
    #+end_src
 
 *** Ivy and related stuff.

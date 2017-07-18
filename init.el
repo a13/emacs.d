@@ -45,6 +45,10 @@
   (setq smex-save-file "~/.cache/emacs/smex-items")
   (smex-initialize))
 
+(use-package expand-region
+  :bind
+  ("C-=" . er/expand-region))
+
 (use-package ivy
   :diminish ivy-mode
   :config
