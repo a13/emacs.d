@@ -259,6 +259,10 @@
 ** Misc
 
    #+begin_src emacs-lisp :tangle yes
+     (use-package multitran)
+
+     (use-package sudo-edit)
+
      (use-package keyfreq
        :config
        (keyfreq-mode 1)
@@ -410,10 +414,6 @@
          'self-insert-command
          minibuffer-local-completion-map))
 
-
-      (use-package flycheck-scala-sbt)
-      ;; Call flycheck-scala-sbt-init from your scala-mode-hook
-
       (use-package ensime
         :bind (:map ensime-mode-map
                     ("C-x C-e" . ensime-inf-eval-region)))
@@ -441,7 +441,7 @@
 
    #+begin_src emacs-lisp :tangle yes
      (use-package company
-       :diminish (company-mode . "𝍎")
+       :diminish company-mode
        :config
        (add-hook 'after-init-hook 'global-company-mode))
 
@@ -469,6 +469,8 @@
 
    #+begin_src emacs-lisp :tangle yes
      (use-package org
+       :ensure t
+       :pin melpa
        :init
        (setq org-src-tab-acts-natively t))
 

@@ -203,6 +203,10 @@
   ;; don't draw a newline
   (setq mu4e-maildirs-extension-before-insert-maildir-hook '()))
 
+(use-package multitran)
+
+(use-package sudo-edit)
+
 (use-package keyfreq
   :config
   (keyfreq-mode 1)
@@ -316,10 +320,6 @@
    'self-insert-command
    minibuffer-local-completion-map))
 
-
-(use-package flycheck-scala-sbt)
-;; Call flycheck-scala-sbt-init from your scala-mode-hook
-
 (use-package ensime
   :bind (:map ensime-mode-map
               ("C-x C-e" . ensime-inf-eval-region)))
@@ -333,7 +333,7 @@
                               (conkeror-minor-mode 1)))))
 
 (use-package company
-  :diminish (company-mode . "𝍎")
+  :diminish company-mode
   :config
   (add-hook 'after-init-hook 'global-company-mode))
 
@@ -357,6 +357,8 @@
                     nil 'prepend))
 
 (use-package org
+  :ensure t
+  :pin melpa
   :init
   (setq org-src-tab-acts-natively t))
 
