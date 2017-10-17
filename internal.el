@@ -187,6 +187,7 @@
   (setq tramp-default-method "ssh")
   ;; TODO: tramp-root-connect-list
   ;; `("\\.lpr\\." "10\\.199\\." "10\\.0\\." ,(regexp-quote (system-name)))
+  (setq tramp-default-proxies-alist nil)
   (add-to-list 'tramp-default-proxies-alist
                '(nil "\\`root\\'" "/ssh:%h:"))
   (add-to-list 'tramp-default-proxies-alist
@@ -200,7 +201,7 @@
 (use-package epa
   :ensure nil
   :config
-  (setf epa-pinentry-mode 'loopback))
+  (setf epa-pinentry-mode nil))
 
 (use-package calendar
   :ensure nil
