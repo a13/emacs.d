@@ -80,8 +80,9 @@
 
 (use-package files
   :ensure nil
+  :hook
+  (before-save-hook . delete-trailing-whitespace)
   :config
-  (add-hook 'before-save-hook 'delete-trailing-whitespace)
   (setq require-final-newline t)
   ;; backup settings
   (setq backup-by-copying t)
@@ -140,9 +141,9 @@
                            (name . "^\\*Messages\\*$")
                            (name . "^\\*Warnings\\*$")
                            (mode . emacs-lisp-mode)))))))
-  (add-hook 'ibuffer-mode-hook
-            (lambda ()
-              (ibuffer-switch-to-saved-filter-groups "default"))))
+  :hook
+  (ibuffer-mode . (lambda ()
+                    (ibuffer-switch-to-saved-filter-groups "default"))))
 
 (use-package simple
   :ensure nil
@@ -187,20 +188,21 @@
   (setq tramp-default-method "ssh")
   ;; TODO: tramp-root-connect-list
   ;; `("\\.lpr\\." "10\\.199\\." "10\\.0\\." ,(regexp-quote (system-name)))
-  (add-to-list 'tramp-default-proxies-alist
-               '(nil "\\`root\\'" "/ssh:%h:"))
-  (add-to-list 'tramp-default-proxies-alist
-               '("10\\.199\\." nil nil))
-  (add-to-list 'tramp-default-proxies-alist
-               '("10\\.0\\." nil nil))
-  (add-to-list 'tramp-default-proxies-alist
-               `((regexp-quote ,(system-name)) nil nil)))
+  ;; (add-to-list 'tramp-default-proxies-alist
+  ;;              '(nil "\\`root\\'" "/ssh:%h:"))
+  ;; (add-to-list 'tramp-default-proxies-alist
+  ;;              '("10\\.199\\." nil nil))
+  ;; (add-to-list 'tramp-default-proxies-alist
+  ;;              '("10\\.0\\." nil nil))
+  ;; (add-to-list 'tramp-default-proxies-alist
+  ;;              `((regexp-quote ,(system-name)) nil nil))
+  )
 
 
 (use-package epa
   :ensure nil
   :config
-  (setf epa-pinentry-mode 'loopback))
+  (setf epa-pinentry-mode nil))
 
 (use-package calendar
   :ensure nil
@@ -333,30 +335,30 @@
   :config
   (setq custom-file (concat user-emacs-directory "custom.el")))
 
-(use-package mu4e-vars
-  :load-path "/usr/share/emacs/site-lisp/mu4e"
-  :ensure nil
-  :config
-  ;;location of my maildir
-  ;; enable inline images
-  (setq mu4e-view-show-images t)
-  ;; use imagemagick, if available
-  (when (fboundp 'imagemagick-register-types)
-    (imagemagick-register-types))
+;; (use-package mu4e-vars
+;;   :load-path "/usr/share/emacs/site-lisp/mu4e"
+;;   :ensure nil
+;;   :config
+;;   ;;location of my maildir
+;;   ;; enable inline images
+;;   (setq mu4e-view-show-images t)
+;;   ;; use imagemagick, if available
+;;   (when (fboundp 'imagemagick-register-types)
+;;     (imagemagick-register-types))
 
-  (setq mu4e-maildir (expand-file-name "~/.mail/work"))
-  ;; ivy does all the work
-  (setq mu4e-completing-read-function 'completing-read)
+;;   (setq mu4e-maildir (expand-file-name "~/.mail/work"))
+;;   ;; ivy does all the work
+;;   (setq mu4e-completing-read-function 'completing-read)
 
-  ;;command used to get mail
-  ;; use this for testing
-  (setq mu4e-get-mail-command "true")
-  ;; use this to sync with mbsync
-  ;;(setq mu4e-get-mail-command "mbsync gmail")
+;;   ;;command used to get mail
+;;   ;; use this for testing
+;;   (setq mu4e-get-mail-command "true")
+;;   ;; use this to sync with mbsync
+;;   ;;(setq mu4e-get-mail-command "mbsync gmail")
 
-  ;;rename files when moving
-  ;;NEEDED FOR MBSYNC
-  (setq mu4e-change-filenames-when-moving t))
+;;   ;;rename files when moving
+;;   ;;NEEDED FOR MBSYNC
+;;   (setq mu4e-change-filenames-when-moving t))
 
 (use-package smtpmail
   :ensure nil

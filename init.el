@@ -107,6 +107,7 @@
 (use-package ace-window
   :config
   (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
+  (setq aw-scope 'frame)
   :bind
   (("M-o" . ace-window)))
 
@@ -191,8 +192,8 @@
   :after mu4e
   :init
   (mu4e-alert-set-default-style 'notifications)
-  (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display)
-  (add-hook 'after-init-hook #'mu4e-alert-enable-notifications))
+  :hook ((after-init . mu4e-alert-enable-mode-line-display)
+         (after-init . mu4e-alert-enable-notifications)))
 
 (use-package mu4e-maildirs-extension
   :after mu4e
@@ -230,22 +231,23 @@
   (add-to-list 'company-backends 'company-restclient))
 
 (use-package ibuffer-vc
-  :config
-  (add-hook 'ibuffer-hook
-            (lambda ()
-              (ibuffer-vc-set-filter-groups-by-vc-root)
-              (unless (eq ibuffer-sorting-mode 'alphabetic)
-                (ibuffer-do-sort-by-alphabetic)))))
+  :hook
+  (ibuffer . (lambda ()
+               (ibuffer-vc-set-filter-groups-by-vc-root)
+               (unless (eq ibuffer-sorting-mode 'alphabetic)
+                 (ibuffer-do-sort-by-alphabetic)))))
 
 (use-package magit)
 
 (use-package diff-hl
-  :config
-  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
-  (add-hook 'prog-mode-hook #'diff-hl-mode)
-  (add-hook 'dired-mode-hook #'diff-hl-dired-mode))
+  :hook
+  ((magit-post-refresh . diff-hl-magit-post-refresh)
+   (prog-mode . diff-hl-mode)
+   (dired-mode . diff-hl-dired-mode)))
 
 (use-package edit-indirect)
+
+(use-package ag)
 
 (use-package projectile
   :init
@@ -263,20 +265,22 @@
   :config
   (yas-reload-all)
   (setq yas-prompt-functions '(yas-completing-prompt yas-ido-prompt))
-  (add-hook 'prog-mode-hook #'yas-minor-mode))
+  :hook
+  (prog-mode  . yas-minor-mode))
 
 (use-package flycheck
   :diminish flycheck-mode
-  :config
-  (add-hook 'prog-mode-hook #'flycheck-mode))
+  :hook
+  (prog-mode . flycheck-mode))
 
 (use-package avy-flycheck
   :config
   (avy-flycheck-setup))
 
 (use-package nameless
+  :hook
+  (emacs-lisp-mode .  nameless-mode)
   :config
-  (add-hook 'emacs-lisp-mode-hook #'nameless-mode)
   (setq nameless-private-prefix t))
 
 (use-package suggest)
@@ -327,15 +331,15 @@
 (use-package lua-mode)
 
 (use-package conkeror-minor-mode
-  :config
-  (add-hook 'js-mode-hook (lambda ()
-                            (when (string-match "conkeror" (or (buffer-file-name) ""))
-                              (conkeror-minor-mode 1)))))
+  :hook
+  (js-mode . (lambda ()
+               (when (string-match "conkeror" (or (buffer-file-name) ""))
+                 (conkeror-minor-mode 1)))))
 
 (use-package company
   :diminish company-mode
-  :config
-  (add-hook 'after-init-hook 'global-company-mode))
+  :hook
+  (after-init . global-company-mode))
 
 (use-package company-quickhelp
   :config
@@ -372,8 +376,8 @@
   ;; others: ▼, ↴, ⬎, ⤷,…, and ⋱.
   ;; (setq org-ellipsis "⤵")
   (setq org-ellipsis "…")
-  :config
-  (add-hook 'org-mode-hook #'org-bullets-mode))
+  :hook
+  (org-mode . org-bullets-mode))
 
 (use-package htmlize
   :config
@@ -381,25 +385,22 @@
   (setq org-html-htmlize-font-prefix "org-"))
 
 (use-package org-password-manager
-  :config
-  (add-hook 'org-mode-hook 'org-password-manager-key-bindings))
+  :hook
+  (org-mode . org-password-manager-key-bindings))
 
 (use-package org-jira
   :config
   (setq jiralib-url "http://jira:8080"))
 
 (use-package rainbow-delimiters
-  :config
-  (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
+  :hook prog-mode)
 
 (use-package rainbow-identifiers
-  :config
-  (add-hook 'prog-mode-hook #'rainbow-identifiers-mode))
+  :hook prog-mode)
 
 (use-package rainbow-mode
   :diminish rainbow-mode
-  :config
-  (add-hook 'prog-mode-hook #'rainbow-mode))
+  :hook prog-mode)
 
 (use-package spaceline
   :config
@@ -407,9 +408,7 @@
   (spaceline-spacemacs-theme))
 
 (use-package fancy-battery
-  :config
-  (add-hook 'after-init-hook #'fancy-battery-mode))
-
+  :hook after-init)
 
 (use-package clipmon
   :config
@@ -422,7 +421,8 @@
   (point-im :repo "a13/point-im.el" :fetcher github :version original)
   :config
   (setq point-im-reply-id-add-plus nil)
-  (add-hook 'jabber-chat-mode-hook #'point-im-mode))
+  :hook
+  (jabber-chat-mode-hook . point-im-mode))
 
 (use-package iqa
   :ensure t
