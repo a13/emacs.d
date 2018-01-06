@@ -393,10 +393,12 @@
   (setq jiralib-url "http://jira:8080"))
 
 (use-package rainbow-delimiters
-  :hook prog-mode)
+  :hook
+  (prog-mode . rainbow-delimiters-mode))
 
 (use-package rainbow-identifiers
-  :hook prog-mode)
+  :hook
+  (prog-mode . rainbow-identifiers-mode))
 
 (use-package rainbow-mode
   :diminish rainbow-mode
@@ -408,7 +410,8 @@
   (spaceline-spacemacs-theme))
 
 (use-package fancy-battery
-  :hook after-init)
+  :hook
+  (after-init . fancy-battery-mode))
 
 (use-package clipmon
   :config

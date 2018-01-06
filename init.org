@@ -53,9 +53,9 @@
    #+end_src
 * Load internal packages with settings
 ** TODO Convert internal.el to org
-  #+begin_src emacs-lisp :tangle yes
-    (load-file (concat user-emacs-directory "internal.el"))
-  #+end_src
+   #+begin_src emacs-lisp :tangle yes
+     (load-file (concat user-emacs-directory "internal.el"))
+   #+end_src
 * External packages
 ** Modernized Package Menu
    #+begin_src emacs-lisp :tangle yes
@@ -510,10 +510,12 @@
    #+begin_src emacs-lisp :tangle yes
 
      (use-package rainbow-delimiters
-       :hook prog-mode)
+       :hook
+       (prog-mode . rainbow-delimiters-mode))
 
      (use-package rainbow-identifiers
-       :hook prog-mode)
+       :hook
+       (prog-mode . rainbow-identifiers-mode))
 
      (use-package rainbow-mode
        :diminish rainbow-mode
@@ -525,7 +527,8 @@
        (spaceline-spacemacs-theme))
 
      (use-package fancy-battery
-       :hook after-init)
+       :hook
+       (after-init . fancy-battery-mode))
 
      (use-package clipmon
        :config

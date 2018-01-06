@@ -81,7 +81,7 @@
 (use-package files
   :ensure nil
   :hook
-  (before-save . 'delete-trailing-whitespace)
+  (before-save . delete-trailing-whitespace)
   :config
   (setq require-final-newline t)
   ;; backup settings
@@ -336,30 +336,30 @@
   :config
   (setq custom-file (concat user-emacs-directory "custom.el")))
 
-(use-package mu4e-vars
-  :load-path "/usr/share/emacs/site-lisp/mu4e"
-  :ensure nil
-  :config
-  ;;location of my maildir
-  ;; enable inline images
-  (setq mu4e-view-show-images t)
-  ;; use imagemagick, if available
-  (when (fboundp 'imagemagick-register-types)
-    (imagemagick-register-types))
+;; (use-package mu4e-vars
+;;   :load-path "/usr/share/emacs/site-lisp/mu4e"
+;;   :ensure nil
+;;   :config
+;;   ;;location of my maildir
+;;   ;; enable inline images
+;;   (setq mu4e-view-show-images t)
+;;   ;; use imagemagick, if available
+;;   (when (fboundp 'imagemagick-register-types)
+;;     (imagemagick-register-types))
 
-  (setq mu4e-maildir (expand-file-name "~/.mail/work"))
-  ;; ivy does all the work
-  (setq mu4e-completing-read-function 'completing-read)
+;;   (setq mu4e-maildir (expand-file-name "~/.mail/work"))
+;;   ;; ivy does all the work
+;;   (setq mu4e-completing-read-function 'completing-read)
 
-  ;;command used to get mail
-  ;; use this for testing
-  (setq mu4e-get-mail-command "true")
-  ;; use this to sync with mbsync
-  ;;(setq mu4e-get-mail-command "mbsync gmail")
+;;   ;;command used to get mail
+;;   ;; use this for testing
+;;   (setq mu4e-get-mail-command "true")
+;;   ;; use this to sync with mbsync
+;;   ;;(setq mu4e-get-mail-command "mbsync gmail")
 
-  ;;rename files when moving
-  ;;NEEDED FOR MBSYNC
-  (setq mu4e-change-filenames-when-moving t))
+;;   ;;rename files when moving
+;;   ;;NEEDED FOR MBSYNC
+;;   (setq mu4e-change-filenames-when-moving t))
 
 (use-package smtpmail
   :ensure nil
