@@ -80,8 +80,9 @@
 
 (use-package files
   :ensure nil
+  :hook
+  (before-save . 'delete-trailing-whitespace)
   :config
-  (add-hook 'before-save-hook 'delete-trailing-whitespace)
   (setq require-final-newline t)
   ;; backup settings
   (setq backup-by-copying t)
@@ -140,9 +141,10 @@
                            (name . "^\\*Messages\\*$")
                            (name . "^\\*Warnings\\*$")
                            (mode . emacs-lisp-mode)))))))
-  (add-hook 'ibuffer-mode-hook
-            (lambda ()
-              (ibuffer-switch-to-saved-filter-groups "default"))))
+  :hook
+  (ibuffer-mode-hook .
+                     (lambda ()
+                       (ibuffer-switch-to-saved-filter-groups "default"))))
 
 (use-package simple
   :ensure nil
