@@ -78,6 +78,12 @@
   :config
   (global-hl-line-mode 1))
 
+(use-package man
+  :ensure nil
+  :config
+  (set-face-attribute 'Man-overstrike nil :inherit font-lock-type-face :bold t)
+  (set-face-attribute 'Man-underline nil :inherit font-lock-keyword-face :underline t))
+
 (use-package files
   :ensure nil
   :hook
@@ -254,6 +260,8 @@
 
 (use-package em-smart
   :ensure nil
+  :init
+  (eshell-smart-initialize)
   :config
   (setq eshell-where-to-jump 'begin)
   (setq eshell-review-quick-commands nil)
@@ -265,6 +273,11 @@
   (setq ls-lisp-emulation 'MS-Windows)
   (setq ls-lisp-ignore-case t)
   (setq ls-lisp-verbosity nil))
+
+(use-package dired
+  :ensure nil
+  :hook
+  (dired-mode . dired-hide-details-mode))
 
 (use-package dired-x
   :ensure nil

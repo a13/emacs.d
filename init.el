@@ -2,7 +2,7 @@
 (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
                          ("melpa" . "https://melpa.org/packages/")
                          ;; ("marmalade" . "https://marmalade-repo.org/packages/")
-                         ;; ("org" . "http://orgmode.org/elpa/")
+                         ("org" . "https://orgmode.org/elpa/")
                          ;; ("sunrise" . "http://joseito.republika.pl/sunrise-commander/")
                          ))
 
@@ -55,6 +55,17 @@
   ;; (setq ivy-re-builders-alist '((t . ivy--regex-fuzzy)))
   (ivy-mode t)
   (setq ivy-count-format "%d/%d ")
+  (setq ivy-use-selectable-prompt t)
+  (ivy-set-actions
+   'ivy-switch-buffer
+   `(("n"
+      (lambda (x)
+        (insert-and-inherit "#<buffer "
+                            (if (stringp x) x (car x))
+                            ">"))
+      "insert buffer name")))
+  :custom-face
+  (ivy-current-match ((t (:background "gray1"))))
   :bind
   (("C-c C-r" . ivy-resume)))
 
@@ -88,8 +99,9 @@
   :defines ivy-rich-abbreviate-paths ivy-rich-switch-buffer-name-max-length
   :config
   (setq ivy-rich-abbreviate-paths t)
-  (setq ivy-rich-switch-buffer-name-max-length 45)
-  (ivy-set-display-transformer 'ivy-switch-buffer 'ivy-rich-switch-buffer-transformer))
+  (setq ivy-rich-switch-buffer-name-max-length 60)
+  (ivy-set-display-transformer 'ivy-switch-buffer 'ivy-rich-switch-buffer-transformer)
+  (ivy-set-display-transformer 'ivy-switch-buffer-other-window 'ivy-rich-switch-buffer-transformer))
 
 (use-package avy
   :config
@@ -166,6 +178,15 @@
 
 (use-package jabber-otr)
 
+(use-package edit-server
+  :init
+  (edit-server-start))
+
+(use-package atomic-chrome
+  :init
+  (atomic-chrome-start-server))
+
+
 (use-package eww-lnum
   :bind (:map eww-mode-map
               ("f" . eww-lnum-follow)
@@ -239,7 +260,14 @@
 
 (use-package magit)
 
+(use-package magithub
+  :after magit
+  :config
+  (magithub-feature-autoinject t)
+  (setq magithub-clone-default-directory "~/git/"))
+
 (use-package diff-hl
+
   :hook
   ((magit-post-refresh . diff-hl-magit-post-refresh)
    (prog-mode . diff-hl-mode)
@@ -254,10 +282,10 @@
   (setq projectile-completion-system 'ivy)
   ;;  :diminish projectile-mode
   :config
-  (diminish 'projectile-mode '(:eval
-                               (let ((ppn (projectile-project-name)))
-                                 (unless (string= ppn "-")
-                                   (format " 📂%s" ppn)))))
+  ;; (diminish 'projectile-mode '(:eval
+  ;;                              (let ((ppn (projectile-project-name)))
+  ;;                                (unless (string= ppn "-")
+  ;;                                  (format " 📂%s" ppn)))))
   (projectile-mode))
 
 (use-package yasnippet
@@ -361,8 +389,7 @@
                     nil 'prepend))
 
 (use-package org
-  :ensure t
-  :pin melpa
+  :ensure org-plus-contrib
   :init
   (setq org-src-tab-acts-natively t))
 
@@ -392,6 +419,18 @@
   :config
   (setq jiralib-url "http://jira:8080"))
 
+(use-package dashboard
+  :config
+  (dashboard-setup-startup-hook)
+  (setq initial-buffer-choice '(lambda ()
+                                 (setq initial-buffer-choice nil)
+                                 (get-buffer "*dashboard*")))
+  (setq dashboard-items '((recents  . 5)
+                          (bookmarks . 5)
+                          (projects . 5)
+                          ;; (agenda . 5)
+                          (registers . 5))))
+
 (use-package rainbow-delimiters
   :hook
   (prog-mode . rainbow-delimiters-mode))
@@ -417,6 +456,37 @@
   :config
   (clipmon-mode))
 
+(use-package all-the-icons
+  :init
+  (set-frame-font "all-the-icons" t)
+  :config
+  (add-to-list
+   'all-the-icons-mode-icon-alist
+   '(package-menu-mode all-the-icons-octicon "package" :v-adjust 0.0)))
+
+(use-package all-the-icons-dired
+  :hook
+  (dired-mode . all-the-icons-dired-mode))
+
+(use-package spaceline-all-the-icons
+  :after spaceline
+  :config
+  (spaceline-all-the-icons-theme)
+  (spaceline-all-the-icons--setup-package-updates)
+  (spaceline-all-the-icons--setup-git-ahead)
+  (spaceline-all-the-icons--setup-paradox))
+
+;; (use-package all-the-icons-ivy
+;;   :config
+;;   (all-the-icons-ivy-setup))
+
+(use-package dired-hide-dotfiles
+  :bind
+  (:map dired-mode-map
+        ("." . dired-hide-dotfiles-mode))
+  :hook
+  (dired-mode . dired-hide-dotfiles-mode))
+
 (use-package point-im
   :ensure nil
   :defines point-im-reply-id-add-plus
@@ -434,15 +504,14 @@
   :config
   (iqa-setup-default))
 
-;; TODO
-(use-package root-edit
-  :disabled
-  :ensure nil
+(use-package esh-autosuggest
+  :hook (eshell-mode . esh-autosuggest-mode)
+  :ensure t)
+
+(use-package font-lock+
+  :ensure t
   :quelpa
-  (root-edit :repo "a13/root-edit.el" :fetcher github :version original)
-  :bind
-  ("M-s C-x C-f" . find-file-as-root)
-  ("M-s C-x C-v" . find-current-as-root))
+  (font-lock+ :repo "emacsmirror/font-lock-plus" :fetcher github))
 
 (use-package eshell-toggle
   :ensure nil
