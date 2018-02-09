@@ -8,18 +8,16 @@
 
 (package-initialize)
 
-(defun package-install-if-not (package)
-  "Install PACKAGE if it's not installed yet."
-  (unless (package-installed-p package)
-    (package-refresh-contents)
-    (package-install package)))
-
-(package-install-if-not 'use-package)
-
 (setq package-enable-at-startup nil)
+
+;; Bootstrap `use-package'
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
 
 (eval-when-compile
   (require 'use-package))
+
 (put 'use-package 'lisp-indent-function 1)
 (setq use-package-always-ensure t)
 
@@ -72,18 +70,11 @@
 (use-package counsel
   :init
   (require 'iso-transl)
+  (counsel-mode)
   :bind
-  (("M-x" . counsel-M-x)
-   ("M-y" . counsel-yank-pop)
-   ("C-x C-f" . counsel-find-file)
-   ("C-c C-SPC" . counsel-mark-ring)
-   ("<f10>" . counsel-tmm)
+  (("<f10>" . counsel-tmm)
    :map iso-transl-ctl-x-8-map
-   ("RET" . counsel-unicode-char)
-   :map help-map
-   ("f" . counsel-describe-function)
-   ("v" . counsel-describe-variable)
-   ("b" . counsel-descbinds)))
+   ("RET" . counsel-unicode-char)))
 
 (use-package swiper)
 
@@ -258,7 +249,9 @@
                (unless (eq ibuffer-sorting-mode 'alphabetic)
                  (ibuffer-do-sort-by-alphabetic)))))
 
-(use-package magit)
+(use-package magit
+  :config
+  (setq magit-completing-read-function 'ivy-completing-read))
 
 (use-package magithub
   :after magit
@@ -275,7 +268,9 @@
 
 (use-package edit-indirect)
 
-(use-package ag)
+(use-package ag
+  :custom
+  (ag-highlight-search t))
 
 (use-package projectile
   :init
@@ -455,6 +450,10 @@
 (use-package clipmon
   :config
   (clipmon-mode))
+
+(use-package yahoo-weather
+  :custom
+  (yahoo-weather-location "Moscow, RU"))
 
 (use-package all-the-icons
   :init
