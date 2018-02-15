@@ -9,6 +9,8 @@
 (setq inhibit-splash-screen t)
 (setq use-dialog-box nil)
 
+(setq enable-recursive-minibuffers t)
+
 (put 'narrow-to-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
 

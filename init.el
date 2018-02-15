@@ -67,6 +67,10 @@
   :bind
   (("C-c C-r" . ivy-resume)))
 
+(use-package ivy-xref
+  :init
+  (setq xref-show-xrefs-function #'ivy-xref-show-xrefs))
+
 (use-package counsel
   :init
   (require 'iso-transl)
@@ -75,6 +79,10 @@
   (("<f10>" . counsel-tmm)
    :map iso-transl-ctl-x-8-map
    ("RET" . counsel-unicode-char)))
+
+(use-package counsel-projectile
+  :init
+  (counsel-projectile-mode))
 
 (use-package swiper)
 
@@ -92,7 +100,8 @@
   (setq ivy-rich-abbreviate-paths t)
   (setq ivy-rich-switch-buffer-name-max-length 60)
   (ivy-set-display-transformer 'ivy-switch-buffer 'ivy-rich-switch-buffer-transformer)
-  (ivy-set-display-transformer 'ivy-switch-buffer-other-window 'ivy-rich-switch-buffer-transformer))
+  (ivy-set-display-transformer 'ivy-switch-buffer-other-window 'ivy-rich-switch-buffer-transformer)
+  (ivy-set-display-transformer 'counsel-projectile-switch-to-buffer 'ivy-rich-switch-buffer-transformer))
 
 (use-package avy
   :config
@@ -115,6 +124,8 @@
   (("M-o" . ace-window)))
 
 (use-package ace-link
+  :bind
+  ("C-c l l" . counsel-ace-link)
   :config
   (ace-link-setup-default))
 
@@ -275,12 +286,7 @@
 (use-package projectile
   :init
   (setq projectile-completion-system 'ivy)
-  ;;  :diminish projectile-mode
   :config
-  ;; (diminish 'projectile-mode '(:eval
-  ;;                              (let ((ppn (projectile-project-name)))
-  ;;                                (unless (string= ppn "-")
-  ;;                                  (format " 📂%s" ppn)))))
   (projectile-mode))
 
 (use-package yasnippet
@@ -475,9 +481,14 @@
   (spaceline-all-the-icons--setup-git-ahead)
   (spaceline-all-the-icons--setup-paradox))
 
-;; (use-package all-the-icons-ivy
-;;   :config
-;;   (all-the-icons-ivy-setup))
+(use-package all-the-icons-ivy
+  :config
+  (ivy-set-display-transformer 'counsel-find-file 'all-the-icons-ivy-file-transformer)
+  (ivy-set-display-transformer 'counsel-find-file-extern 'all-the-icons-ivy-file-transformer)
+  (ivy-set-display-transformer 'counsel-file-jump 'all-the-icons-ivy-file-transformer)
+  (ivy-set-display-transformer 'counsel-recentf 'all-the-icons-ivy-file-transformer)
+  (ivy-set-display-transformer 'counsel-projectile-find-file 'all-the-icons-ivy-file-transformer)
+  (ivy-set-display-transformer 'counsel-projectile-find-dir 'all-the-icons-ivy-file-transformer))
 
 (use-package dired-hide-dotfiles
   :bind
@@ -518,6 +529,13 @@
   (eshell-toggle :repo "4DA/eshell-toggle" :fetcher github :version original)
   :bind
   (("M-`" . eshell-toggle)))
+
+(use-package magit-keys
+  :ensure nil
+  :quelpa
+  (magit-keys :repo "a13/magit-keys.el" :fetcher github :version original)
+  :config
+  (magit-keys-mode t))
 
 (use-package reverse-im
   :config
