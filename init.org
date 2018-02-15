@@ -318,64 +318,64 @@
 *** Common stuff
 
     #+begin_src emacs-lisp :tangle yes
-            (use-package ibuffer-vc
-              :hook
-              (ibuffer . (lambda ()
-                           (ibuffer-vc-set-filter-groups-by-vc-root)
-                           (unless (eq ibuffer-sorting-mode 'alphabetic)
-                             (ibuffer-do-sort-by-alphabetic)))))
+      (use-package ibuffer-vc
+        :hook
+        (ibuffer . (lambda ()
+                     (ibuffer-vc-set-filter-groups-by-vc-root)
+                     (unless (eq ibuffer-sorting-mode 'alphabetic)
+                       (ibuffer-do-sort-by-alphabetic)))))
 
-            (use-package magit
-              :config
-              (setq magit-completing-read-function 'ivy-completing-read))
+      (use-package magit
+        :config
+        (setq magit-completing-read-function 'ivy-completing-read))
 
-            (use-package magithub
-              :after magit
-              :config
-              (magithub-feature-autoinject t)
-              (setq magithub-clone-default-directory "~/git/"))
+      (use-package magithub
+        :after magit
+        :config
+        (magithub-feature-autoinject t)
+        (setq magithub-clone-default-directory "~/git/"))
 
-            (use-package diff-hl
+      (use-package diff-hl
+        :hook
+        ((magit-post-refresh . diff-hl-magit-post-refresh)
+         (prog-mode . diff-hl-mode)
+         (org-mode . diff-hl-mode)
+         (dired-mode . diff-hl-dired-mode)))
 
-              :hook
-              ((magit-post-refresh . diff-hl-magit-post-refresh)
-               (prog-mode . diff-hl-mode)
-               (dired-mode . diff-hl-dired-mode)))
+      (use-package edit-indirect)
 
-            (use-package edit-indirect)
+      (use-package ag
+        :custom
+        (ag-highlight-search t))
 
-            (use-package ag
-              :custom
-              (ag-highlight-search t))
+      (use-package projectile
+        :init
+        (setq projectile-completion-system 'ivy)
+        :config
+        (projectile-mode))
 
-            (use-package projectile
-              :init
-              (setq projectile-completion-system 'ivy)
-              :config
-              (projectile-mode))
+      (use-package yasnippet
+        :diminish yas-minor-mode
+        :config
+        (yas-reload-all)
+        (setq yas-prompt-functions '(yas-completing-prompt yas-ido-prompt))
+        :hook
+        (prog-mode  . yas-minor-mode))
 
-            (use-package yasnippet
-              :diminish yas-minor-mode
-              :config
-              (yas-reload-all)
-              (setq yas-prompt-functions '(yas-completing-prompt yas-ido-prompt))
-              :hook
-              (prog-mode  . yas-minor-mode))
+      (use-package flycheck
+        :diminish flycheck-mode
+        :hook
+        (prog-mode . flycheck-mode))
 
-            (use-package flycheck
-              :diminish flycheck-mode
-              :hook
-              (prog-mode . flycheck-mode))
+      (use-package avy-flycheck
+        :config
+        (avy-flycheck-setup))
 
-            (use-package avy-flycheck
-              :config
-              (avy-flycheck-setup))
-
-            (use-package nameless
-              :hook
-              (emacs-lisp-mode .  nameless-mode)
-              :config
-              (setq nameless-private-prefix t))
+      (use-package nameless
+        :hook
+        (emacs-lisp-mode .  nameless-mode)
+        :config
+        (setq nameless-private-prefix t))
     #+end_src
 
 ** Languages support

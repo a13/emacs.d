@@ -271,10 +271,10 @@
   (setq magithub-clone-default-directory "~/git/"))
 
 (use-package diff-hl
-
   :hook
   ((magit-post-refresh . diff-hl-magit-post-refresh)
    (prog-mode . diff-hl-mode)
+   (org-mode . diff-hl-mode)
    (dired-mode . diff-hl-dired-mode)))
 
 (use-package edit-indirect)
