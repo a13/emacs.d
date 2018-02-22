@@ -180,20 +180,13 @@
 
 (use-package jabber-otr)
 
-(use-package edit-server
-  :init
-  (edit-server-start))
-
 (use-package atomic-chrome
   :init
+  (setq atomic-chrome-url-major-mode-alist
+        '(("reddit\\.com" . markdown-mode)
+          ("github\\.com" . gfm-mode)
+          ("redmine" . textile-mode)))
   (atomic-chrome-start-server))
-
-
-(use-package eww-lnum
-  :bind (:map eww-mode-map
-              ("f" . eww-lnum-follow)
-              ("F" . eww-lnum-universal)))
-
 
 (use-package shr-tag-pre-highlight
   :after shr
@@ -209,7 +202,9 @@
 (use-package google-this
   :diminish google-this-mode
   :config
-  (google-this-mode 1))
+  (google-this-mode 1)
+  :bind
+  ("C-c g" . google-this-mode-submap))
 
 (use-package mu4e-alert
   :after mu4e
@@ -505,7 +500,7 @@
   :config
   (setq point-im-reply-id-add-plus nil)
   :hook
-  (jabber-chat-mode-hook . point-im-mode))
+  (jabber-chat-mode . point-im-mode))
 
 (use-package iqa
   :ensure t
