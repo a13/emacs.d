@@ -73,12 +73,10 @@
 
 (use-package counsel
   :init
-  (require 'iso-transl)
   (counsel-mode)
   :bind
-  (("<f10>" . counsel-tmm)
-   :map iso-transl-ctl-x-8-map
-   ("RET" . counsel-unicode-char)))
+  (([remap menu-bar-open] . counsel-tmm)
+   ([remap insert-char] . counsel-unicode-char)))
 
 (use-package counsel-projectile
   :init
@@ -91,7 +89,7 @@
   :quelpa
   (counsel-extras :repo "a13/counsel-extras" :fetcher github :version original)
   :bind
-  (("C-s" . counsel-extras-grep-or-isearch-or-swiper)
+  (([remap isearch-forward] . counsel-grep-or-swiper)
    ("s-p" . counsel-extras-xmms2-jump)))
 
 (use-package ivy-rich
