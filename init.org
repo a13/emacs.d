@@ -66,11 +66,7 @@
 ** Usability packages
 
    #+begin_src emacs-lisp :tangle yes
-     (use-package smex
-       :defines smex-save-file
-       :config
-       (setq smex-save-file "~/.cache/emacs/smex-items")
-       (smex-initialize))
+     (use-package smex)
 
      (use-package expand-region
        :bind
@@ -82,37 +78,31 @@
     #+begin_src emacs-lisp :tangle yes
       (use-package ivy
         :diminish ivy-mode
-        :config
-        ;; (setq ivy-re-builders-alist '((t . ivy--regex-fuzzy)))
-        (ivy-mode t)
-        (setq ivy-count-format "%d/%d ")
-        (setq ivy-use-selectable-prompt t)
-        (ivy-set-actions
-         'ivy-switch-buffer
-         `(("n"
-            (lambda (x)
-              (insert-and-inherit "#<buffer "
-                                  (if (stringp x) x (car x))
-                                  ">"))
-            "insert buffer name")))
+        :custom
+        ;; (ivy-re-builders-alist '((t . ivy--regex-fuzzy)))
+        (ivy-count-format "%d/%d " "Show anzu-like counter.")
+        (ivy-use-selectable-prompt t "Make the prompt line selectable")
         :custom-face
         (ivy-current-match ((t (:background "gray1"))))
         :bind
-        (("C-c C-r" . ivy-resume)))
+        (("C-c C-r" . ivy-resume))
+        :config
+        (ivy-mode t))
 
       (use-package ivy-xref
-        :init
-        (setq xref-show-xrefs-function #'ivy-xref-show-xrefs))
+        :custom
+        (xref-show-xrefs-function #'ivy-xref-show-xrefs "Use Ivy to show xrefs"))
 
       (use-package counsel
-        :init
-        (counsel-mode)
         :bind
         (([remap menu-bar-open] . counsel-tmm)
-         ([remap insert-char] . counsel-unicode-char)))
+         ([remap insert-char] . counsel-unicode-char)
+         ([remap isearch-forward] . counsel-grep-or-swiper))
+        :config
+        (counsel-mode))
 
       (use-package counsel-projectile
-        :init
+        :config
         (counsel-projectile-mode))
 
       (use-package swiper)
@@ -122,17 +112,17 @@
         :quelpa
         (counsel-extras :repo "a13/counsel-extras" :fetcher github :version original)
         :bind
-        (([remap isearch-forward] . counsel-grep-or-swiper)
-         ("s-p" . counsel-extras-xmms2-jump)))
+        (("s-p" . counsel-extras-xmms2-jump)))
 
       (use-package ivy-rich
-        :defines ivy-rich-abbreviate-paths ivy-rich-switch-buffer-name-max-length
+        :custom
+        (ivy-rich-switch-buffer-name-max-length 60 "Increase max length of buffer name.")
         :config
-        (setq ivy-rich-abbreviate-paths t)
-        (setq ivy-rich-switch-buffer-name-max-length 60)
-        (ivy-set-display-transformer 'ivy-switch-buffer 'ivy-rich-switch-buffer-transformer)
-        (ivy-set-display-transformer 'ivy-switch-buffer-other-window 'ivy-rich-switch-buffer-transformer)
-        (ivy-set-display-transformer 'counsel-projectile-switch-to-buffer 'ivy-rich-switch-buffer-transformer))
+        (dolist (cmd
+                 '(ivy-switch-buffer
+                   ivy-switch-buffer-other-window
+                   counsel-projectile-switch-to-buffer))
+          (ivy-set-display-transformer cmd #'ivy-rich-switch-buffer-transformer)))
     #+end_src
 
 *** Avy-based stuff
@@ -152,9 +142,9 @@
         (("M-g b" . ace-jump-buffer)))
 
       (use-package ace-window
-        :config
-        (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
-        (setq aw-scope 'frame)
+        :custom
+        (aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l) "Use home row for selecting.")
+        (aw-scope 'frame "Highlight only current frame.")
         :bind
         (("M-o" . ace-window)))
 
@@ -176,6 +166,7 @@
 ** Internet
 
 *** Jabber
+
 
     #+begin_src emacs-lisp :tangle yes
       (use-package jabber
@@ -226,11 +217,12 @@
 
     #+begin_src emacs-lisp :tangle yes
       (use-package atomic-chrome
-        :init
-        (setq atomic-chrome-url-major-mode-alist
-              '(("reddit\\.com" . markdown-mode)
-                ("github\\.com" . gfm-mode)
-                ("redmine" . textile-mode)))
+        :custom
+        (atomic-chrome-url-major-mode-alist
+         '(("reddit\\.com" . markdown-mode)
+           ("github\\.com" . gfm-mode)
+           ("redmine" . textile-mode))
+         "Major modes for URLs.")
         (atomic-chrome-start-server))
 
       (use-package shr-tag-pre-highlight
@@ -248,10 +240,9 @@
         :diminish google-this-mode
         :config
         (google-this-mode 1)
-        :bind
-        ("C-c g" . google-this-mode-submap))
-
-    #+end_src
+        :custom
+        (google-this-keybind (kbd "C-c g")))
+     #+end_src
 
 *** E-mail
 
@@ -287,7 +278,7 @@
 
      (use-package which-key
        :diminish which-key-mode
-       :init
+       :config
        (which-key-mode))
 
      (use-package helpful)
@@ -311,6 +302,18 @@
 
     #+begin_src emacs-lisp :tangle yes
       (use-package ibuffer-vc
+        :custom
+        (ibuffer-formats
+         '((mark modified read-only vc-status-mini " "
+                 (name 18 18 :left :elide)
+                 " "
+                 (size 9 -1 :right)
+                 " "
+                 (mode 16 16 :left :elide)
+                 " "
+                 (vc-status 10 10 :left)
+                 " "
+                 filename-and-process)) "include vc status info")
         :hook
         (ibuffer . (lambda ()
                      (ibuffer-vc-set-filter-groups-by-vc-root)
@@ -318,14 +321,15 @@
                        (ibuffer-do-sort-by-alphabetic)))))
 
       (use-package magit
-        :config
-        (setq magit-completing-read-function 'ivy-completing-read))
+        :custom
+        (magit-completing-read-function 'ivy-completing-read "Force Ivy usage."))
 
       (use-package magithub
         :after magit
+        :custom
+        (magithub-clone-default-directory "~/git/")
         :config
-        (magithub-feature-autoinject t)
-        (setq magithub-clone-default-directory "~/git/"))
+        (magithub-feature-autoinject t))
 
       (use-package diff-hl
         :hook
@@ -338,13 +342,18 @@
 
       (use-package ag
         :custom
-        (ag-highlight-search t))
+        (ag-highlight-search t "Highlight the current search term."))
 
       (use-package projectile
-        :init
-        (setq projectile-completion-system 'ivy)
+        :custom
+        (projectile-completion-system 'ivy)
         :config
         (projectile-mode))
+
+      (use-package dumb-jump
+        :custom
+        (dumb-jump-selector 'ivy)
+        (dumb-jump-prefer-searcher 'ag))
 
       (use-package yasnippet
         :diminish yas-minor-mode
@@ -539,6 +548,9 @@
                                (projects . 5)
                                ;; (agenda . 5)
                                (registers . 5))))
+     (use-package page-break-lines
+       :config
+       (global-page-break-lines-mode))
 
      (use-package rainbow-delimiters
        :hook
@@ -590,13 +602,16 @@
        (spaceline-all-the-icons--setup-paradox))
 
      (use-package all-the-icons-ivy
+       :custom
+       (all-the-icons-ivy-buffer-commands '() "Don't use for buffers.")
+       (all-the-icons-ivy-file-commands
+             '(counsel-find-file
+               counsel-file-jump
+               counsel-recentf
+               counselа-projectile-find-file
+               counsel-projectile-find-dir) "Prettify more commands.")
        :config
-       (ivy-set-display-transformer 'counsel-find-file 'all-the-icons-ivy-file-transformer)
-       (ivy-set-display-transformer 'counsel-find-file-extern 'all-the-icons-ivy-file-transformer)
-       (ivy-set-display-transformer 'counsel-file-jump 'all-the-icons-ivy-file-transformer)
-       (ivy-set-display-transformer 'counsel-recentf 'all-the-icons-ivy-file-transformer)
-       (ivy-set-display-transformer 'counsel-projectile-find-file 'all-the-icons-ivy-file-transformer)
-       (ivy-set-display-transformer 'counsel-projectile-find-dir 'all-the-icons-ivy-file-transformer))
+       (all-the-icons-ivy-setup))
    #+end_src
 
 ** Dired
@@ -623,9 +638,8 @@
       (jabber-chat-mode . point-im-mode))
 
     (use-package iqa
-      :ensure t
-      :init
-      (setq iqa-user-init-file (concat user-emacs-directory "init.org"))
+      :custom
+      (iqa-user-init-file (concat user-emacs-directory "init.org") "Edit init.org by default.")
       :config
       (iqa-setup-default))
 

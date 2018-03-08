@@ -120,15 +120,6 @@
   :bind
   ([remap list-buffers] . ibuffer))
 
-(use-package ibuf-ext
-  :ensure nil
-  :config
-  (setq ibuffer-show-empty-filter-groups nil)
-  :hook
-  (ibuffer-mode-hook .
-                     (lambda ()
-                       (ibuffer-switch-to-saved-filter-groups "default"))))
-
 (use-package simple
   :ensure nil
   :diminish
@@ -139,7 +130,8 @@
   (toggle-truncate-lines 1)
   :bind
   ;; remap ctrl-w/ctrl-h
-  (("C-w" . backward-kill-word)
+  (("C-c h" . help-command)
+   ("C-w" . backward-kill-word)
    ("C-x C-k" . kill-region)
    ("C-h" . delete-backward-char)))
 
@@ -150,7 +142,6 @@
 (use-package autorevert
   :ensure nil
   :diminish auto-revert-mode)
-
 
 (use-package isearch
   :ensure nil
@@ -359,5 +350,24 @@
   ;;use mu mkdir  ~/Maildir/queue to set up first
   (setq smtpmail-queue-mail nil  ;; start in normal mode
         smtpmail-queue-dir "~/Maildir/queue/cur"))
+
+(use-package net-utils
+  :bind
+  (:prefix-map net-utils-prefix-map
+               :prefix "C-c n"
+               ("p" . ping)
+               ("i" . ifconfig)
+               ("w" . iwconfig)
+               ("n" . netstat)
+               ("p" . ping)
+               ("a" . arp)
+               ("r" . route)
+               ("h" . nslookup-host)
+               ("d" . dig)
+               ("s" . smbclient)))
+
+(use-package autoinsert
+  :hook
+  (find-file . auto-insert))
 
 ;;;
