@@ -286,6 +286,19 @@
      (use-package emamux)
    #+end_src
 
+** Docker
+
+   #+begin_src emacs-lisp :tangle yes
+     (use-package docker
+       :config
+       (docker-global-mode))
+
+     (use-package dockerfile-mode
+       :mode "Dockerfile\\'")
+
+     (use-package docker-compose-mode)
+   #+end_src
+
 ** Programming-related
 
 *** HTTP

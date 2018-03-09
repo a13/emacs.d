@@ -229,6 +229,15 @@
 
 (use-package emamux)
 
+(use-package docker
+  :config
+  (docker-global-mode))
+
+(use-package dockerfile-mode
+  :mode "Dockerfile\\'")
+
+(use-package docker-compose-mode)
+
 (use-package restclient)
 
 (use-package ob-restclient)
