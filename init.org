@@ -213,6 +213,23 @@
       (use-package jabber-otr)
     #+end_src
 
+*** Slack
+    #+begin_src emacs-lisp :tangle yes
+      (use-package slack
+        :commands (slack-start)
+        :init
+        (setq slack-buffer-emojify t) ;; if you want to enable emoji, default nil
+        (setq slack-prefer-current-team t)
+        :config
+        (load-file jabber-secrets-file))
+
+      ;; TODO: move somewhere
+      (use-package alert
+        :commands (alert)
+        :init
+        (setq alert-default-style 'notifier))
+
+    #+end_src
 *** Web
 
     #+begin_src emacs-lisp :tangle yes

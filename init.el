@@ -168,6 +168,20 @@
 
 (use-package jabber-otr)
 
+(use-package slack
+  :commands (slack-start)
+  :init
+  (setq slack-buffer-emojify t) ;; if you want to enable emoji, default nil
+  (setq slack-prefer-current-team t)
+  :config
+  (load-file jabber-secrets-file))
+
+;; TODO: move somewhere
+(use-package alert
+  :commands (alert)
+  :init
+  (setq alert-default-style 'notifier))
+
 (use-package atomic-chrome
   :custom
   (atomic-chrome-url-major-mode-alist
