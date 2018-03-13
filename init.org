@@ -227,7 +227,7 @@
       (use-package alert
         :commands (alert)
         :init
-        (setq alert-default-style 'notifier))
+        (setq alert-default-style 'libnotify))
 
     #+end_src
 *** Web
@@ -293,6 +293,10 @@
        (keyfreq-mode 1)
        (keyfreq-autosave-mode 1))
 
+     (use-package clipmon
+       :config
+       (clipmon-mode))
+
      (use-package which-key
        :diminish which-key-mode
        :config
@@ -301,6 +305,26 @@
      (use-package helpful)
 
      (use-package emamux)
+
+     (use-package copy-as-format
+       :bind
+       (:prefix-map copy-as-format-prefix-map
+                    :prefix "C-c f"
+                    ("f" . copy-as-format)
+                    ("a" . copy-as-format-asciidoc)
+                    ("b" . copy-as-format-bitbucket)
+                    ("d" . copy-as-format-disqus)
+                    ("g" . copy-as-format-github)
+                    ("l" . copy-as-format-gitlab)
+                    ("c" . copy-as-format-hipchat)
+                    ("h" . copy-as-format-html)
+                    ("j" . copy-as-format-jira)
+                    ("m" . copy-as-format-markdown)
+                    ("w" . copy-as-format-mediawiki)
+                    ("o" . copy-as-format-org-mode)
+                    ("p" . copy-as-format-pod)
+                    ("r" . copy-as-format-rst)
+                    ("s" . copy-as-format-slack)))
    #+end_src
 
 ** Docker
@@ -327,6 +351,7 @@
       (use-package company-restclient
         :config
         (add-to-list 'company-backends 'company-restclient))
+
     #+end_src
 *** Common stuff
 
@@ -499,6 +524,13 @@
         (js-mode . (lambda ()
                      (when (string-match "conkeror" (or (buffer-file-name) ""))
                        (conkeror-minor-mode 1)))))
+
+      (use-package graphql-mode
+        :custom
+        (graphql-url "http://localhost:8000/api/graphql/query"))
+
+      (use-package json-mode)
+
     #+end_src
 
 ** Completion
@@ -603,13 +635,9 @@
        :hook
        (after-init . fancy-battery-mode))
 
-     (use-package clipmon
-       :config
-       (clipmon-mode))
-
      (use-package yahoo-weather
        :custom
-       (yahoo-weather-location "Moscow, RU"))
+       (yahoo-weather-location "Kyiv, UA"))
 
      (use-package all-the-icons
        :init
