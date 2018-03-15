@@ -21,6 +21,8 @@
 (put 'use-package 'lisp-indent-function 1)
 (setq use-package-always-ensure t)
 
+(use-package use-package-ensure-system-package)
+
 ;; :diminish keyword
 (use-package diminish)
 
@@ -64,7 +66,11 @@
   :bind
   (([remap menu-bar-open] . counsel-tmm)
    ([remap insert-char] . counsel-unicode-char)
-   ([remap isearch-forward] . counsel-grep-or-swiper))
+   ([remap isearch-forward] . counsel-grep-or-swiper)
+   :prefix-map counsel-prefix-map
+   :prefix "C-c c"
+   ("r" . counsel-recentf)
+   ("l" . counsel-locate))
   :config
   (counsel-mode))
 
@@ -98,7 +104,7 @@
   (("C-:" . avy-goto-char)
    ;; ("C-'" . avy-goto-char-2)
    ("M-g M-g" . avy-goto-line)
-   ("M-g w" . avy-goto-word-1)))
+   ("M-s M-s" . avy-goto-word-1)))
 
 (use-package ace-jump-buffer
   :bind
@@ -189,6 +195,7 @@
      ("github\\.com" . gfm-mode)
      ("redmine" . textile-mode))
    "Major modes for URLs.")
+  :config
   (atomic-chrome-start-server))
 
 (use-package shr-tag-pre-highlight
@@ -294,8 +301,6 @@
            " "
            (mode 16 16 :left :elide)
            " "
-           (vc-status 10 10 :left)
-           " "
            filename-and-process)) "include vc status info")
   :hook
   (ibuffer . (lambda ()
@@ -324,6 +329,7 @@
 (use-package edit-indirect)
 
 (use-package ag
+  :ensure-system-package (ag . "sudo apt install silversearcher-ag")
   :custom
   (ag-highlight-search t "Highlight the current search term."))
 
@@ -516,8 +522,6 @@
   (yahoo-weather-location "Kyiv, UA"))
 
 (use-package all-the-icons
-  :init
-  (set-frame-font "all-the-icons" t)
   :config
   (add-to-list
    'all-the-icons-mode-icon-alist
@@ -604,8 +608,8 @@
   (reverse-im-mode t))
 
 ;; defined in internal.el
-(when (and custom-file (file-exists-p custom-file))
-  (load-file custom-file))
+;; (when (and custom-file (file-exists-p custom-file))
+;;   (load-file custom-file))
 
 ;; Local Variables:
 ;; eval: (add-hook 'after-save-hook (lambda ()(org-babel-tangle)) nil t)
