@@ -329,7 +329,7 @@
 (use-package edit-indirect)
 
 (use-package ag
-  :ensure-system-package (ag . "sudo apt install silversearcher-ag")
+  :ensure-system-package (ag . silversearcher-ag)
   :custom
   (ag-highlight-search t "Highlight the current search term."))
 
@@ -426,6 +426,8 @@
 
 (use-package json-mode)
 
+(use-package apt-sources-list)
+
 (use-package company
   :diminish company-mode
   :hook
@@ -441,6 +443,7 @@
   (add-to-list 'company-backends 'company-shell))
 
 (use-package company-emoji
+  ;; :ensure-system-package fonts-symbola
   :config
   (add-to-list 'company-backends 'company-emoji)
   (set-fontset-font t 'symbol
@@ -543,11 +546,11 @@
   :custom
   (all-the-icons-ivy-buffer-commands '() "Don't use for buffers.")
   (all-the-icons-ivy-file-commands
-        '(counsel-find-file
-          counsel-file-jump
-          counsel-recentf
-          counselа-projectile-find-file
-          counsel-projectile-find-dir) "Prettify more commands.")
+   '(counsel-find-file
+     counsel-file-jump
+     counsel-recentf
+     counsel-projectile-find-file
+     counsel-projectile-find-dir) "Prettify more commands.")
   :config
   (all-the-icons-ivy-setup))
 
@@ -557,6 +560,12 @@
         ("." . dired-hide-dotfiles-mode))
   :hook
   (dired-mode . dired-hide-dotfiles-mode))
+
+(use-package diredfl
+  :hook
+  (dired-mode . diredfl-mode))
+
+(use-package dired-launch)
 
 (use-package point-im
   :ensure nil
@@ -606,10 +615,6 @@
                    "russian-unipunct"
                  "russian-computer"))
   (reverse-im-mode t))
-
-;; defined in internal.el
-;; (when (and custom-file (file-exists-p custom-file))
-;;   (load-file custom-file))
 
 ;; Local Variables:
 ;; eval: (add-hook 'after-save-hook (lambda ()(org-babel-tangle)) nil t)

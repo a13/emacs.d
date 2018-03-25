@@ -34,7 +34,7 @@
   :config
   (menu-bar-mode -1)
   :bind
-  (([S-f10] . menu-bar-mode)))
+  ([S-f10] . menu-bar-mode))
 
 (use-package time
   :ensure nil
@@ -45,21 +45,18 @@
 
 
 ;;; fonts & colors
-
-(use-package frame
+(use-package faces
   :ensure nil
-  ;; disable suspending on C-z
-  :bind
-  (("C-z" . nil))
   :init
-  (defvar default-font "Consolas-10")
-  :config
-  (set-frame-font default-font)
-  (add-to-list 'default-frame-alist `(font . ,default-font))
-  (setq initial-frame-alist default-frame-alist)
-  (setq display-buffer-alist default-frame-alist)
-  (set-fontset-font "fontset-default" 'cyrillic
-                    (font-spec :registry "iso10646-1" :script 'cyrillic)))
+  (let ((preferred-font-families
+         '("Consolas"
+           "DejaVu Sans Mono"
+           "Monaco"
+           "Monospace")))
+    (internal-set-alternative-font-family-alist (list preferred-font-families))
+    (set-face-attribute 'default nil :family (car preferred-font-families) :weight 'regular :width 'semi-condensed)
+    (set-fontset-font "fontset-default" 'cyrillic
+                      (font-spec :registry "iso10646-1" :script 'cyrillic))))
 
 (use-package custom
   :ensure nil
@@ -67,6 +64,11 @@
   (setq custom-enabled-themes '(deeper-blue))
   (load-theme 'deeper-blue))
 
+(use-package frame
+  :ensure nil
+  ;; disable suspending on C-z
+  :bind
+  ("C-z" . nil))
 
 ;;; highlighting
 
@@ -264,7 +266,7 @@
 (use-package browse-url
   :ensure nil
   :bind
-  (([f5] . browse-url))
+  ([f5] . browse-url)
   :config
   (setq browse-url-browser-function 'browse-url-generic
         browse-url-generic-program "x-www-browser")
@@ -315,11 +317,19 @@
 (use-package cus-edit
   :ensure nil
   :config
-  (setq custom-file (concat user-emacs-directory "custom.el")))
+  (setq custom-file (make-temp-file "emacs-custom")))
+
+(use-package smtpmail
+  :ensure nil
+  ;; let's install it now, since mu4e packages aren't available yet
+  :ensure-system-package (mu . mu4e)
+  :config
+  ;;set up queue for offline email
+  ;;use mu mkdir  ~/Maildir/queue to set up first
+  (setq smtpmail-queue-mail nil  ;; start in normal mode
+        smtpmail-queue-dir "~/.mail/queue/cur"))
 
 (use-package mu4e-vars
-  :ensure-system-package
-  (mu . "sudo apt install mu4e")
   :load-path "/usr/share/emacs/site-lisp/mu4e"
   :ensure nil
   :config
@@ -338,25 +348,20 @@
   ;; use this for testing
   (setq mu4e-get-mail-command "true")
   ;; use this to sync with mbsync
-  ;;(setq mu4e-get-mail-command "mbsync gmail")
-
+  (setq mu4e-get-mail-command "mbsync work")
   ;;rename files when moving
   ;;NEEDED FOR MBSYNC
   (setq mu4e-change-filenames-when-moving t))
 
+(use-package shr-color
+  :ensure nil
+  :custom
+  (shr-color-visible-luminance-min 80 "Improve the contract"))
+
 (use-package mu4e-contrib
   :ensure nil
-  :config
-  (setq shr-color-visible-luminance-min 80)
-  (setq mu4e-html2text-command 'mu4e-shr2text))
-
-(use-package smtpmail
-  :ensure nil
-  :config
-  ;;set up queue for offline email
-  ;;use mu mkdir  ~/Maildir/queue to set up first
-  (setq smtpmail-queue-mail nil  ;; start in normal mode
-        smtpmail-queue-dir "~/.mail/queue/cur"))
+  :custom
+  (mu4e-html2text-command 'mu4e-shr2text))
 
 (use-package net-utils
   :bind
