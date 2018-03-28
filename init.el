@@ -4,6 +4,7 @@
         ("melpa" . "https://melpa.org/packages/")
         ;; ("marmalade" . "https://marmalade-repo.org/packages/")
         ("org" . "https://orgmode.org/elpa/")
+        ;; ("user42" . "https://download.tuxfamily.org/user42/elpa/packages/")
         ;; ("emacswiki" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/emacswiki/")
         ;; ("sunrise" . "http://joseito.republika.pl/sunrise-commander/")
         ))
@@ -189,6 +190,8 @@
   ;; do not bind C-x C-j since it's used by jabber.el
   (dired-bind-jump nil))
 
+(use-package dired-toggle)
+
 (use-package dired-hide-dotfiles
   :bind
   (:map dired-mode-map
@@ -205,6 +208,8 @@
 (use-package mule
   :ensure nil
   :config
+  (prefer-coding-system 'utf-8)
+  (set-terminal-coding-system 'utf-8)
   (set-language-environment "UTF-8"))
 
 (use-package ispell
@@ -384,12 +389,25 @@
    ([remap isearch-forward] . counsel-grep-or-swiper)
    :prefix-map counsel-prefix-map
    :prefix "C-c c"
+   ("a" . counsel-apropos)
+   ("b" . counsel-bookmark)
+   ("d" . counsel-dired-jump)
+   ("e" . counsel-expression-history)
+   ("f" . counsel-file-jump)
+   ("g" . counsel-org-goto)
+   ("h" . counsel-command-history)
+   ("i" . counsel-imenu)
+   ("l" . counsel-locate)
+   ("m" . counsel-mark-ring)
+   ("o" . counsel-outline)
+   ("p" . counsel-package)
    ("r" . counsel-recentf)
-   ("l" . counsel-locate))
-  :config
-  (counsel-mode))
-
-(use-package counsel-projectile
+   ("s g" . counsel-grep)
+   ("s r" . counsel-rg)
+   ("s s" . counsel-ag)
+   ("t" . counsel-org-tag)
+   ("v" . counsel-set-variable)
+   ("w" . counsel-wmctrl))
   :after projectile
   :config
   (counsel-projectile-mode))
@@ -458,6 +476,7 @@
 (use-package select
   :ensure nil
   :custom
+  (x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
   (select-enable-clipboard t "Use the clipboard"))
 
 (use-package expand-region
@@ -507,6 +526,9 @@
   :diminish which-key-mode
   :config
   (which-key-mode))
+
+(use-package free-keys
+  :commands free-keys)
 
 (use-package helpful)
 
@@ -799,6 +821,10 @@
   :config
   (magithub-feature-autoinject t))
 
+(use-package browse-at-remote
+  :bind
+  ("C-c l r" . browse-at-remote))
+
 (use-package smerge-mode
   :ensure nil
   :diminish smerge-mode)
@@ -887,6 +913,13 @@
   :custom
   (nameless-private-prefix t))
 
+;; bind-key can't bind to keymaps
+(use-package erefactor)
+
+(use-package flycheck-package
+  :after flycheck
+  (flycheck-package-setup))
+
 (use-package geiser)
 
 (use-package clojure-mode)
@@ -950,11 +983,19 @@
 
 (use-package apt-sources-list)
 
+(use-package markdown-mode
+  :ensure-system-package markdown
+  :mode (("\\`README\\.md\\'" . gfm-mode)
+         ("\\.md\\'"          . markdown-mode)
+         ("\\.markdown\\'"    . markdown-mode))
+  :init (setq markdown-command "markdown"))
+
 (use-package restclient)
 
 (use-package ob-restclient)
 
 (use-package company-restclient
+  :after (company restclient)
   :config
   (add-to-list 'company-backends 'company-restclient))
 
