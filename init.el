@@ -1,10 +1,10 @@
 (require 'package)
 (setq package-archives
-      '(("gnu" . "https://elpa.gnu.org/packages/")
+      `(,@package-archives
         ("melpa" . "https://melpa.org/packages/")
-        ;; ("emacswiki" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/emacswiki/")
         ;; ("marmalade" . "https://marmalade-repo.org/packages/")
         ("org" . "https://orgmode.org/elpa/")
+        ;; ("emacswiki" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/emacswiki/")
         ;; ("sunrise" . "http://joseito.republika.pl/sunrise-commander/")
         ))
 (package-initialize)
@@ -101,6 +101,14 @@
   :ensure nil
   :custom
   (uniquify-buffer-name-style 'forward))
+
+(use-package tramp
+  :ensure nil
+  :custom
+  (tramp-default-method "ssh")
+  (tramp-default-proxies-alist nil))
+
+(use-package sudo-edit)
 
 (use-package frame
   :ensure nil
@@ -501,14 +509,6 @@
   (which-key-mode))
 
 (use-package helpful)
-
-(use-package tramp
-  :ensure nil
-  :custom
-  (tramp-default-method "ssh")
-  (tramp-default-proxies-alist nil))
-
-(use-package sudo-edit)
 
 (use-package jabber
   :secret

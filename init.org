@@ -8,11 +8,11 @@
    #+BEGIN_SRC emacs-lisp :tangle yes
      (require 'package)
      (setq package-archives
-           '(("gnu" . "https://elpa.gnu.org/packages/")
+           `(,@package-archives
              ("melpa" . "https://melpa.org/packages/")
-             ;; ("emacswiki" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/emacswiki/")
              ;; ("marmalade" . "https://marmalade-repo.org/packages/")
              ("org" . "https://orgmode.org/elpa/")
+             ;; ("emacswiki" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/emacswiki/")
              ;; ("sunrise" . "http://joseito.republika.pl/sunrise-commander/")
              ))
      (package-initialize)
@@ -140,6 +140,18 @@
        :custom
        (uniquify-buffer-name-style 'forward))
    #+END_SRC
+
+** Tramp
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (use-package tramp
+       :ensure nil
+       :custom
+       (tramp-default-method "ssh")
+       (tramp-default-proxies-alist nil))
+
+     (use-package sudo-edit)
+   #+END_SRC
+
 
 ** Uncategorized
    (Mostly) keybindings customization
@@ -490,7 +502,6 @@
   #+END_SRC
   Usually, I don't use isearch, but just in case
   #+BEGIN_SRC emacs-lisp :tangle yes
-
     (use-package isearch
       :ensure nil
       :bind
@@ -595,17 +606,6 @@
       (which-key-mode))
 
     (use-package helpful)
-  #+END_SRC
-
-* Tramp
-  #+BEGIN_SRC emacs-lisp :tangle yes
-    (use-package tramp
-      :ensure nil
-      :custom
-      (tramp-default-method "ssh")
-      (tramp-default-proxies-alist nil))
-
-    (use-package sudo-edit)
   #+END_SRC
 
 * Internet
