@@ -1,10 +1,12 @@
 (require 'package)
-(setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
-                         ("melpa" . "https://melpa.org/packages/")
-                         ;; ("marmalade" . "https://marmalade-repo.org/packages/")
-                         ("org" . "https://orgmode.org/elpa/")
-                         ;; ("sunrise" . "http://joseito.republika.pl/sunrise-commander/")
-                         ))
+(setq package-archives
+      '(("gnu" . "https://elpa.gnu.org/packages/")
+        ("melpa" . "https://melpa.org/packages/")
+        ;; ("emacswiki" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/emacswiki/")
+        ;; ("marmalade" . "https://marmalade-repo.org/packages/")
+        ("org" . "https://orgmode.org/elpa/")
+        ;; ("sunrise" . "http://joseito.republika.pl/sunrise-commander/")
+        ))
 (package-initialize)
 
 (setq package-enable-at-startup nil)
@@ -39,7 +41,7 @@
 (use-package use-package-secrets
   :ensure nil
   :custom
-  (use-package-secrets-default-directory "~/docs/secrets")
+  (use-package-secrets-default-directory "~/.emacs.d/secrets")
   :quelpa
   (use-package-secrets :repo "a13/use-package-secrets" :fetcher github :version original))
 
@@ -87,7 +89,8 @@
 (use-package cus-edit
   :ensure nil
   :custom
-  (custom-file (make-temp-file "emacs-custom") "Don't store customizations"))
+  ;; alternatively, one can use `(make-temp-file "emacs-custom")'
+  (custom-file null-device "Don't store customizations"))
 
 (use-package epa
   :ensure nil
@@ -107,7 +110,7 @@
 
 (use-package delsel
   :ensure nil
-  ;; C-c C-g always quit minubuffer
+  ;; C-c C-g always quits minubuffer
   :bind
   ("C-c C-g" . minibuffer-keyboard-quit))
 
@@ -483,9 +486,9 @@
 
 (use-package man
   :ensure nil
-  :config
-  (set-face-attribute 'Man-overstrike nil :inherit font-lock-type-face :bold t)
-  (set-face-attribute 'Man-underline nil :inherit font-lock-keyword-face :underline t))
+  :custom-face
+  (Man-overstrike ((t (:inherit font-lock-type-face :bold t))))
+  (Man-underline ((t (:inherit font-lock-keyword-face :underline t)))))
 
 (use-package keyfreq
   :config
@@ -509,7 +512,7 @@
 
 (use-package jabber
   :secret
-  (jabber-connect-all "~/.secrets.el.gpg")
+  (jabber-connect-all "jabber.el.gpg")
   :config
   (setq jabber-history-enabled t
         jabber-use-global-history nil
