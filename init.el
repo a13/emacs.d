@@ -762,14 +762,35 @@
 
 (use-package magit
   :custom
-  (magit-completing-read-function 'ivy-completing-read "Force Ivy usage."))
-
-(use-package magit-keys
-  :ensure nil
-  :quelpa
-  (magit-keys :repo "a13/magit-keys.el" :fetcher github :version original)
-  :config
-  (magit-keys-mode t))
+  (magit-completing-read-function 'ivy-completing-read "Force Ivy usage.")
+  :bind
+  (:prefix-map magit-prefix-map
+               :prefix "C-c m"
+               (("a" . magit-stage-file) ; the closest analog to git add
+                ("b" . magit-blame)
+                ("B" . magit-branch)
+                ("c" . magit-checkout)
+                ("C" . magit-commit)
+                ("d" . magit-diff)
+                ("D" . magit-discard)
+                ("f" . magit-fetch)
+                ("g" . vc-git-grep)
+                ("G" . magit-gitignore)
+                ("i" . magit-init)
+                ("l" . magit-log)
+                ("m" . magit)
+                ("M" . magit-merge)
+                ("n" . magit-notes-edit)
+                ("p" . magit-pull)
+                ("P" . magit-push)
+                ("r" . magit-reset)
+                ("R" . magit-rebase)
+                ("s" . magit-status)
+                ("S" . magit-stash)
+                ("t" . magit-tag)
+                ("T" . magit-tag-delete)
+                ("u" . magit-unstage)
+                ("U" . magit-update-index))))
 
 (use-package magithub
   :after magit

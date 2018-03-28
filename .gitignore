@@ -1,17 +1,22 @@
 # -*-	mode: conf; -*-
-custom.el
-elpa
-auto-save-list
-eshell
-tramp
 abbrev_defs
-url
-places
+auto-save-list
+elpa
+emojis
+eshell
+history
 ido.last
+jabber-history
 jabber-otr
+magithub
+places
 quelpa
-request
 recentf
+request
+secrets
+smex-items
+tramp
+url
 # backups
 *~
 \#*\#
