@@ -96,6 +96,7 @@
 (use-package epa
   :ensure nil
   :custom
+  (epg-gpg-program "gpg")
   (epa-pinentry-mode nil))
 
 (use-package uniquify
@@ -311,7 +312,7 @@
   (spaceline-all-the-icons--setup-paradox))
 
 (use-package all-the-icons-ivy
-  :after ivy
+  :after ivy projectile
   :custom
   (all-the-icons-ivy-buffer-commands '() "Don't use for buffers.")
   (all-the-icons-ivy-file-commands
@@ -408,7 +409,6 @@
    ("t" . counsel-org-tag)
    ("v" . counsel-set-variable)
    ("w" . counsel-wmctrl))
-  :after projectile
   :config
   (counsel-mode))
 
@@ -847,6 +847,11 @@
   (projectile-completion-system 'ivy)
   :config
   (projectile-mode))
+
+(use-package counsel-projectile
+  :after counsel projectile
+  :config
+  (counsel-projectile-mode))
 
 (use-package ag
   :ensure-system-package (ag . silversearcher-ag)
