@@ -410,7 +410,7 @@
    ("w" . counsel-wmctrl))
   :after projectile
   :config
-  (counsel-projectile-mode))
+  (counsel-mode))
 
 (use-package swiper)
 
@@ -447,6 +447,10 @@
    ;; ("C-'" . avy-goto-char-2)
    ("M-g M-g" . avy-goto-line)
    ("M-s M-s" . avy-goto-word-1)))
+
+(use-package avy-zap
+  :bind
+  ([remap zap-to-char] . avy-zap-to-char))
 
 (use-package ace-jump-buffer
   :bind
@@ -733,6 +737,8 @@
   :custom
   (calendar-week-start-day 1))
 
+(use-package org-plus-contrib)
+
 (use-package org
   ;; to be sure we have latest Org version
   :ensure org-plus-contrib
@@ -967,11 +973,12 @@
                (when (string-match "conkeror" (or (buffer-file-name) ""))
                  (conkeror-minor-mode 1)))))
 
+(use-package json-mode)
+
 (use-package graphql-mode
+  :mode "\\.graphql\\'"
   :custom
   (graphql-url "http://localhost:8000/api/graphql/query"))
-
-(use-package json-mode)
 
 (use-package sh-script
   :ensure nil
