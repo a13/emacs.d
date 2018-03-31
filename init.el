@@ -409,7 +409,7 @@
    ("t" . counsel-org-tag)
    ("v" . counsel-set-variable)
    ("w" . counsel-wmctrl))
-  :config
+  :init
   (counsel-mode))
 
 (use-package swiper)
@@ -823,7 +823,7 @@
 (use-package magithub
   :after magit
   :custom
-  (magithub-clone-default-directory "~/git")
+  (magithub-clone-default-directory "~/git/")
   :config
   (magithub-feature-autoinject t))
 
