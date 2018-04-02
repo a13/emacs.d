@@ -180,6 +180,7 @@
 
 (use-package dired
   :ensure nil
+  :custom (dired-dwim-target t "guess a target directory")
   :bind
   ([remap list-directory] . dired)
   :hook
