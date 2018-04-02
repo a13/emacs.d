@@ -1,4 +1,4 @@
-!: Emacs Config
+: Emacs Config
 #+INFOJS_OPT: view:t toc:t ltoc:t mouse:underline buttons:0 path:https://www.linux.org.ru/tango/combined.css
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="http://www.pirilampo.org/styles/readtheorg/css/htmlize.css"/>
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="http://www.pirilampo.org/styles/readtheorg/css/readtheorg.css"/>
@@ -349,6 +349,7 @@
        (after-init . fancy-battery-mode))
 
      (use-package yahoo-weather
+       :bind ("C-c w" . yahoo-weather-mode)
        :custom
        ;; TODO: autolocate
        (yahoo-weather-location "Kyiv, UA"))

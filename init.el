@@ -280,6 +280,7 @@
   (after-init . fancy-battery-mode))
 
 (use-package yahoo-weather
+  :bind ("C-c w" . yahoo-weather-mode)
   :custom
   ;; TODO: autolocate
   (yahoo-weather-location "Kyiv, UA"))
