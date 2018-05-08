@@ -110,7 +110,9 @@
   (tramp-default-method "ssh")
   (tramp-default-proxies-alist nil))
 
-(use-package sudo-edit)
+(use-package sudo-edit
+  :bind (:map ctl-x-map
+              ("M-s" . sudo-edit)))
 
 (use-package frame
   :ensure nil
@@ -246,9 +248,11 @@
 (use-package custom
   :ensure nil
   :custom
-  (custom-enabled-themes '(deeper-blue))
+  (custom-safe-themes t))
+
+(use-package gruvbox-theme
   :config
-  (load-theme 'deeper-blue))
+  (load-theme 'gruvbox-dark-medium))
 
 (use-package tool-bar
   :ensure nil
@@ -739,8 +743,6 @@
   :custom
   (calendar-week-start-day 1))
 
-(use-package org-plus-contrib)
-
 (use-package org
   ;; to be sure we have latest Org version
   :ensure org-plus-contrib
@@ -774,16 +776,20 @@
   (jiralib-url "http://jira:8080"))
 
 (use-package ibuffer-vc
+  :config
+  (define-ibuffer-column icon
+    (:name "Icon" :inline t)
+    (all-the-icons-ivy--icon-for-mode major-mode))
   :custom
   (ibuffer-formats
    '((mark modified read-only vc-status-mini " "
-           (name 18 18 :left :elide)
-           " "
-           (size 9 -1 :right)
-           " "
-           (mode 16 16 :left :elide)
-           " "
-           filename-and-process)) "include vc status info")
+      (name 18 18 :left :elide)
+      " "
+      (size 9 -1 :right)
+      " "
+      (mode 16 16 :left :elide)
+      " "
+      filename-and-process)) "include vc status info")
   :hook
   (ibuffer . (lambda ()
                (ibuffer-vc-set-filter-groups-by-vc-root)
@@ -974,6 +980,10 @@
 
 (use-package lua-mode)
 
+(use-package fennel-mode
+  :ensure nil
+  :quelpa (fennel-mode :repo "technomancy/fennel-mode" :fetcher gitlab))
+
 (use-package conkeror-minor-mode
   :hook
   (js-mode . (lambda ()
@@ -997,6 +1007,17 @@
 
 (use-package apt-sources-list)
 
+(use-package ssh-config-mode
+  :init
+  (autoload 'ssh-config-mode "ssh-config-mode" t)
+  :mode
+  (("/\\.ssh/config\\'"     . ssh-config-mode)
+   ("/sshd?_config\\'"      . ssh-config-mode)
+   ("/known_hosts\\'"       . ssh-known-hosts-mode)
+   ("/authorized_keys2?\\'" . ssh-authorized-keys-mode))
+  :hook
+  (ssh-config-mode . turn-on-font-lock))
+
 (use-package markdown-mode
   :ensure-system-package markdown
   :mode (("\\`README\\.md\\'" . gfm-mode)
@@ -1014,6 +1035,7 @@
   (add-to-list 'company-backends 'company-restclient))
 
 (use-package net-utils
+  :ensure-system-package traceroute
   :bind
   (:prefix-map net-utils-prefix-map
                :prefix "C-c n"
@@ -1026,7 +1048,8 @@
                ("r" . route)
                ("h" . nslookup-host)
                ("d" . dig)
-               ("s" . smbclient)))
+               ("s" . smbclient)
+               ("t" . traceroute)))
 
 (use-package docker
   :config

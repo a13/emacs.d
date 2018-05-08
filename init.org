@@ -151,7 +151,10 @@
        (tramp-default-method "ssh")
        (tramp-default-proxies-alist nil))
 
-     (use-package sudo-edit)
+     (use-package sudo-edit
+       :bind (:map ctl-x-map
+                   ("M-s" . sudo-edit)))
+
    #+END_SRC
 ** Uncategorized
    (Mostly) keybindings customization
@@ -308,9 +311,11 @@
      (use-package custom
        :ensure nil
        :custom
-       (custom-enabled-themes '(deeper-blue))
+       (custom-safe-themes t))
+
+     (use-package gruvbox-theme
        :config
-       (load-theme 'deeper-blue))
+       (load-theme 'gruvbox-dark-medium))
    #+END_SRC
 
 ** GUI
@@ -853,8 +858,6 @@
       :custom
       (calendar-week-start-day 1))
 
-    (use-package org-plus-contrib)
-
     (use-package org
       ;; to be sure we have latest Org version
       :ensure org-plus-contrib
@@ -890,19 +893,23 @@
   #+END_SRC
 
 * Programming-related
-** Version control
+
    #+BEGIN_SRC emacs-lisp :tangle yes
      (use-package ibuffer-vc
+       :config
+       (define-ibuffer-column icon
+         (:name "Icon" :inline t)
+         (all-the-icons-ivy--icon-for-mode major-mode))
        :custom
        (ibuffer-formats
         '((mark modified read-only vc-status-mini " "
-                (name 18 18 :left :elide)
-                " "
-                (size 9 -1 :right)
-                " "
-                (mode 16 16 :left :elide)
-                " "
-                filename-and-process)) "include vc status info")
+           (name 18 18 :left :elide)
+           " "
+           (size 9 -1 :right)
+           " "
+           (mode 16 16 :left :elide)
+           " "
+           filename-and-process)) "include vc status info")
        :hook
        (ibuffer . (lambda ()
                     (ibuffer-vc-set-filter-groups-by-vc-root)
@@ -1139,6 +1146,10 @@
 
     #+BEGIN_SRC emacs-lisp :tangle yes
       (use-package lua-mode)
+
+      (use-package fennel-mode
+        :ensure nil
+        :quelpa (fennel-mode :repo "technomancy/fennel-mode" :fetcher gitlab))
     #+END_SRC
 
 *** JS
@@ -1173,6 +1184,17 @@
 *** Configuration files
     #+BEGIN_SRC emacs-lisp :tangle yes
       (use-package apt-sources-list)
+
+      (use-package ssh-config-mode
+        :init
+        (autoload 'ssh-config-mode "ssh-config-mode" t)
+        :mode
+        (("/\\.ssh/config\\'"     . ssh-config-mode)
+         ("/sshd?_config\\'"      . ssh-config-mode)
+         ("/known_hosts\\'"       . ssh-known-hosts-mode)
+         ("/authorized_keys2?\\'" . ssh-authorized-keys-mode))
+        :hook
+        (ssh-config-mode . turn-on-font-lock))
     #+END_SRC
 
 *** Markup
@@ -1202,6 +1224,7 @@
 ** Network
    #+BEGIN_SRC emacs-lisp :tangle yes
      (use-package net-utils
+       :ensure-system-package traceroute
        :bind
        (:prefix-map net-utils-prefix-map
                     :prefix "C-c n"
@@ -1214,7 +1237,8 @@
                     ("r" . route)
                     ("h" . nslookup-host)
                     ("d" . dig)
-                    ("s" . smbclient)))
+                    ("s" . smbclient)
+                    ("t" . traceroute)))
    #+END_SRC
 ** Docker
    #+BEGIN_SRC emacs-lisp :tangle yes
