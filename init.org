@@ -304,7 +304,7 @@
      (use-package faces
        :ensure nil
        :custom
-       (face-font-family-alternatives '(("Fira Code" "Consolas" "Monaco" "Monospace")))
+       (face-font-family-alternatives '(("Consolas" "Monaco" "Monospace")))
        :init
        (set-face-attribute 'default nil :family (caar face-font-family-alternatives) :weight 'regular :width 'semi-condensed)
        (set-fontset-font "fontset-default" 'cyrillic
