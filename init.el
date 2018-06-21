@@ -107,6 +107,7 @@
 (use-package tramp
   :ensure nil
   :custom
+  (tramp-backup-directory-alist backup-directory-alist)
   (tramp-default-method "ssh")
   (tramp-default-proxies-alist nil))
 
@@ -173,6 +174,10 @@
   :bind
   (("M-`" . eshell-toggle)))
 
+(use-package eshell-fringe-status
+  :config
+  (add-hook 'eshell-mode-hook 'eshell-fringe-status-mode))
+
 (use-package ls-lisp
   :ensure nil
   :custom
@@ -183,13 +188,13 @@
 (use-package dired
   :ensure nil
   :custom (dired-dwim-target t "guess a target directory")
-  :bind
-  ([remap list-directory] . dired)
   :hook
   (dired-mode . dired-hide-details-mode))
 
 (use-package dired-x
   :ensure nil
+  :bind
+  ([remap list-directory] . dired-jump)
   :custom
   ;; do not bind C-x C-j since it's used by jabber.el
   (dired-bind-jump nil))
@@ -342,6 +347,11 @@
                      (projects . 5)
                      ;; (agenda . 5)
                      (registers . 5))))
+
+(use-package winner
+  :ensure nil
+  :config
+  (winner-mode 1))
 
 (use-package paren
   :ensure nil
@@ -796,6 +806,10 @@
                (unless (eq ibuffer-sorting-mode 'alphabetic)
                  (ibuffer-do-sort-by-alphabetic)))))
 
+(use-package gitconfig-mode)
+
+(use-package gitignore-mode)
+
 (use-package magit
   :custom
   (magit-completing-read-function 'ivy-completing-read "Force Ivy usage.")
@@ -849,6 +863,9 @@
    (prog-mode . diff-hl-mode)
    (org-mode . diff-hl-mode)
    (dired-mode . diff-hl-dired-mode)))
+
+(use-package smart-comment
+  :bind ("M-;" . smart-comment))
 
 (use-package projectile
   :custom
@@ -919,6 +936,15 @@
 (use-package avy-flycheck
   :config
   (avy-flycheck-setup))
+
+(use-package lisp
+  :ensure nil
+  :hook
+  (after-save-hook . check-parens))
+
+(use-package eros
+  :hook
+  (emacs-lisp-mode-hook . eros-mode))
 
 (use-package suggest)
 

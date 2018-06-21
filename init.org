@@ -148,6 +148,7 @@
      (use-package tramp
        :ensure nil
        :custom
+       (tramp-backup-directory-alist backup-directory-alist)
        (tramp-default-method "ssh")
        (tramp-default-proxies-alist nil))
 
@@ -222,6 +223,10 @@
       (eshell-toggle :repo "4DA/eshell-toggle" :fetcher github :version original)
       :bind
       (("M-`" . eshell-toggle)))
+
+    (use-package eshell-fringe-status
+      :config
+      (add-hook 'eshell-mode-hook 'eshell-fringe-status-mode))
   #+END_SRC
 * Dired
   #+BEGIN_SRC emacs-lisp :tangle yes
@@ -235,13 +240,13 @@
     (use-package dired
       :ensure nil
       :custom (dired-dwim-target t "guess a target directory")
-      :bind
-      ([remap list-directory] . dired)
       :hook
       (dired-mode . dired-hide-details-mode))
 
     (use-package dired-x
       :ensure nil
+      :bind
+      ([remap list-directory] . dired-jump)
       :custom
       ;; do not bind C-x C-j since it's used by jabber.el
       (dired-bind-jump nil))
@@ -299,7 +304,7 @@
      (use-package faces
        :ensure nil
        :custom
-       (face-font-family-alternatives '(("Consolas" "Monaco" "Monospace")))
+       (face-font-family-alternatives '(("Fira Code" "Consolas" "Monaco" "Monospace")))
        :init
        (set-face-attribute 'default nil :family (caar face-font-family-alternatives) :weight 'regular :width 'semi-condensed)
        (set-fontset-font "fontset-default" 'cyrillic
@@ -422,6 +427,13 @@
                           (registers . 5))))
    #+END_SRC
 
+   And the winner is…
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (use-package winner
+       :ensure nil
+       :config
+       (winner-mode 1))
+   #+END_SRC
 ** Highlighting
    #+BEGIN_SRC emacs-lisp :tangle yes
      (use-package paren
@@ -916,6 +928,10 @@
                     (unless (eq ibuffer-sorting-mode 'alphabetic)
                       (ibuffer-do-sort-by-alphabetic)))))
 
+     (use-package gitconfig-mode)
+
+     (use-package gitignore-mode)
+
      (use-package magit
        :custom
        (magit-completing-read-function 'ivy-completing-read "Force Ivy usage.")
@@ -969,6 +985,9 @@
         (prog-mode . diff-hl-mode)
         (org-mode . diff-hl-mode)
         (dired-mode . diff-hl-dired-mode)))
+
+     (use-package smart-comment
+       :bind ("M-;" . smart-comment))
 
      (use-package projectile
        :custom
@@ -1060,6 +1079,15 @@
 *** Emacs Lisp
 
     #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package lisp
+        :ensure nil
+        :hook
+        (after-save-hook . check-parens))
+
+      (use-package eros
+        :hook
+        (emacs-lisp-mode-hook . eros-mode))
+
       (use-package suggest)
 
       (use-package ipretty
