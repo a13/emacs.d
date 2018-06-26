@@ -60,7 +60,8 @@
   (inhibit-startup-screen t "Don't show splash screen")
   (use-dialog-box nil "Disable dialog boxes")
   (enable-recursive-minibuffers t "Allow minibuffer commands in the minibuffer")
-  (indent-tabs-mode nil "Spaces!"))
+  (indent-tabs-mode nil "Spaces!")
+  (debug-on-quit nil))
 
 (use-package files
   :ensure nil
