@@ -247,7 +247,13 @@
   :custom
   (face-font-family-alternatives '(("Consolas" "Monaco" "Monospace")))
   :init
-  (set-face-attribute 'default nil :family (caar face-font-family-alternatives) :weight 'regular :width 'semi-condensed)
+  (set-face-attribute 'default
+                      nil
+                      :family (caar face-font-family-alternatives)
+                      :weight 'regular
+                      :width 'semi-condensed
+                      ;; (/ (* 19 (display-pixel-height)) (display-mm-height))
+                      :height (if (> (display-pixel-height) 1000) 160 120))
   (set-fontset-font "fontset-default" 'cyrillic
                     (font-spec :registry "iso10646-1" :script 'cyrillic)))
 
@@ -390,7 +396,7 @@
   (ivy-count-format "%d/%d " "Show anzu-like counter")
   (ivy-use-selectable-prompt t "Make the prompt line selectable")
   :custom-face
-  (ivy-current-match ((t (:background "gray1"))))
+  (ivy-current-match ((t (:inherit 'hl-line))))
   :bind
   (("C-c C-r" . ivy-resume))
   :config
@@ -852,7 +858,8 @@
 
 (use-package browse-at-remote
   :bind
-  ("C-c l r" . browse-at-remote))
+  ("C-c l r" . browse-at-remote)
+  ("C-c l k" . browse-at-remote-kill))
 
 (use-package smerge-mode
   :ensure nil
