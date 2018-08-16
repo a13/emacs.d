@@ -126,7 +126,8 @@
   :ensure nil
   ;; C-c C-g always quits minubuffer
   :bind
-  ("C-c C-g" . minibuffer-keyboard-quit))
+  (:map mode-specific-map
+        ("C-g" . minibuffer-keyboard-quit)))
 
 (use-package simple
   :ensure nil
@@ -138,10 +139,12 @@
   (toggle-truncate-lines 1)
   :bind
   ;; remap ctrl-w/ctrl-h
-  (("C-c h" . help-command)
-   ("C-w" . backward-kill-word)
-   ("C-x C-k" . kill-region)
-   ("C-h" . delete-backward-char)))
+  (("C-w" . backward-kill-word)
+   ("C-h" . delete-backward-char)
+   :map ctl-x-map
+   ("C-k" . kill-region)
+   :map mode-specific-map
+   ("h" . help-command)))
 
 (use-package ibuffer
   :ensure nil
@@ -244,9 +247,11 @@
 
 (use-package faces
   :ensure nil
+  :defer t
   :custom
   (face-font-family-alternatives '(("Consolas" "Monaco" "Monospace")))
-  :init
+  :config
+  (message "height %s" (display-pixel-height))
   (set-face-attribute 'default
                       nil
                       :family (caar face-font-family-alternatives)
@@ -296,7 +301,8 @@
   (after-init . fancy-battery-mode))
 
 (use-package yahoo-weather
-  :bind ("C-c w" . yahoo-weather-mode)
+  :bind (:map mode-specific-map
+              ("w" . yahoo-weather-mode))
   :custom
   ;; TODO: autolocate
   (yahoo-weather-location "Kyiv, UA"))
@@ -398,7 +404,8 @@
   :custom-face
   (ivy-current-match ((t (:inherit 'hl-line))))
   :bind
-  (("C-c C-r" . ivy-resume))
+  (:map mode-specific-map
+        ("C-r" . ivy-resume))
   :config
   (ivy-mode t))
 
@@ -411,8 +418,9 @@
   (([remap menu-bar-open] . counsel-tmm)
    ([remap insert-char] . counsel-unicode-char)
    ([remap isearch-forward] . counsel-grep-or-swiper)
+   :map mode-specific-map
    :prefix-map counsel-prefix-map
-   :prefix "C-c c"
+   :prefix "c"
    ("a" . counsel-apropos)
    ("b" . counsel-bookmark)
    ("d" . counsel-dired-jump)
@@ -486,19 +494,23 @@
   :bind
   (("M-o" . ace-window)))
 
-(use-package ace-link
+(use-package link-hint
   :bind
-  ("C-c l l" . counsel-ace-link)
+  (("<XF86Search>" . link-hint-open-link)
+   ("S-<XF86Search>" . link-hint-copy-link)
+   :map mode-specific-map
+   :prefix-map link-hint-keymap
+   :prefix "l"
+   ("o" . link-hint-open-link)
+   ("c" . link-hint-copy-link)))
+
+(use-package ace-link
+  :after link-hint ; to use prefix keymap
+  :bind
+  (:map link-hint-keymap
+        ("l" . counsel-ace-link))
   :config
   (ace-link-setup-default))
-
-(use-package link-hint
-  :ensure t
-  :bind
-  (("C-c l o" . link-hint-open-link)
-   ("<XF86Search>" . link-hint-open-link)
-   ("C-c l c" . link-hint-copy-link)
-   ("S-<XF86Search>" . link-hint-copy-link)))
 
 (use-package select
   :ensure nil
@@ -512,31 +524,35 @@
 
 (use-package edit-indirect
   :bind
-  ("C-c e r" . edit-indirect-region))
+  (:map mode-specific-map
+        ("r" . edit-indirect-region)))
 
 (use-package clipmon
   :config
   (clipmon-mode))
 
 (use-package copy-as-format
+  :custom
+  (copy-as-format-default "github")
   :bind
-  (:prefix-map copy-as-format-prefix-map
-               :prefix "C-c f"
-               ("f" . copy-as-format)
-               ("a" . copy-as-format-asciidoc)
-               ("b" . copy-as-format-bitbucket)
-               ("d" . copy-as-format-disqus)
-               ("g" . copy-as-format-github)
-               ("l" . copy-as-format-gitlab)
-               ("c" . copy-as-format-hipchat)
-               ("h" . copy-as-format-html)
-               ("j" . copy-as-format-jira)
-               ("m" . copy-as-format-markdown)
-               ("w" . copy-as-format-mediawiki)
-               ("o" . copy-as-format-org-mode)
-               ("p" . copy-as-format-pod)
-               ("r" . copy-as-format-rst)
-               ("s" . copy-as-format-slack)))
+  (:map mode-specific-map
+        :prefix-map copy-as-format-prefix-map
+        :prefix "f"
+        ("f" . copy-as-format)
+        ("a" . copy-as-format-asciidoc)
+        ("b" . copy-as-format-bitbucket)
+        ("d" . copy-as-format-disqus)
+        ("g" . copy-as-format-github)
+        ("l" . copy-as-format-gitlab)
+        ("c" . copy-as-format-hipchat)
+        ("h" . copy-as-format-html)
+        ("j" . copy-as-format-jira)
+        ("m" . copy-as-format-markdown)
+        ("w" . copy-as-format-mediawiki)
+        ("o" . copy-as-format-org-mode)
+        ("p" . copy-as-format-pod)
+        ("r" . copy-as-format-rst)
+        ("s" . copy-as-format-slack)))
 
 (use-package man
   :ensure nil
@@ -696,8 +712,9 @@
   :diminish google-this-mode
   :config
   (google-this-mode 1)
-  :custom
-  (google-this-keybind (kbd "C-c g")))
+  :bind
+  (:map mode-specific-map
+        ("g" . google-this-mode-submap)))
 
 (use-package multitran)
 
@@ -800,13 +817,13 @@
   :custom
   (ibuffer-formats
    '((mark modified read-only vc-status-mini " "
-      (name 18 18 :left :elide)
-      " "
-      (size 9 -1 :right)
-      " "
-      (mode 16 16 :left :elide)
-      " "
-      filename-and-process)) "include vc status info")
+           (name 18 18 :left :elide)
+           " "
+           (size 9 -1 :right)
+           " "
+           (mode 16 16 :left :elide)
+           " "
+           filename-and-process)) "include vc status info")
   :hook
   (ibuffer . (lambda ()
                (ibuffer-vc-set-filter-groups-by-vc-root)
@@ -821,33 +838,34 @@
   :custom
   (magit-completing-read-function 'ivy-completing-read "Force Ivy usage.")
   :bind
-  (:prefix-map magit-prefix-map
-               :prefix "C-c m"
-               (("a" . magit-stage-file) ; the closest analog to git add
-                ("b" . magit-blame)
-                ("B" . magit-branch)
-                ("c" . magit-checkout)
-                ("C" . magit-commit)
-                ("d" . magit-diff)
-                ("D" . magit-discard)
-                ("f" . magit-fetch)
-                ("g" . vc-git-grep)
-                ("G" . magit-gitignore)
-                ("i" . magit-init)
-                ("l" . magit-log)
-                ("m" . magit)
-                ("M" . magit-merge)
-                ("n" . magit-notes-edit)
-                ("p" . magit-pull)
-                ("P" . magit-push)
-                ("r" . magit-reset)
-                ("R" . magit-rebase)
-                ("s" . magit-status)
-                ("S" . magit-stash)
-                ("t" . magit-tag)
-                ("T" . magit-tag-delete)
-                ("u" . magit-unstage)
-                ("U" . magit-update-index))))
+  (:map mode-specific-map
+        :prefix-map magit-prefix-map
+        :prefix "m"
+        (("a" . magit-stage-file) ; the closest analog to git add
+         ("b" . magit-blame)
+         ("B" . magit-branch)
+         ("c" . magit-checkout)
+         ("C" . magit-commit)
+         ("d" . magit-diff)
+         ("D" . magit-discard)
+         ("f" . magit-fetch)
+         ("g" . vc-git-grep)
+         ("G" . magit-gitignore)
+         ("i" . magit-init)
+         ("l" . magit-log)
+         ("m" . magit)
+         ("M" . magit-merge)
+         ("n" . magit-notes-edit)
+         ("p" . magit-pull)
+         ("P" . magit-push)
+         ("r" . magit-reset)
+         ("R" . magit-rebase)
+         ("s" . magit-status)
+         ("S" . magit-stash)
+         ("t" . magit-tag)
+         ("T" . magit-tag-delete)
+         ("u" . magit-unstage)
+         ("U" . magit-update-index))))
 
 (use-package magithub
   :after magit
@@ -857,9 +875,11 @@
   (magithub-feature-autoinject t))
 
 (use-package browse-at-remote
+  :after link-hint
   :bind
-  ("C-c l r" . browse-at-remote)
-  ("C-c l k" . browse-at-remote-kill))
+  (:map link-hint-keymap
+        ("r" . browse-at-remote)
+        ("k" . browse-at-remote-kill)))
 
 (use-package smerge-mode
   :ensure nil
@@ -876,10 +896,10 @@
   :bind ("M-;" . smart-comment))
 
 (use-package projectile
+  :bind
+  (:map mode-specific-map ("p" . projectile-command-map))
   :custom
-  (projectile-completion-system 'ivy)
-  :config
-  (projectile-mode))
+  (projectile-completion-system 'ivy))
 
 (use-package counsel-projectile
   :after counsel projectile
@@ -1071,23 +1091,25 @@
 (use-package net-utils
   :ensure-system-package traceroute
   :bind
-  (:prefix-map net-utils-prefix-map
-               :prefix "C-c n"
-               ("p" . ping)
-               ("i" . ifconfig)
-               ("w" . iwconfig)
-               ("n" . netstat)
-               ("p" . ping)
-               ("a" . arp)
-               ("r" . route)
-               ("h" . nslookup-host)
-               ("d" . dig)
-               ("s" . smbclient)
-               ("t" . traceroute)))
+  (:map mode-specific-map
+        :prefix-map net-utils-prefix-map
+        :prefix "n"
+        ("p" . ping)
+        ("i" . ifconfig)
+        ("w" . iwconfig)
+        ("n" . netstat)
+        ("p" . ping)
+        ("a" . arp)
+        ("r" . route)
+        ("h" . nslookup-host)
+        ("d" . dig)
+        ("s" . smbclient)
+        ("t" . traceroute)))
 
 (use-package docker
-  :config
-  (docker-global-mode))
+  :bind
+  (:map mode-specific-map
+        ("d" . docker)))
 
 ;; not sure if these two should be here
 (use-package dockerfile-mode
