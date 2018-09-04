@@ -251,7 +251,6 @@
   :custom
   (face-font-family-alternatives '(("Consolas" "Monaco" "Monospace")))
   :config
-  (message "height %s" (display-pixel-height))
   (set-face-attribute 'default
                       nil
                       :family (caar face-font-family-alternatives)
@@ -457,11 +456,7 @@
   :custom
   (ivy-rich-switch-buffer-name-max-length 60 "Increase max length of buffer name.")
   :config
-  (dolist (cmd
-           '(ivy-switch-buffer
-             ivy-switch-buffer-other-window
-             counsel-projectile-switch-to-buffer))
-    (ivy-set-display-transformer cmd #'ivy-rich-switch-buffer-transformer)))
+  (ivy-rich-mode 1))
 
 (use-package isearch
   :ensure nil
@@ -710,7 +705,7 @@
 
 (use-package google-this
   :diminish google-this-mode
-  :config
+  :init
   (google-this-mode 1)
   :bind
   (:map mode-specific-map
@@ -899,6 +894,11 @@
   :bind
   (:map mode-specific-map ("p" . projectile-command-map))
   :custom
+  (projectile-project-root-files-functions
+   '(projectile-root-local
+     projectile-root-top-down
+     projectile-root-bottom-up
+     projectile-root-top-down-recurring))
   (projectile-completion-system 'ivy))
 
 (use-package counsel-projectile
@@ -1107,6 +1107,7 @@
         ("t" . traceroute)))
 
 (use-package docker
+  :ensure t
   :bind
   (:map mode-specific-map
         ("d" . docker)))
