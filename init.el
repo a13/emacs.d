@@ -12,7 +12,6 @@
 
 (setq package-enable-at-startup nil)
 
-;; Bootstrap `use-package'
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
@@ -264,7 +263,7 @@
 (use-package custom
   :ensure nil
   :custom
-  (custom-safe-themes t))
+  (custom-safe-themes t "Treat all themes as safe"))
 
 (use-package gruvbox-theme
   :config
@@ -338,12 +337,6 @@
   :after ivy projectile
   :custom
   (all-the-icons-ivy-buffer-commands '() "Don't use for buffers.")
-  (all-the-icons-ivy-file-commands
-   '(counsel-find-file
-     counsel-file-jump
-     counsel-recentf
-     counsel-projectile-find-file
-     counsel-projectile-find-dir) "Prettify more commands.")
   :config
   (all-the-icons-ivy-setup))
 

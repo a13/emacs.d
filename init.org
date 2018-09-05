@@ -3,8 +3,30 @@
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="http://www.pirilampo.org/styles/readtheorg/css/htmlize.css"/>
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="http://www.pirilampo.org/styles/readtheorg/css/readtheorg.css"/>
 
+* Foreword
+** Declarative
+   I try to keep my configuration as declarative as possible, thanks to [[https://github.com/jwiegley/use-package][Use-package]] — it's very easy now.
+   All defuns should go to packages/libraries. [[https://github.com/quelpa/quelpa][Quelpa]] really helps with that — I can make a package from whatever source I want.
+
+** [[http://www.gnu.org/software/emacs/manual/html_node/emacs/Easy-Customization.html][Customization]]
+   I don't use it directly (my own [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Saving-Customizations.html][~custom-file~]] is =/dev/null=), but put variable customizations
+   under the [[https://github.com/jwiegley/use-package#customizing-variables][~:custom~]] keyword of Use-package instead. It even supports comments!
+
+** Fonts and colors.
+   Hardcoding these can break themes, so I use [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Face-Attributes.html][~:inherit~]] for customizations.
+
+** Keybindings
+   - I try not to hardcode bindings starting with /C-x/, /C-c/ and /C-h/, which are [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Prefix-Keymaps.html#Prefix-Keymaps][bound]] to ~ctl-x-map~, ~mode-specific-map~ and ~help-map~ respectively. Not that I'm not happy with all these defaults (except /C-h/, see *simple* package below), but just in case if I want to rebind them to something else (/SPC/, /mouse-1/, gas, break or whatever else), I can do it, at least for my own bindings — sadly, some plugins hardcode them (and that causes many issues for alternative bindings users), but I hope it will change someday.
+
+   - I use named prefix keymaps so they are visible in minibuffer while [[https://github.com/justbur/emacs-which-key][Which-key]] is active.
+
+   - I use [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Remapping-Commands.html][remap]] instead of explicit keys declaration, sometimes it makes sense, sometimes it doesn't, but I try to keep things consistent.
+
+   - Where mnemonics conflicts with ergonomics - prefer the former.
+
 * Package system
 ** Initialization
+   By default, Emacs knows about [[https://elpa.gnu.org/][GNU ELPA]] only, add some more repositories.
    #+BEGIN_SRC emacs-lisp :tangle yes
      (require 'package)
      (setq package-archives
@@ -23,7 +45,6 @@
    #+BEGIN_SRC emacs-lisp :tangle yes
      (setq package-enable-at-startup nil)
 
-     ;; Bootstrap `use-package'
      (unless (package-installed-p 'use-package)
        (package-refresh-contents)
        (package-install 'use-package))
@@ -35,7 +56,7 @@
      (setq use-package-always-ensure t)
    #+END_SRC
 
-   Use-package has a lot of useful keywords
+   Now we can use it to extend its own functionality by some more useful keywords.
    #+BEGIN_SRC emacs-lisp :tangle yes
      (use-package system-packages
        :custom
@@ -72,7 +93,7 @@
 * Global defaults
 
 ** Common
-   These were defined in C code, so use emacs pseudo-package to set them.
+   These were defined in C code, so use ~emacs~ pseudo-package to set them.
    #+BEGIN_SRC emacs-lisp :tangle yes
      (use-package emacs
        :ensure nil
@@ -159,7 +180,7 @@
 
    #+END_SRC
 ** Uncategorized
-   (Mostly) keybindings customization
+   (Mostly) default keybindings customization
    #+BEGIN_SRC emacs-lisp :tangle yes
      (use-package frame
        :ensure nil
@@ -173,7 +194,10 @@
        :bind
        (:map mode-specific-map
              ("C-g" . minibuffer-keyboard-quit)))
+   #+END_SRC
 
+   /C-w/ and /C-h/ kill a word/char before cursor (see [[http://unix-kb.cat-v.org/][Unix keyboard shortcuts]], don't know what to do with /C-u/ though)
+   #+BEGIN_SRC emacs-lisp :tangle yes
      (use-package simple
        :ensure nil
        :diminish
@@ -304,6 +328,8 @@
    #+END_SRC
 
 ** Fonts
+   Though [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Font-Selection.html][~face-font-family-alternatives~]] here is not a list of font family lists,
+   it's the only way to set up substitutions for the font if it isn't present in the system.
    #+BEGIN_SRC emacs-lisp :tangle yes
      (use-package faces
        :ensure nil
@@ -322,12 +348,12 @@
                          (font-spec :registry "iso10646-1" :script 'cyrillic)))
    #+END_SRC
 
-** Colors
+** Color themes
    #+BEGIN_SRC emacs-lisp :tangle yes
      (use-package custom
        :ensure nil
        :custom
-       (custom-safe-themes t))
+       (custom-safe-themes t "Treat all themes as safe"))
 
      (use-package gruvbox-theme
        :config
@@ -355,7 +381,7 @@
        ([S-f10] . menu-bar-mode))
    #+END_SRC
 
-   Add those we want instead
+   Add those we want instead:
    #+BEGIN_SRC emacs-lisp :tangle yes
      (use-package time
        :ensure nil
@@ -412,12 +438,6 @@
        :after ivy projectile
        :custom
        (all-the-icons-ivy-buffer-commands '() "Don't use for buffers.")
-       (all-the-icons-ivy-file-commands
-        '(counsel-find-file
-          counsel-file-jump
-          counsel-recentf
-          counsel-projectile-find-file
-          counsel-projectile-find-dir) "Prettify more commands.")
        :config
        (all-the-icons-ivy-setup))
 
