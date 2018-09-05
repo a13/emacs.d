@@ -9,18 +9,18 @@
    All defuns should go to packages/libraries. [[https://github.com/quelpa/quelpa][Quelpa]] really helps with that — I can make a package from whatever source I want.
 
 ** [[http://www.gnu.org/software/emacs/manual/html_node/emacs/Easy-Customization.html][Customization]]
-   I don't use it directly (my own [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Saving-Customizations.html][~custom-file~]] is =/dev/null=), but put variable customizations
-   under the [[https://github.com/jwiegley/use-package#customizing-variables][~:custom~]] keyword of Use-package instead. It even supports comments!
+   I don't use it directly (my own [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Saving-Customizations.html][custom-file]] is =/dev/null=), but put variable customizations
+   under the [[https://github.com/jwiegley/use-package#customizing-variables][:custom]] keyword of Use-package instead. It even supports comments!
 
 ** Fonts and colors.
-   Hardcoding these can break themes, so I use [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Face-Attributes.html][~:inherit~]] for customizations.
+   Hardcoding these can break themes, so I use [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Face-Attributes.html][:inherit]] for customizations.
 
 ** Keybindings
    - I try not to hardcode bindings starting with /C-x/, /C-c/ and /C-h/, which are [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Prefix-Keymaps.html#Prefix-Keymaps][bound]] to ~ctl-x-map~, ~mode-specific-map~ and ~help-map~ respectively. Not that I'm not happy with all these defaults (except /C-h/, see *simple* package below), but just in case if I want to rebind them to something else (/SPC/, /mouse-1/, gas, break or whatever else), I can do it, at least for my own bindings — sadly, some plugins hardcode them (and that causes many issues for alternative bindings users), but I hope it will change someday.
 
    - I use named prefix keymaps so they are visible in minibuffer while [[https://github.com/justbur/emacs-which-key][Which-key]] is active.
 
-   - I use [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Remapping-Commands.html][remap]] instead of explicit keys declaration, sometimes it makes sense, sometimes it doesn't, but I try to keep things consistent.
+   - I use [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Remapping-Commands.html][remap]] if I want to rebind a command to a "better" version of it and do an explicit keys declaration, when I rebind it to something completely different.
 
    - Where mnemonics conflicts with ergonomics - prefer the former.
 
@@ -196,7 +196,7 @@
              ("C-g" . minibuffer-keyboard-quit)))
    #+END_SRC
 
-   /C-w/ and /C-h/ kill a word/char before cursor (see [[http://unix-kb.cat-v.org/][Unix keyboard shortcuts]], don't know what to do with /C-u/ though)
+   Make /C-w/ and /C-h/ kill a word/char before cursor (see [[http://unix-kb.cat-v.org/][Unix keyboard shortcuts]], don't know what to do with /C-u/ though)
    #+BEGIN_SRC emacs-lisp :tangle yes
      (use-package simple
        :ensure nil
@@ -328,7 +328,7 @@
    #+END_SRC
 
 ** Fonts
-   Though [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Font-Selection.html][~face-font-family-alternatives~]] here is not a list of font family lists,
+   Though [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Font-Selection.html][face-font-family-alternatives]] here is not a list of font family lists,
    it's the only way to set up substitutions for the font if it isn't present in the system.
    #+BEGIN_SRC emacs-lisp :tangle yes
      (use-package faces
