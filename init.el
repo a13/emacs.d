@@ -83,7 +83,7 @@
 
 (use-package iqa
   :custom
-  (iqa-user-init-file (concat user-emacs-directory "README.org") "Edit init.org by default.")
+  (iqa-user-init-file (concat user-emacs-directory "README.org") "Edit README.org by default.")
   :config
   (iqa-setup-default))
 
@@ -458,6 +458,11 @@
   (:map isearch-mode-map
         ("C-h" . isearch-delete-char)))
 
+(use-package mb-depth
+  :ensure nil
+  :config
+  (minibuffer-depth-indicate-mode 1))
+
 (use-package avy
   :config
   (avy-setup-default)
@@ -503,7 +508,7 @@
 (use-package select
   :ensure nil
   :custom
-  (x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
+  (selection-coding-system 'utf-8)
   (select-enable-clipboard t "Use the clipboard"))
 
 (use-package expand-region
