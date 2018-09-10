@@ -83,7 +83,7 @@
 
 (use-package iqa
   :custom
-  (iqa-user-init-file (concat user-emacs-directory "init.org") "Edit init.org by default.")
+  (iqa-user-init-file (concat user-emacs-directory "README.org") "Edit init.org by default.")
   :config
   (iqa-setup-default))
 
@@ -698,8 +698,6 @@
 
 (use-package google-this
   :diminish google-this-mode
-  :init
-  (google-this-mode 1)
   :bind
   (:map mode-specific-map
         ("g" . google-this-mode-submap)))
