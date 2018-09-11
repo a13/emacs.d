@@ -3,14 +3,35 @@
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="http://www.pirilampo.org/styles/readtheorg/css/htmlize.css"/>
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="http://www.pirilampo.org/styles/readtheorg/css/readtheorg.css"/>
 #+PROPERTY: header-args:emacs-lisp :tangle "init.el"
-* Foreword
-** Declarative
-   I try to keep my configuration as declarative as possible, thanks to [[https://github.com/jwiegley/use-package][Use-package]] — it's very easy now.
-   All defuns should go to packages/libraries. [[https://github.com/quelpa/quelpa][Quelpa]] really helps with that — I can make a package from whatever source I want.
+* Foreword and keynotes
 
-** [[http://www.gnu.org/software/emacs/manual/html_node/emacs/Easy-Customization.html][Customization]]
-   I don't use it directly (my own [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Saving-Customizations.html][custom-file]] is =/dev/null=), but put variable customizations
-   under the [[https://github.com/jwiegley/use-package#customizing-variables][:custom]] keyword of Use-package instead. It even supports comments!
+** Declarative
+   I try to keep my configuration as declarative as possible, thanks to [[https://github.com/jwiegley/use-package][Use-package]] — it's very easy now:
+   - [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Setting-Variables.html][setq]] is almost always can be rewritten with [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Applying-Customizations.html][customize-set-variable]] and therefore with [[https://github.com/jwiegley/use-package#customizing-variables][:custom]] keyword, it even supports comments! At the same time I don't use [[http://www.gnu.org/software/emacs/manual/html_node/emacs/Easy-Customization.html][Customization]] interface, and my own [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Saving-Customizations.html][custom-file]] is =/dev/null=.
+     An example
+     #+BEGIN_SRC emacs-lisp :tangle no
+       ;; "Don't show splash screen"
+       (setq inhibit-startup-screen t)
+     #+END_SRC
+     becomes
+     #+BEGIN_SRC emacs-lisp :tangle no
+       :custom
+       (inhibit-startup-screen t "Don't show splash screen")
+     #+END_SRC
+
+   - [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Face-Attributes.html][set-face-attribute]] and stuff like that → [[https://github.com/jwiegley/use-package#customizing-faces][:custom-face]]
+     #+BEGIN_SRC emacs-lisp :tangle no
+       (set-face-attributes 'Man-overstrike nil :inherit font-lock-type-face :bold t)
+     #+END_SRC
+     becomes
+     #+BEGIN_SRC emacs-lisp :tangle no
+       :custom-face
+       (Man-overstrike ((t (:inherit font-lock-type-face :bold t))))
+     #+END_SRC
+   - [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Hooks.html][add-hook]] → [[https://github.com/jwiegley/use-package#hooks][:hook]]
+   - [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Changing-Key-Bindings.html][define-key]] → [[https://github.com/jwiegley/use-package#key-binding][:bind]]
+
+   All defuns should go to packages/libraries. [[https://github.com/quelpa/quelpa][Quelpa]] really helps with that — I can make a package from whatever source I want.
 
 ** Fonts and colors.
    Hardcoding these can break themes, so I use [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Face-Attributes.html][:inherit]] for customizations.
