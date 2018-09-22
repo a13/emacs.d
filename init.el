@@ -215,6 +215,15 @@
   :hook
   (dired-mode . diredfl-mode))
 
+(use-package async
+  :init
+  (dired-async-mode t))
+
+(use-package dired-rsync
+  :bind
+  (:map dired-mode-map
+        ("r" . dired-rsync)))
+
 (use-package dired-launch)
 
 (use-package mule
@@ -437,6 +446,11 @@
 
 (use-package swiper)
 
+(use-package counsel-world-clock
+  :bind
+  (:map counsel-prefix-map
+        ("c" .  counsel-world-clock)))
+
 (use-package counsel-extras
   :disabled t
   :ensure nil
@@ -467,8 +481,7 @@
   :config
   (avy-setup-default)
   :bind
-  (("C-:" . avy-goto-char)
-   ;; ("C-'" . avy-goto-char-2)
+  (("C-:" .   avy-goto-char-timer)
    ("M-g M-g" . avy-goto-line)
    ("M-s M-s" . avy-goto-word-1)))
 
@@ -914,6 +927,10 @@
 
 (use-package company
   :diminish company-mode
+  :bind
+  (:map company-active-map
+        ("C-n" . company-select-next-or-abort)
+        ("C-p" . company-select-previous-or-abort))
   :hook
   (after-init . global-company-mode))
 
@@ -991,7 +1008,11 @@
 
 (use-package geiser)
 
-(use-package clojure-mode)
+(use-package clojure-mode
+  :config
+  (define-clojure-indent
+    (alet 'defun)
+    (mlet 'defun)))
 (use-package clojure-mode-extra-font-locking)
 (use-package clojure-snippets)
 (use-package cider
@@ -1075,9 +1096,20 @@
          ("\\.markdown\\'"    . markdown-mode))
   :init (setq markdown-command "markdown"))
 
-(use-package restclient)
+(use-package csv-mode
+  :mode
+  (("\\.[Cc][Ss][Vv]\\'" . csv-mode)))
 
-(use-package ob-restclient)
+(use-package restclient
+  :mode
+  ("\\.http\\'" . restclient-mode))
+
+(use-package ob-restclient
+  :after org restclient
+  :init
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((restclient . t))))
 
 (use-package company-restclient
   :after (company restclient)

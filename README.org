@@ -313,6 +313,15 @@
       :hook
       (dired-mode . diredfl-mode))
 
+    (use-package async
+      :init
+      (dired-async-mode t))
+
+    (use-package dired-rsync
+      :bind
+      (:map dired-mode-map
+            ("r" . dired-rsync)))
+
     (use-package dired-launch)
   #+END_SRC
 
@@ -572,6 +581,11 @@
 
     (use-package swiper)
 
+    (use-package counsel-world-clock
+      :bind
+      (:map counsel-prefix-map
+            ("c" .  counsel-world-clock)))
+
     (use-package counsel-extras
       :disabled t
       :ensure nil
@@ -609,8 +623,7 @@
       :config
       (avy-setup-default)
       :bind
-      (("C-:" . avy-goto-char)
-       ;; ("C-'" . avy-goto-char-2)
+      (("C-:" .   avy-goto-char-timer)
        ("M-g M-g" . avy-goto-line)
        ("M-s M-s" . avy-goto-word-1)))
 
@@ -1094,6 +1107,10 @@
    #+BEGIN_SRC emacs-lisp
      (use-package company
        :diminish company-mode
+       :bind
+       (:map company-active-map
+             ("C-n" . company-select-next-or-abort)
+             ("C-p" . company-select-previous-or-abort))
        :hook
        (after-init . global-company-mode))
 
@@ -1193,7 +1210,11 @@
 *** Clojure
 
     #+BEGIN_SRC emacs-lisp
-      (use-package clojure-mode)
+      (use-package clojure-mode
+        :config
+        (define-clojure-indent
+          (alet 'defun)
+          (mlet 'defun)))
       (use-package clojure-mode-extra-font-locking)
       (use-package clojure-snippets)
       (use-package cider
@@ -1311,17 +1332,30 @@
         :init (setq markdown-command "markdown"))
     #+END_SRC
 
+*** Misc
+    #+BEGIN_SRC emacs-lisp
+      (use-package csv-mode
+        :mode
+        (("\\.[Cc][Ss][Vv]\\'" . csv-mode)))
+    #+END_SRC
+
 *** HTTP
     #+BEGIN_SRC emacs-lisp
-      (use-package restclient)
+      (use-package restclient
+        :mode
+        ("\\.http\\'" . restclient-mode))
 
-      (use-package ob-restclient)
+      (use-package ob-restclient
+        :after org restclient
+        :init
+        (org-babel-do-load-languages
+         'org-babel-load-languages
+         '((restclient . t))))
 
       (use-package company-restclient
         :after (company restclient)
         :config
         (add-to-list 'company-backends 'company-restclient))
-
     #+END_SRC
 
 * External utilities
