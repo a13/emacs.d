@@ -377,7 +377,6 @@
     (all-the-icons-ivy-setup))
 
 (use-package dashboard
-  :defer t
   :config
   (dashboard-setup-startup-hook)
   :custom

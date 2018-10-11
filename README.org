@@ -500,7 +500,6 @@
    Dashboard
    #+BEGIN_SRC emacs-lisp
      (use-package dashboard
-       :defer t
        :config
        (dashboard-setup-startup-hook)
        :custom
