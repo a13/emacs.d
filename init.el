@@ -344,7 +344,6 @@
   (yahoo-weather-location "Kyiv, UA"))
 
 (use-package font-lock+
-  :defer t
   :ensure nil
   :quelpa
   (font-lock+ :repo "emacsmirror/font-lock-plus" :fetcher github))

@@ -463,7 +463,6 @@
    Fancy stuff
    #+BEGIN_SRC emacs-lisp
      (use-package font-lock+
-       :defer t
        :ensure nil
        :quelpa
        (font-lock+ :repo "emacsmirror/font-lock-plus" :fetcher github))
