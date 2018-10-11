@@ -21,6 +21,8 @@
 
 (put 'use-package 'lisp-indent-function 1)
 (setq use-package-always-ensure t)
+(setq use-package-verbose t)
+(setq use-package-minimum-reported-time 0.01)
 
 (use-package system-packages
   :custom
@@ -35,8 +37,13 @@
 (use-package bind-key)
 
 ;; :quelpa keyword
-(use-package quelpa)
+(use-package quelpa
+  :defer t
+  :custom
+  (quelpa-update-melpa-p nil))
+
 (use-package quelpa-use-package)
+
 
 (use-package use-package-secrets
   :ensure nil
@@ -46,6 +53,7 @@
   (use-package-secrets :repo "a13/use-package-secrets" :fetcher github :version original))
 
 (use-package paradox
+  :defer 1
   :config
   (paradox-enable))
 
@@ -94,6 +102,7 @@
   (custom-file null-device "Don't store customizations"))
 
 (use-package epa
+  :defer t
   :ensure nil
   :custom
   (epg-gpg-program "gpg")
@@ -106,6 +115,7 @@
 
 (use-package tramp
   :ensure nil
+  :defer t
   :custom
   (tramp-backup-directory-alist backup-directory-alist)
   (tramp-default-method "ssh")
@@ -151,13 +161,16 @@
   ([remap list-buffers] . ibuffer))
 
 (use-package exec-path-from-shell
+  :defer 0.1
   :config
   (exec-path-from-shell-initialize))
 
 (use-package eshell
+  :defer t
   :ensure nil)
 
 (use-package em-smart
+  :defer t
   :ensure nil
   :config
   (eshell-smart-initialize)
@@ -175,11 +188,13 @@
   :quelpa
   (eshell-toggle :repo "4DA/eshell-toggle" :fetcher github :version original)
   :bind
-  (("M-`" . eshell-toggle)))
+  ("M-`" . eshell-toggle))
 
 (use-package eshell-fringe-status
-  :config
-  (add-hook 'eshell-mode-hook 'eshell-fringe-status-mode))
+  :ensure t
+  :defer t
+  :hook
+  (eshell-mode . 'eshell-fringe-status-mode))
 
 (use-package ls-lisp
   :ensure nil
@@ -202,7 +217,8 @@
   ;; do not bind C-x C-j since it's used by jabber.el
   (dired-bind-jump nil))
 
-(use-package dired-toggle)
+(use-package dired-toggle
+  :defer t)
 
 (use-package dired-hide-dotfiles
   :bind
@@ -234,6 +250,7 @@
   (set-language-environment "UTF-8"))
 
 (use-package ispell
+  :defer t
   :ensure nil
   :custom
   (ispell-local-dictionary-alist
@@ -249,13 +266,14 @@
   (ispell-silently-savep t))
 
 (use-package flyspell
+  :defer t
   :ensure nil
   :custom
   (flyspell-delay 1))
 
 (use-package faces
   :ensure nil
-  :defer t
+  :defer 0.1
   :custom
   (face-font-family-alternatives '(("Consolas" "Monaco" "Monospace")))
   :config
@@ -265,7 +283,7 @@
                       :weight 'regular
                       :width 'semi-condensed
                       ;; (/ (* 19 (display-pixel-height)) (display-mm-height))
-                      :height (if (> (display-pixel-height) 1000) 160 120))
+                      :height 160)
   (set-fontset-font "fontset-default" 'cyrillic
                     (font-spec :registry "iso10646-1" :script 'cyrillic)))
 
@@ -274,9 +292,12 @@
   :custom
   (custom-safe-themes t "Treat all themes as safe"))
 
-(use-package gruvbox-theme
+(use-package lor-theme
+  :ensure nil
   :config
-  (load-theme 'gruvbox-dark-medium))
+  (load-theme 'lor)
+  :quelpa
+  (lor-theme :repo "a13/lor-theme" :fetcher github :version original))
 
 (use-package tool-bar
   :ensure nil
@@ -284,6 +305,7 @@
   (tool-bar-mode -1))
 
 (use-package scroll-bar
+  :defer t
   :ensure nil
   :config
   (scroll-bar-mode -1))
@@ -295,7 +317,14 @@
   :bind
   ([S-f10] . menu-bar-mode))
 
+(use-package tooltip
+  :defer t
+  :ensure nil
+  :custom
+  (tooltip-mode -1))
+
 (use-package time
+  :defer t
   :ensure nil
   :custom
   (display-time-default-load-average nil)
@@ -311,45 +340,44 @@
   :bind (:map mode-specific-map
               ("w" . yahoo-weather-mode))
   :custom
-  ;; TODO: autolocate
+  (yahoo-weather-guess-location-function #'yahoo-weather-ipinfo)
   (yahoo-weather-location "Kyiv, UA"))
 
-(use-package spaceline
-  :config
-  (require 'spaceline-config)
-  (spaceline-spacemacs-theme))
-
 (use-package font-lock+
-  :ensure t
+  :defer t
+  :ensure nil
   :quelpa
   (font-lock+ :repo "emacsmirror/font-lock-plus" :fetcher github))
 
 (use-package all-the-icons
+  :defer t
   :config
-  (add-to-list
-   'all-the-icons-mode-icon-alist
-   '(package-menu-mode all-the-icons-octicon "package" :v-adjust 0.0)))
+  (setq all-the-icons-mode-icon-alist
+        `(,@all-the-icons-mode-icon-alist
+          (package-menu-mode all-the-icons-octicon "package" :v-adjust 0.0)
+          (jabber-chat-mode all-the-icons-material "chat" :v-adjust 0.0)
+          (jabber-roster-mode all-the-icons-material "contacts" :v-adjust 0.0))))
 
-(use-package all-the-icons-dired
-  :hook
-  (dired-mode . all-the-icons-dired-mode))
+  (use-package all-the-icons-dired
+    :hook
+    (dired-mode . all-the-icons-dired-mode))
 
-(use-package spaceline-all-the-icons
-  :after spaceline
-  :config
-  (spaceline-all-the-icons-theme)
-  (spaceline-all-the-icons--setup-package-updates)
-  (spaceline-all-the-icons--setup-git-ahead)
-  (spaceline-all-the-icons--setup-paradox))
+  (use-package spaceline-all-the-icons
+    :config
+    (spaceline-all-the-icons-theme)
+    (spaceline-all-the-icons--setup-package-updates)
+    (spaceline-all-the-icons--setup-git-ahead)
+    (spaceline-all-the-icons--setup-paradox))
 
-(use-package all-the-icons-ivy
-  :after ivy projectile
-  :custom
-  (all-the-icons-ivy-buffer-commands '() "Don't use for buffers.")
-  :config
-  (all-the-icons-ivy-setup))
+  (use-package all-the-icons-ivy
+    :after ivy
+    :custom
+    (all-the-icons-ivy-buffer-commands '() "Don't use for buffers.")
+    :config
+    (all-the-icons-ivy-setup))
 
 (use-package dashboard
+  :defer t
   :config
   (dashboard-setup-startup-hook)
   :custom
@@ -374,8 +402,13 @@
 
 (use-package hl-line
   :ensure nil
-  :config
-  (global-hl-line-mode 1))
+  :hook
+  (prog-mode . hl-line-mode))
+
+(use-package highlight-numbers
+  :ensure t
+  :hook
+  (prog-mode . highlight-numbers-mode))
 
 (use-package page-break-lines
   :config
@@ -411,6 +444,7 @@
   (ivy-mode t))
 
 (use-package ivy-xref
+  :defer t
   :custom
   (xref-show-xrefs-function #'ivy-xref-show-xrefs "Use Ivy to show xrefs"))
 
@@ -425,7 +459,7 @@
    ("a" . counsel-apropos)
    ("b" . counsel-bookmark)
    ("d" . counsel-dired-jump)
-   ("e" . counsel-expression-history)
+   ("e" . counsel-minibuffer-history)
    ("f" . counsel-file-jump)
    ("g" . counsel-org-goto)
    ("h" . counsel-command-history)
@@ -539,7 +573,7 @@
 
 (use-package copy-as-format
   :custom
-  (copy-as-format-default "github")
+  (copy-as-format-default "slack")
   :bind
   (:map mode-specific-map
         :prefix-map copy-as-format-prefix-map
@@ -579,9 +613,11 @@
 (use-package free-keys
   :commands free-keys)
 
-(use-package helpful)
+(use-package helpful
+  :defer t)
 
 (use-package jabber
+  :defer t
   :secret
   (jabber-connect-all "jabber.el.gpg")
   :config
@@ -606,7 +642,8 @@
    '(jabber-show-offline-contacts nil)
    '(jabber-show-resources nil)))
 
-(use-package jabber-otr)
+(use-package jabber-otr
+  :defer t)
 
 (use-package point-im
   :ensure nil
@@ -633,11 +670,13 @@
   (alert-default-style 'libnotify))
 
 (use-package shr-color
+  :defer t
   :ensure nil
   :custom
   (shr-color-visible-luminance-min 80 "Improve the contrast"))
 
 (use-package eww
+  :defer t
   :ensure nil
   :custom
   (shr-use-fonts nil)
@@ -694,6 +733,7 @@
                 webjump-sample-sites)))
 
 (use-package atomic-chrome
+  :defer t
   :custom
   (atomic-chrome-url-major-mode-alist
    '(("reddit\\.com" . markdown-mode)
@@ -704,6 +744,7 @@
   (atomic-chrome-start-server))
 
 (use-package shr-tag-pre-highlight
+  :defer t
   :after shr
   :config
   (add-to-list 'shr-external-rendering-functions
@@ -720,9 +761,11 @@
   (:map mode-specific-map
         ("g" . google-this-mode-submap)))
 
-(use-package multitran)
+(use-package multitran
+  :defer t)
 
 (use-package smtpmail
+  :defer t
   :ensure nil
   ;; let's install it now, since mu4e packages aren't available yet
   :ensure-system-package (mu . mu4e)
@@ -733,6 +776,7 @@
         smtpmail-queue-dir "~/.mail/queue/cur"))
 
 (use-package mu4e-vars
+  :defer t
   :load-path "/usr/share/emacs/site-lisp/mu4e"
   :ensure nil
   :config
@@ -757,6 +801,7 @@
   (setq mu4e-change-filenames-when-moving t))
 
 (use-package mu4e-contrib
+  :defer t
   :ensure nil
   :custom
   (mu4e-html2text-command 'mu4e-shr2text))
@@ -777,13 +822,18 @@
   (setq mu4e-maildirs-extension-before-insert-maildir-hook '()))
 
 (use-package calendar
+  :defer t
   :ensure nil
   :custom
   (calendar-week-start-day 1))
 
 (use-package org
+  :defer t
   ;; to be sure we have latest Org version
   :ensure org-plus-contrib
+  :hook
+  (org-mode . variable-pitch-mode)
+  (org-mode . visual-line-mode)
   :custom
   (org-src-tab-acts-natively t))
 
@@ -801,6 +851,7 @@
   (org-mode . org-bullets-mode))
 
 (use-package htmlize
+  :defer t
   :custom
   (org-html-htmlize-output-type 'css)
   (org-html-htmlize-font-prefix "org-"))
@@ -810,6 +861,7 @@
   (org-mode . org-password-manager-key-bindings))
 
 (use-package org-jira
+  :defer t
   :custom
   (jiralib-url "http://jira:8080"))
 
@@ -834,9 +886,11 @@
                (unless (eq ibuffer-sorting-mode 'alphabetic)
                  (ibuffer-do-sort-by-alphabetic)))))
 
-(use-package gitconfig-mode)
+(use-package gitconfig-mode
+  :defer t)
 
-(use-package gitignore-mode)
+(use-package gitignore-mode
+  :defer t)
 
 (use-package magit
   :custom
@@ -886,6 +940,7 @@
         ("k" . browse-at-remote-kill)))
 
 (use-package smerge-mode
+  :defer t
   :ensure nil
   :diminish smerge-mode)
 
@@ -916,11 +971,13 @@
   (counsel-projectile-mode))
 
 (use-package ag
+  :defer t
   :ensure-system-package (ag . silversearcher-ag)
   :custom
   (ag-highlight-search t "Highlight the current search term."))
 
 (use-package dumb-jump
+  :defer t
   :custom
   (dumb-jump-selector 'ivy)
   (dumb-jump-prefer-searcher 'ag))
@@ -935,16 +992,19 @@
   (after-init . global-company-mode))
 
 (use-package company-quickhelp
+  :defer t
   :custom
   (company-quickhelp-delay 3)
   :config
   (company-quickhelp-mode 1))
 
 (use-package company-shell
+  :defer t
   :config
   (add-to-list 'company-backends 'company-shell))
 
 (use-package company-emoji
+  :defer t
   ;; :ensure-system-package fonts-symbola
   :config
   (add-to-list 'company-backends 'company-emoji)
@@ -963,7 +1023,6 @@
   :diminish yas-minor-mode
   :custom
   (yas-prompt-functions '(yas-completing-prompt yas-ido-prompt))
-
   :config
   (yas-reload-all)
   :hook
@@ -975,19 +1034,31 @@
   (prog-mode . flycheck-mode))
 
 (use-package avy-flycheck
+  :defer t
   :config
   (avy-flycheck-setup))
 
 (use-package lisp
   :ensure nil
   :hook
-  (after-save-hook . check-parens))
+  (after-save . check-parens))
+
+(use-package highlight-defined
+  :ensure t
+  :hook
+  (emacs-lisp-mode . highlight-defined-mode))
+
+(use-package highlight-quoted
+  :ensure t
+  :hook
+  (emacs-lisp-mode . highlight-quoted-mode))
 
 (use-package eros
   :hook
-  (emacs-lisp-mode-hook . eros-mode))
+  (emacs-lisp-mode . eros-mode))
 
-(use-package suggest)
+(use-package suggest
+  :defer t)
 
 (use-package ipretty
   :config
@@ -1000,28 +1071,40 @@
   (nameless-private-prefix t))
 
 ;; bind-key can't bind to keymaps
-(use-package erefactor)
+(use-package erefactor
+  :defer t)
 
 (use-package flycheck-package
+  :defer t
   :after flycheck
   (flycheck-package-setup))
 
 (use-package geiser)
 
 (use-package clojure-mode
+  :defer t
   :config
   (define-clojure-indent
     (alet 'defun)
     (mlet 'defun)))
-(use-package clojure-mode-extra-font-locking)
-(use-package clojure-snippets)
+
+(use-package clojure-mode-extra-font-locking
+  :defer t)
+
+(use-package clojure-snippets
+  :defer t)
+
 (use-package cider
+  :defer t
+  :custom
+  (cider-repl-display-help-banner nil)
   :config
   ;; sadly, we can't use :diminish keyword here, yet
   (diminish 'cider-mode
             '(:eval (format " 🍏%s" (cider--modeline-info)))))
 
-(use-package kibit-helper)
+(use-package kibit-helper
+  :defer t)
 
 (use-package slime
   :disabled
@@ -1033,9 +1116,11 @@
   (slime-setup '(slime-fancy))
   (setq slime-net-coding-system 'utf-8-unix))
 
-(use-package scala-mode)
+(use-package scala-mode
+  :defer t)
 
 (use-package sbt-mode
+  :defer t
   :commands sbt-start sbt-command
   :config
   ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
@@ -1046,22 +1131,22 @@
    minibuffer-local-completion-map))
 
 (use-package ensime
+  :defer t
   :bind (:map ensime-mode-map
               ("C-x C-e" . ensime-inf-eval-region)))
 
-(use-package lua-mode)
-
-(use-package fennel-mode
-  :ensure nil
-  :quelpa (fennel-mode :repo "technomancy/fennel-mode" :fetcher gitlab))
+(use-package lua-mode
+  :defer t)
 
 (use-package conkeror-minor-mode
+  :defer t
   :hook
   (js-mode . (lambda ()
                (when (string-match "conkeror" (or (buffer-file-name) ""))
                  (conkeror-minor-mode 1)))))
 
-(use-package json-mode)
+(use-package json-mode
+  :defer t)
 
 (use-package graphql-mode
   :mode "\\.graphql\\'"
@@ -1146,7 +1231,8 @@
 
 (use-package docker-compose-mode)
 
-(use-package emamux)
+(use-package emamux
+  :defer t)
 
 (use-package reverse-im
   :config
