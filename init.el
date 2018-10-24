@@ -1,3 +1,6 @@
+
+
+
 (require 'package)
 (setq package-archives
       `(,@package-archives
@@ -78,8 +81,9 @@
   (require-final-newline t)
   ;; backup settings
   (backup-by-copying t)
-  ;; (backup-directory-alist
-  ;;  '(("." . "~/.cache/emacs/backups")))
+  (backup-directory-alist
+   `((".*" . ,(expand-file-name
+               (concat user-emacs-directory "backups")))))
   (delete-old-versions t)
   (kept-new-versions 6)
   (kept-old-versions 2)
@@ -355,7 +359,10 @@
         `(,@all-the-icons-mode-icon-alist
           (package-menu-mode all-the-icons-octicon "package" :v-adjust 0.0)
           (jabber-chat-mode all-the-icons-material "chat" :v-adjust 0.0)
-          (jabber-roster-mode all-the-icons-material "contacts" :v-adjust 0.0))))
+          (jabber-roster-mode all-the-icons-material "contacts" :v-adjust 0.0)
+          (telega-chat-mode all-the-icons-fileicon "telegram" :v-adjust 0.0
+                            :face all-the-icons-blue-alt)
+          (telega-root-mode all-the-icons-material "contacts" :v-adjust 0.0))))
 
   (use-package all-the-icons-dired
     :hook
@@ -417,7 +424,13 @@
   (prog-mode . rainbow-delimiters-mode))
 
 (use-package rainbow-identifiers
+  :custom
+  (rainbow-identifiers-cie-l*a*b*-lightness 80)
+  (rainbow-identifiers-cie-l*a*b*-saturation 50)
+  (rainbow-identifiers-choose-face-function
+   #'rainbow-identifiers-cie-l*a*b*-choose-face)
   :hook
+  (emacs-lisp-mode . rainbow-identifiers-mode)
   (prog-mode . rainbow-identifiers-mode))
 
 (use-package rainbow-mode
@@ -456,15 +469,22 @@
    :prefix "c"
    ("a" . counsel-apropos)
    ("b" . counsel-bookmark)
+   ("B" . counsel-bookmarked-directory)
+   ("c w" . counsel-colors-web)
+   ("c e" . counsel-colors-emacs)
    ("d" . counsel-dired-jump)
-   ("e" . counsel-minibuffer-history)
    ("f" . counsel-file-jump)
+   ("F" . counsel-faces)
    ("g" . counsel-org-goto)
    ("h" . counsel-command-history)
+   ("H" . counsel-minibuffer-history)
    ("i" . counsel-imenu)
+   ("j" . counsel-find-symbol)
    ("l" . counsel-locate)
+   ("L" . counsel-find-library)
    ("m" . counsel-mark-ring)
    ("o" . counsel-outline)
+   ("O" . counsel-find-file-extern)
    ("p" . counsel-package)
    ("r" . counsel-recentf)
    ("s g" . counsel-grep)
@@ -472,24 +492,19 @@
    ("s s" . counsel-ag)
    ("t" . counsel-org-tag)
    ("v" . counsel-set-variable)
-   ("w" . counsel-wmctrl))
+   ("w" . counsel-wmctrl)
+   :map help-map
+   ("F" . counsel-describe-face))
   :init
   (counsel-mode))
 
 (use-package swiper)
 
 (use-package counsel-world-clock
+  :after counsel
   :bind
   (:map counsel-prefix-map
-        ("c" .  counsel-world-clock)))
-
-(use-package counsel-extras
-  :disabled t
-  :ensure nil
-  :quelpa
-  (counsel-extras :repo "a13/counsel-extras" :fetcher github :version original)
-  :bind
-  (("s-p" . counsel-extras-xmms2-jump)))
+        ("C" .  counsel-world-clock)))
 
 (use-package ivy-rich
   :custom
@@ -754,10 +769,9 @@
                   'eww-display-html--override-shr-external-rendering-functions))))
 
 (use-package google-this
-  :diminish google-this-mode
   :bind
   (:map mode-specific-map
-        ("g" . google-this-mode-submap)))
+        ("g" . 'google-this-mode-submap)))
 
 (use-package multitran
   :defer t)
@@ -1086,9 +1100,6 @@
     (alet 'defun)
     (mlet 'defun)))
 
-(use-package clojure-mode-extra-font-locking
-  :defer t)
-
 (use-package clojure-snippets
   :defer t)
 
@@ -1178,6 +1189,14 @@
          ("\\.md\\'"          . markdown-mode)
          ("\\.markdown\\'"    . markdown-mode))
   :init (setq markdown-command "markdown"))
+
+(use-package jira-markup-mode
+  :defer t
+  :after atomic-chrome
+  :mode ("\\.confluence$" . jira-markup-mode)
+  :config
+  (add-to-list 'atomic-chrome-url-major-mode-alist
+               '("atlassian\\.net$" . jira-markup-mode)))
 
 (use-package csv-mode
   :mode
