@@ -1,6 +1,3 @@
-
-
-
 (require 'package)
 (setq package-archives
       `(,@package-archives
@@ -28,24 +25,26 @@
 (setq use-package-minimum-reported-time 0.01)
 
 (use-package system-packages
+  :ensure t
   :custom
   (system-packages-noconfirm t))
 
-(use-package use-package-ensure-system-package)
+(use-package use-package-ensure-system-package :ensure t)
 
 ;; :diminish keyword
-(use-package diminish)
+(use-package diminish :ensure t)
 
 ;; :bind keyword
-(use-package bind-key)
+(use-package bind-key :ensure t)
 
 ;; :quelpa keyword
 (use-package quelpa
+  :ensure t
   :defer t
   :custom
-  (quelpa-update-melpa-p nil))
+  (quelpa-update-melpa-p nil "Don't update the MELPA git repo."))
 
-(use-package quelpa-use-package)
+(use-package quelpa-use-package :ensure t)
 
 
 (use-package use-package-secrets
@@ -56,6 +55,7 @@
   (use-package-secrets :repo "a13/use-package-secrets" :fetcher github :version original))
 
 (use-package paradox
+  :ensure t
   :defer 1
   :config
   (paradox-enable))
@@ -94,6 +94,7 @@
   :diminish auto-revert-mode)
 
 (use-package iqa
+  :ensure t
   :custom
   (iqa-user-init-file (concat user-emacs-directory "README.org") "Edit README.org by default.")
   :config
@@ -104,6 +105,12 @@
   :custom
   ;; alternatively, one can use `(make-temp-file "emacs-custom")'
   (custom-file null-device "Don't store customizations"))
+
+(use-package vlf
+  :ensure t
+  :after (ivy counsel)
+  :config
+  (ivy-add-actions  'counsel-find-file '(("l" vlf "view large file"))))
 
 (use-package epa
   :defer t
@@ -126,6 +133,7 @@
   (tramp-default-proxies-alist nil))
 
 (use-package sudo-edit
+  :ensure t
   :bind (:map ctl-x-map
               ("M-s" . sudo-edit)))
 
@@ -144,6 +152,8 @@
 
 (use-package simple
   :ensure nil
+  :custom
+  (kill-ring-max 300)
   :diminish
   ((visual-line-mode . " ↩")
    (auto-fill-function . " ↵"))
@@ -165,6 +175,7 @@
   ([remap list-buffers] . ibuffer))
 
 (use-package exec-path-from-shell
+  :ensure t
   :defer 0.1
   :config
   (exec-path-from-shell-initialize))
@@ -183,7 +194,13 @@
   (eshell-review-quick-commands nil)
   (eshell-smart-space-goes-to-end t))
 
+(use-package esh-help
+  :ensure t
+  :config
+  (setup-esh-help-eldoc))
+
 (use-package esh-autosuggest
+  :ensure t
   :hook (eshell-mode . esh-autosuggest-mode)
   :ensure t)
 
@@ -222,9 +239,11 @@
   (dired-bind-jump nil))
 
 (use-package dired-toggle
+  :ensure t
   :defer t)
 
 (use-package dired-hide-dotfiles
+  :ensure t
   :bind
   (:map dired-mode-map
         ("." . dired-hide-dotfiles-mode))
@@ -232,19 +251,22 @@
   (dired-mode . dired-hide-dotfiles-mode))
 
 (use-package diredfl
+  :ensure t
   :hook
   (dired-mode . diredfl-mode))
 
 (use-package async
+  :ensure t
   :init
   (dired-async-mode t))
 
 (use-package dired-rsync
+  :ensure t
   :bind
   (:map dired-mode-map
         ("r" . dired-rsync)))
 
-(use-package dired-launch)
+(use-package dired-launch :ensure t)
 
 (use-package mule
   :ensure nil
@@ -337,10 +359,12 @@
   (display-time-mode t))
 
 (use-package fancy-battery
+  :ensure t
   :hook
   (after-init . fancy-battery-mode))
 
 (use-package yahoo-weather
+  :ensure t
   :bind (:map mode-specific-map
               ("w" . yahoo-weather-mode))
   :custom
@@ -353,6 +377,7 @@
   (font-lock+ :repo "emacsmirror/font-lock-plus" :fetcher github))
 
 (use-package all-the-icons
+  :ensure t
   :defer t
   :config
   (setq all-the-icons-mode-icon-alist
@@ -364,25 +389,37 @@
                             :face all-the-icons-blue-alt)
           (telega-root-mode all-the-icons-material "contacts" :v-adjust 0.0))))
 
-  (use-package all-the-icons-dired
-    :hook
-    (dired-mode . all-the-icons-dired-mode))
+(use-package all-the-icons-dired
+  :ensure t
+  :hook
+  (dired-mode . all-the-icons-dired-mode))
 
-  (use-package spaceline-all-the-icons
-    :config
-    (spaceline-all-the-icons-theme)
-    (spaceline-all-the-icons--setup-package-updates)
-    (spaceline-all-the-icons--setup-git-ahead)
-    (spaceline-all-the-icons--setup-paradox))
+;; (use-package spaceline-all-the-icons
+;;   :config
+;;   (spaceline-all-the-icons-theme)
+;;   (spaceline-all-the-icons--setup-package-updates)
+;;   (spaceline-all-the-icons--setup-git-ahead)
+;;   (spaceline-all-the-icons--setup-paradox))
 
-  (use-package all-the-icons-ivy
-    :after ivy
-    :custom
-    (all-the-icons-ivy-buffer-commands '() "Don't use for buffers.")
-    :config
-    (all-the-icons-ivy-setup))
+(use-package all-the-icons-ivy
+  :ensure t
+  :after ivy
+  :custom
+  (all-the-icons-ivy-buffer-commands '() "Don't use for buffers.")
+  :config
+  (all-the-icons-ivy-setup))
+
+(use-package doom-modeline
+  :ensure t
+  :hook
+  (after-init . doom-modeline-init)
+  :custom
+  (doom-modeline-major-mode-icon t)
+  (doom-modeline-buffer-file-name-style 'buffer-name)
+  (doom-modeline-icon t))
 
 (use-package dashboard
+  :ensure t
   :config
   (dashboard-setup-startup-hook)
   :custom
@@ -416,14 +453,17 @@
   (prog-mode . highlight-numbers-mode))
 
 (use-package page-break-lines
+  :ensure t
   :config
   (global-page-break-lines-mode))
 
 (use-package rainbow-delimiters
+  :ensure t
   :hook
   (prog-mode . rainbow-delimiters-mode))
 
 (use-package rainbow-identifiers
+  :ensure t
   :custom
   (rainbow-identifiers-cie-l*a*b*-lightness 80)
   (rainbow-identifiers-cie-l*a*b*-saturation 50)
@@ -434,13 +474,15 @@
   (prog-mode . rainbow-identifiers-mode))
 
 (use-package rainbow-mode
+  :ensure t
   :diminish rainbow-mode
   :hook prog-mode)
 
 ;; counsel-M-x can use this one
-(use-package smex)
+(use-package smex :ensure t)
 
 (use-package ivy
+  :ensure t
   :diminish ivy-mode
   :custom
   ;; (ivy-re-builders-alist '((t . ivy--regex-fuzzy)))
@@ -455,11 +497,13 @@
   (ivy-mode t))
 
 (use-package ivy-xref
+  :ensure t
   :defer t
   :custom
   (xref-show-xrefs-function #'ivy-xref-show-xrefs "Use Ivy to show xrefs"))
 
 (use-package counsel
+  :ensure t
   :bind
   (([remap menu-bar-open] . counsel-tmm)
    ([remap insert-char] . counsel-unicode-char)
@@ -498,15 +542,17 @@
   :init
   (counsel-mode))
 
-(use-package swiper)
+(use-package swiper :ensure t)
 
 (use-package counsel-world-clock
+  :ensure t
   :after counsel
   :bind
   (:map counsel-prefix-map
         ("C" .  counsel-world-clock)))
 
 (use-package ivy-rich
+  :ensure t
   :custom
   (ivy-rich-switch-buffer-name-max-length 60 "Increase max length of buffer name.")
   :config
@@ -525,6 +571,7 @@
   (minibuffer-depth-indicate-mode 1))
 
 (use-package avy
+  :ensure t
   :config
   (avy-setup-default)
   :bind
@@ -533,14 +580,17 @@
    ("M-s M-s" . avy-goto-word-1)))
 
 (use-package avy-zap
+  :ensure t
   :bind
   ([remap zap-to-char] . avy-zap-to-char))
 
 (use-package ace-jump-buffer
+  :ensure t
   :bind
   (("M-g b" . ace-jump-buffer)))
 
 (use-package ace-window
+  :ensure t
   :custom
   (aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l) "Use home row for selecting.")
   (aw-scope 'frame "Highlight only current frame.")
@@ -548,6 +598,7 @@
   (("M-o" . ace-window)))
 
 (use-package link-hint
+  :ensure t
   :bind
   (("<XF86Search>" . link-hint-open-link)
    ("S-<XF86Search>" . link-hint-copy-link)
@@ -558,6 +609,7 @@
    ("c" . link-hint-copy-link)))
 
 (use-package ace-link
+  :ensure t
   :after link-hint ; to use prefix keymap
   :bind
   (:map link-hint-keymap
@@ -572,19 +624,23 @@
   (select-enable-clipboard t "Use the clipboard"))
 
 (use-package expand-region
+  :ensure t
   :bind
   ("C-=" . er/expand-region))
 
 (use-package edit-indirect
+  :ensure t
   :bind
   (:map mode-specific-map
         ("r" . edit-indirect-region)))
 
 (use-package clipmon
+  :ensure t
   :config
   (clipmon-mode))
 
 (use-package copy-as-format
+  :ensure t
   :custom
   (copy-as-format-default "slack")
   :bind
@@ -776,6 +832,9 @@
 (use-package multitran
   :defer t)
 
+(use-package imgbb
+  :ensure t)
+
 (use-package smtpmail
   :defer t
   :ensure nil
@@ -841,7 +900,7 @@
 
 (use-package org
   :defer t
-  ;; to be sure we have latest Org version
+  ;; to be sure we have the latest Org version
   :ensure org-plus-contrib
   :hook
   (org-mode . variable-pitch-mode)
@@ -941,6 +1000,12 @@
   :after magit
   :custom
   (magithub-clone-default-directory "~/git/")
+  :bind
+  (:map magit-prefix-map
+        ("h b" . magithub-browse)
+        ("h c" . magithub-clone)
+        ("h C" . magithub-create)
+        ("h f" . magithub-fork))
   :config
   (magithub-feature-autoinject t))
 
@@ -1028,10 +1093,12 @@
                     nil 'prepend))
 
 (use-package autoinsert
+  :ensure nil
   :hook
   (find-file . auto-insert))
 
 (use-package yasnippet
+  :ensure t
   :diminish yas-minor-mode
   :custom
   (yas-prompt-functions '(yas-completing-prompt yas-ido-prompt))
@@ -1057,6 +1124,8 @@
 
 (use-package highlight-defined
   :ensure t
+  :custom
+  (highlight-defined-face-use-itself t)
   :hook
   (emacs-lisp-mode . highlight-defined-mode))
 
@@ -1080,6 +1149,7 @@
   :hook
   (emacs-lisp-mode .  nameless-mode)
   :custom
+  (nameless-global-aliases '())
   (nameless-private-prefix t))
 
 ;; bind-key can't bind to keymaps
@@ -1125,25 +1195,6 @@
   (slime-setup '(slime-fancy))
   (setq slime-net-coding-system 'utf-8-unix))
 
-(use-package scala-mode
-  :defer t)
-
-(use-package sbt-mode
-  :defer t
-  :commands sbt-start sbt-command
-  :config
-  ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
-  ;; allows using SPACE when in the minibuffer
-  (substitute-key-definition
-   'minibuffer-complete-word
-   'self-insert-command
-   minibuffer-local-completion-map))
-
-(use-package ensime
-  :defer t
-  :bind (:map ensime-mode-map
-              ("C-x C-e" . ensime-inf-eval-region)))
-
 (use-package lua-mode
   :defer t)
 
@@ -1169,6 +1220,11 @@
   :custom
   ;; zsh
   (system-uses-terminfo nil))
+
+(use-package executable
+  :ensure nil
+  :hook
+  (after-save . executable-make-buffer-file-executable-if-script-p))
 
 (use-package apt-sources-list)
 
@@ -1205,6 +1261,10 @@
 (use-package restclient
   :mode
   ("\\.http\\'" . restclient-mode))
+
+(use-package restclient-test
+  :hook
+  (restclient-mode-hook . restclient-test-mode))
 
 (use-package ob-restclient
   :after org restclient
@@ -1250,6 +1310,8 @@
 
 (use-package emamux
   :defer t)
+
+(use-package debian-el)
 
 (use-package reverse-im
   :config
