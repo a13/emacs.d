@@ -21,8 +21,11 @@
 
 (put 'use-package 'lisp-indent-function 1)
 
-(setq use-package-verbose t)
-(setq use-package-minimum-reported-time 0.01)
+;; for startup profiling only
+(use-package use-package-core
+  :custom
+  (use-package-verbose t)
+  (use-package-minimum-reported-time 0.01))
 
 (use-package system-packages
   :ensure t
@@ -69,6 +72,41 @@
   (enable-recursive-minibuffers t "Allow minibuffer commands in the minibuffer")
   (indent-tabs-mode nil "Spaces!")
   (debug-on-quit nil))
+
+(use-package frame
+  :bind
+  ("C-z" . nil))
+
+(use-package delsel
+  :bind
+  (:map mode-specific-map
+        ("C-g" . minibuffer-keyboard-quit)))
+
+(use-package simple
+  :custom
+  (kill-ring-max 300)
+  :diminish
+  (visual-line-mode . " ↩")
+  (auto-fill-function . " ↵")
+  :config
+  (column-number-mode t)
+  (toggle-truncate-lines 1)
+  :bind
+  ;; remap ctrl-w/ctrl-h
+  (("C-w" . backward-kill-word)
+   ("C-h" . delete-backward-char)
+   :map ctl-x-map
+   ("C-k" . kill-region)))
+
+(use-package help
+  :bind
+  (("C-?" . help-command)
+   :map mode-specific-map
+   ("h" . help-command)))
+
+(use-package ibuffer
+  :bind
+  ([remap list-buffers] . ibuffer))
 
 (use-package files
   :hook
@@ -127,39 +165,6 @@
   :bind (:map ctl-x-map
               ("M-s" . sudo-edit)))
 
-(use-package frame
-  ;; disable suspending on C-z
-  :bind
-  ("C-z" . nil))
-
-(use-package delsel
-  ;; C-c C-g always quits minubuffer
-  :bind
-  (:map mode-specific-map
-        ("C-g" . minibuffer-keyboard-quit)))
-
-(use-package simple
-  :custom
-  (kill-ring-max 300)
-  :diminish
-  (visual-line-mode . " ↩")
-  (auto-fill-function . " ↵")
-  :config
-  (column-number-mode t)
-  (toggle-truncate-lines 1)
-  :bind
-  ;; remap ctrl-w/ctrl-h
-  (("C-w" . backward-kill-word)
-   ("C-h" . delete-backward-char)
-   :map ctl-x-map
-   ("C-k" . kill-region)
-   :map mode-specific-map
-   ("h" . help-command)))
-
-(use-package ibuffer
-  :bind
-  ([remap list-buffers] . ibuffer))
-
 (use-package exec-path-from-shell
   :ensure t
   :defer 0.1
@@ -193,7 +198,6 @@
 
 (use-package eshell-fringe-status
   :ensure t
-  :defer t
   :hook
   (eshell-mode . 'eshell-fringe-status-mode))
 
@@ -247,13 +251,14 @@
 
 (use-package dired-launch
   :ensure t
-  :defer t)
+  :hook
+  (dired-mode . dired-launch-mode))
 
 (use-package mule
   :config
   (prefer-coding-system 'utf-8)
-  (set-terminal-coding-system 'utf-8)
-  (set-language-environment "UTF-8"))
+  (set-language-environment "UTF-8")
+  (set-terminal-coding-system 'utf-8))
 
 (use-package ispell
   :defer t
@@ -290,13 +295,9 @@
   (set-fontset-font "fontset-default" 'cyrillic
                     (font-spec :registry "iso10646-1" :script 'cyrillic)))
 
-(use-package custom
-  :custom
-  (custom-safe-themes t "Treat all themes as safe"))
-
 (use-package lor-theme
   :config
-  (load-theme 'lor)
+  (load-theme 'lor t)
   :quelpa
   (lor-theme :repo "a13/lor-theme" :fetcher github :version original))
 
@@ -362,13 +363,6 @@
   :hook
   (dired-mode . all-the-icons-dired-mode))
 
-;; (use-package spaceline-all-the-icons
-;;   :config
-;;   (spaceline-all-the-icons-theme)
-;;   (spaceline-all-the-icons--setup-package-updates)
-;;   (spaceline-all-the-icons--setup-git-ahead)
-;;   (spaceline-all-the-icons--setup-paradox))
-
 (use-package all-the-icons-ivy
   :ensure t
   :after ivy
@@ -391,7 +385,7 @@
   :config
   (dashboard-setup-startup-hook)
   :custom
-  (initial-buffer-choice (or (get-buffer "*dashboard*") t))
+  (initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
   (dashboard-items '((recents  . 5)
                      (bookmarks . 5)
                      (projects . 5)
@@ -433,7 +427,7 @@
   (rainbow-identifiers-choose-face-function
    #'rainbow-identifiers-cie-l*a*b*-choose-face)
   :hook
-  (emacs-lisp-mode . rainbow-identifiers-mode)
+  (emacs-lisp-mode . rainbow-identifiers-mode) ; actually, turns it off
   (prog-mode . rainbow-identifiers-mode))
 
 (use-package rainbow-mode
@@ -584,12 +578,37 @@
 (use-package expand-region
   :ensure t
   :bind
-  ("C-=" . er/expand-region))
+  (("C-=" . er/expand-region)
+   ("C-+" . er/contract-region)
+   :map mode-specific-map
+   :prefix-map region-prefix-map
+   :prefix "r"
+   ("(" . er/mark-inside-pairs)
+   (")" . er/mark-outside-pairs)
+   ("'" . er/mark-inside-quotes)
+   ([34] . er/mark-outside-quotes) ; it's just a quotation mark
+   ("o" . er/mark-org-parent)
+   ("u" . er/mark-url)
+   ("b" . er/mark-org-code-block)
+   ("." . er/mark-method-call)
+   (">" . er/mark-next-accessor)
+   ("w" . er/mark-word)
+   ("d" . er/mark-defun)
+   ("e" . er/mark-email)
+   ("," . er/mark-symbol)
+   ("<" . er/mark-symbol-with-prefix)
+   (";" . er/mark-comment)
+   ("s" . er/mark-sentence)
+   ("S" . er/mark-text-sentence)
+   ("p" . er/mark-paragraph)
+   ("P" . er/mark-text-paragraph)))
+
 
 (use-package edit-indirect
   :ensure t
+  :after expand-region ; to use region-prefix-map
   :bind
-  (:map mode-specific-map
+  (:map region-prefix-map
         ("r" . edit-indirect-region)))
 
 (use-package clipmon
@@ -622,6 +641,8 @@
         ("s" . copy-as-format-slack)))
 
 (use-package man
+  :custom
+  (Man-notify-method 'pushy "show manpage HERE")
   :custom-face
   (Man-overstrike ((t (:inherit font-lock-type-face :bold t))))
   (Man-underline ((t (:inherit font-lock-keyword-face :underline t)))))
@@ -703,6 +724,11 @@
   :custom
   (alert-default-style 'libnotify))
 
+(use-package shr
+  :defer t
+  :custom
+  (shr-use-fonts nil))
+
 (use-package shr-color
   :defer t
   :custom
@@ -711,7 +737,6 @@
 (use-package eww
   :defer t
   :custom
-  (shr-use-fonts nil)
   (eww-search-prefix "https://duckduckgo.com/html/?kd=-1&q="))
 
 (use-package browse-url

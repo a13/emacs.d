@@ -75,8 +75,11 @@
 
      (put 'use-package 'lisp-indent-function 1)
 
-     (setq use-package-verbose t)
-     (setq use-package-minimum-reported-time 0.01)
+     ;; for startup profiling only
+     (use-package use-package-core
+       :custom
+       (use-package-verbose t)
+       (use-package-minimum-reported-time 0.01))
    #+END_SRC
 
    Now we can use it to extend its own functionality by some more useful keywords.
@@ -136,6 +139,59 @@
        (indent-tabs-mode nil "Spaces!")
        (debug-on-quit nil))
    #+END_SRC
+**  Default keybindings customization and other built-in settings
+
+   Disable suspending on C-z
+   #+BEGIN_SRC emacs-lisp
+     (use-package frame
+       :bind
+       ("C-z" . nil))
+   #+END_SRC
+
+   C-c C-g always quits minubuffer
+   #+BEGIN_SRC emacs-lisp
+     (use-package delsel
+       :bind
+       (:map mode-specific-map
+             ("C-g" . minibuffer-keyboard-quit)))
+   #+END_SRC
+
+   Make /C-w/ and /C-h/ kill a word/char before cursor (see [[http://unix-kb.cat-v.org/][Unix keyboard shortcuts]], don't know what to do with /C-u/ though)
+   #+BEGIN_SRC emacs-lisp
+     (use-package simple
+       :custom
+       (kill-ring-max 300)
+       :diminish
+       (visual-line-mode . " ↩")
+       (auto-fill-function . " ↵")
+       :config
+       (column-number-mode t)
+       (toggle-truncate-lines 1)
+       :bind
+       ;; remap ctrl-w/ctrl-h
+       (("C-w" . backward-kill-word)
+        ("C-h" . delete-backward-char)
+        :map ctl-x-map
+        ("C-k" . kill-region)))
+   #+END_SRC
+
+   But we still need to access help somehow
+   #+BEGIN_SRC emacs-lisp
+     (use-package help
+       :bind
+       (("C-?" . help-command)
+        :map mode-specific-map
+        ("h" . help-command)))
+   #+END_SRC
+
+   Who uses list-buffers?
+   #+BEGIN_SRC emacs-lisp
+     (use-package ibuffer
+       :bind
+       ([remap list-buffers] . ibuffer))
+   #+END_SRC
+
+
 ** Files
    Saving
    #+BEGIN_SRC emacs-lisp
@@ -210,45 +266,6 @@
 
    #+END_SRC
 ** Uncategorized
-   (Mostly) default keybindings customization
-   #+BEGIN_SRC emacs-lisp
-     (use-package frame
-       ;; disable suspending on C-z
-       :bind
-       ("C-z" . nil))
-
-     (use-package delsel
-       ;; C-c C-g always quits minubuffer
-       :bind
-       (:map mode-specific-map
-             ("C-g" . minibuffer-keyboard-quit)))
-   #+END_SRC
-
-   Make /C-w/ and /C-h/ kill a word/char before cursor (see [[http://unix-kb.cat-v.org/][Unix keyboard shortcuts]], don't know what to do with /C-u/ though)
-   #+BEGIN_SRC emacs-lisp
-     (use-package simple
-       :custom
-       (kill-ring-max 300)
-       :diminish
-       (visual-line-mode . " ↩")
-       (auto-fill-function . " ↵")
-       :config
-       (column-number-mode t)
-       (toggle-truncate-lines 1)
-       :bind
-       ;; remap ctrl-w/ctrl-h
-       (("C-w" . backward-kill-word)
-        ("C-h" . delete-backward-char)
-        :map ctl-x-map
-        ("C-k" . kill-region)
-        :map mode-specific-map
-        ("h" . help-command)))
-
-     (use-package ibuffer
-       :bind
-       ([remap list-buffers] . ibuffer))
-   #+END_SRC
-
    [[https://github.com/purcell/exec-path-from-shell][Get environment variables from the shell]]
    #+BEGIN_SRC emacs-lisp
      (use-package exec-path-from-shell
@@ -287,7 +304,6 @@
 
     (use-package eshell-fringe-status
       :ensure t
-      :defer t
       :hook
       (eshell-mode . 'eshell-fringe-status-mode))
   #+END_SRC
@@ -343,8 +359,8 @@
 
     (use-package dired-launch
       :ensure t
-      :defer t)
-
+      :hook
+      (dired-mode . dired-launch-mode))
   #+END_SRC
 
 * Interface
@@ -354,8 +370,8 @@
      (use-package mule
        :config
        (prefer-coding-system 'utf-8)
-       (set-terminal-coding-system 'utf-8)
-       (set-language-environment "UTF-8"))
+       (set-language-environment "UTF-8")
+       (set-terminal-coding-system 'utf-8))
 
      (use-package ispell
        :defer t
@@ -400,13 +416,9 @@
 
 ** Color themes
    #+BEGIN_SRC emacs-lisp
-     (use-package custom
-       :custom
-       (custom-safe-themes t "Treat all themes as safe"))
-
      (use-package lor-theme
        :config
-       (load-theme 'lor)
+       (load-theme 'lor t)
        :quelpa
        (lor-theme :repo "a13/lor-theme" :fetcher github :version original))
    #+END_SRC
@@ -482,13 +494,6 @@
        :hook
        (dired-mode . all-the-icons-dired-mode))
 
-     ;; (use-package spaceline-all-the-icons
-     ;;   :config
-     ;;   (spaceline-all-the-icons-theme)
-     ;;   (spaceline-all-the-icons--setup-package-updates)
-     ;;   (spaceline-all-the-icons--setup-git-ahead)
-     ;;   (spaceline-all-the-icons--setup-paradox))
-
      (use-package all-the-icons-ivy
        :ensure t
        :after ivy
@@ -514,7 +519,7 @@
        :config
        (dashboard-setup-startup-hook)
        :custom
-       (initial-buffer-choice (or (get-buffer "*dashboard*") t))
+       (initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
        (dashboard-items '((recents  . 5)
                           (bookmarks . 5)
                           (projects . 5)
@@ -561,7 +566,7 @@
        (rainbow-identifiers-choose-face-function
         #'rainbow-identifiers-cie-l*a*b*-choose-face)
        :hook
-       (emacs-lisp-mode . rainbow-identifiers-mode)
+       (emacs-lisp-mode . rainbow-identifiers-mode) ; actually, turns it off
        (prog-mode . rainbow-identifiers-mode))
 
      (use-package rainbow-mode
@@ -728,12 +733,37 @@
     (use-package expand-region
       :ensure t
       :bind
-      ("C-=" . er/expand-region))
+      (("C-=" . er/expand-region)
+       ("C-+" . er/contract-region)
+       :map mode-specific-map
+       :prefix-map region-prefix-map
+       :prefix "r"
+       ("(" . er/mark-inside-pairs)
+       (")" . er/mark-outside-pairs)
+       ("'" . er/mark-inside-quotes)
+       ([34] . er/mark-outside-quotes) ; it's just a quotation mark
+       ("o" . er/mark-org-parent)
+       ("u" . er/mark-url)
+       ("b" . er/mark-org-code-block)
+       ("." . er/mark-method-call)
+       (">" . er/mark-next-accessor)
+       ("w" . er/mark-word)
+       ("d" . er/mark-defun)
+       ("e" . er/mark-email)
+       ("," . er/mark-symbol)
+       ("<" . er/mark-symbol-with-prefix)
+       (";" . er/mark-comment)
+       ("s" . er/mark-sentence)
+       ("S" . er/mark-text-sentence)
+       ("p" . er/mark-paragraph)
+       ("P" . er/mark-text-paragraph)))
+
 
     (use-package edit-indirect
       :ensure t
+      :after expand-region ; to use region-prefix-map
       :bind
-      (:map mode-specific-map
+      (:map region-prefix-map
             ("r" . edit-indirect-region)))
 
     (use-package clipmon
@@ -764,11 +794,14 @@
             ("p" . copy-as-format-pod)
             ("r" . copy-as-format-rst)
             ("s" . copy-as-format-slack)))
+
   #+END_SRC
 
 * Help
   #+BEGIN_SRC emacs-lisp
     (use-package man
+      :custom
+      (Man-notify-method 'pushy "show manpage HERE")
       :custom-face
       (Man-overstrike ((t (:inherit font-lock-type-face :bold t))))
       (Man-underline ((t (:inherit font-lock-keyword-face :underline t)))))
@@ -862,6 +895,11 @@
 ** Web
 
    #+BEGIN_SRC emacs-lisp
+     (use-package shr
+       :defer t
+       :custom
+       (shr-use-fonts nil))
+
      (use-package shr-color
        :defer t
        :custom
@@ -870,7 +908,6 @@
      (use-package eww
        :defer t
        :custom
-       (shr-use-fonts nil)
        (eww-search-prefix "https://duckduckgo.com/html/?kd=-1&q="))
 
      (use-package browse-url
