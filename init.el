@@ -20,7 +20,7 @@
   (require 'use-package))
 
 (put 'use-package 'lisp-indent-function 1)
-(setq use-package-always-ensure t)
+
 (setq use-package-verbose t)
 (setq use-package-minimum-reported-time 0.01)
 
@@ -46,9 +46,7 @@
 
 (use-package quelpa-use-package :ensure t)
 
-
 (use-package use-package-secrets
-  :ensure nil
   :custom
   (use-package-secrets-default-directory "~/.emacs.d/secrets")
   :quelpa
@@ -61,7 +59,6 @@
   (paradox-enable))
 
 (use-package emacs
-  :ensure nil
   :init
   (put 'narrow-to-region 'disabled nil)
   (put 'downcase-region 'disabled nil)
@@ -74,7 +71,6 @@
   (debug-on-quit nil))
 
 (use-package files
-  :ensure nil
   :hook
   (before-save . delete-trailing-whitespace)
   :custom
@@ -90,7 +86,6 @@
   (version-control t))
 
 (use-package autorevert
-  :ensure nil
   :diminish auto-revert-mode)
 
 (use-package iqa
@@ -101,31 +96,26 @@
   (iqa-setup-default))
 
 (use-package cus-edit
-  :ensure nil
   :custom
-  ;; alternatively, one can use `(make-temp-file "emacs-custom")'
   (custom-file null-device "Don't store customizations"))
 
 (use-package vlf
   :ensure t
   :after (ivy counsel)
   :config
-  (ivy-add-actions  'counsel-find-file '(("l" vlf "view large file"))))
+  (ivy-add-actions 'counsel-find-file '(("l" vlf "view large file"))))
 
 (use-package epa
   :defer t
-  :ensure nil
   :custom
   (epg-gpg-program "gpg")
   (epa-pinentry-mode nil))
 
 (use-package uniquify
-  :ensure nil
   :custom
   (uniquify-buffer-name-style 'forward))
 
 (use-package tramp
-  :ensure nil
   :defer t
   :custom
   (tramp-backup-directory-alist backup-directory-alist)
@@ -138,25 +128,22 @@
               ("M-s" . sudo-edit)))
 
 (use-package frame
-  :ensure nil
   ;; disable suspending on C-z
   :bind
   ("C-z" . nil))
 
 (use-package delsel
-  :ensure nil
   ;; C-c C-g always quits minubuffer
   :bind
   (:map mode-specific-map
         ("C-g" . minibuffer-keyboard-quit)))
 
 (use-package simple
-  :ensure nil
   :custom
   (kill-ring-max 300)
   :diminish
-  ((visual-line-mode . " ↩")
-   (auto-fill-function . " ↵"))
+  (visual-line-mode . " ↩")
+  (auto-fill-function . " ↵")
   :config
   (column-number-mode t)
   (toggle-truncate-lines 1)
@@ -170,7 +157,6 @@
    ("h" . help-command)))
 
 (use-package ibuffer
-  :ensure nil
   :bind
   ([remap list-buffers] . ibuffer))
 
@@ -180,13 +166,8 @@
   :config
   (exec-path-from-shell-initialize))
 
-(use-package eshell
-  :defer t
-  :ensure nil)
-
 (use-package em-smart
   :defer t
-  :ensure nil
   :config
   (eshell-smart-initialize)
   :custom
@@ -196,16 +177,15 @@
 
 (use-package esh-help
   :ensure t
+  :defer t
   :config
   (setup-esh-help-eldoc))
 
 (use-package esh-autosuggest
   :ensure t
-  :hook (eshell-mode . esh-autosuggest-mode)
-  :ensure t)
+  :hook (eshell-mode . esh-autosuggest-mode))
 
 (use-package eshell-toggle
-  :ensure nil
   :quelpa
   (eshell-toggle :repo "4DA/eshell-toggle" :fetcher github :version original)
   :bind
@@ -218,20 +198,18 @@
   (eshell-mode . 'eshell-fringe-status-mode))
 
 (use-package ls-lisp
-  :ensure nil
+  :defer t
   :custom
   (ls-lisp-emulation 'MS-Windows)
   (ls-lisp-ignore-case t)
   (ls-lisp-verbosity nil))
 
 (use-package dired
-  :ensure nil
   :custom (dired-dwim-target t "guess a target directory")
   :hook
   (dired-mode . dired-hide-details-mode))
 
 (use-package dired-x
-  :ensure nil
   :bind
   ([remap list-directory] . dired-jump)
   :custom
@@ -257,6 +235,7 @@
 
 (use-package async
   :ensure t
+  :defer t
   :init
   (dired-async-mode t))
 
@@ -266,10 +245,11 @@
   (:map dired-mode-map
         ("r" . dired-rsync)))
 
-(use-package dired-launch :ensure t)
+(use-package dired-launch
+  :ensure t
+  :defer t)
 
 (use-package mule
-  :ensure nil
   :config
   (prefer-coding-system 'utf-8)
   (set-terminal-coding-system 'utf-8)
@@ -277,7 +257,6 @@
 
 (use-package ispell
   :defer t
-  :ensure nil
   :custom
   (ispell-local-dictionary-alist
    '(("russian"
@@ -293,12 +272,10 @@
 
 (use-package flyspell
   :defer t
-  :ensure nil
   :custom
   (flyspell-delay 1))
 
 (use-package faces
-  :ensure nil
   :defer 0.1
   :custom
   (face-font-family-alternatives '(("Consolas" "Monaco" "Monospace")))
@@ -314,30 +291,24 @@
                     (font-spec :registry "iso10646-1" :script 'cyrillic)))
 
 (use-package custom
-  :ensure nil
   :custom
   (custom-safe-themes t "Treat all themes as safe"))
 
 (use-package lor-theme
-  :ensure nil
   :config
   (load-theme 'lor)
   :quelpa
   (lor-theme :repo "a13/lor-theme" :fetcher github :version original))
 
 (use-package tool-bar
-  :ensure nil
   :config
   (tool-bar-mode -1))
 
 (use-package scroll-bar
-  :defer t
-  :ensure nil
   :config
   (scroll-bar-mode -1))
 
 (use-package menu-bar
-  :ensure nil
   :config
   (menu-bar-mode -1)
   :bind
@@ -345,13 +316,11 @@
 
 (use-package tooltip
   :defer t
-  :ensure nil
   :custom
   (tooltip-mode -1))
 
 (use-package time
   :defer t
-  :ensure nil
   :custom
   (display-time-default-load-average nil)
   (display-time-24hr-format t)
@@ -372,7 +341,6 @@
   (yahoo-weather-location "Kyiv, UA"))
 
 (use-package font-lock+
-  :ensure nil
   :quelpa
   (font-lock+ :repo "emacsmirror/font-lock-plus" :fetcher github))
 
@@ -423,9 +391,7 @@
   :config
   (dashboard-setup-startup-hook)
   :custom
-  (initial-buffer-choice '(lambda ()
-                            (setq initial-buffer-choice nil)
-                            (get-buffer "*dashboard*")))
+  (initial-buffer-choice (or (get-buffer "*dashboard*") t))
   (dashboard-items '((recents  . 5)
                      (bookmarks . 5)
                      (projects . 5)
@@ -433,17 +399,14 @@
                      (registers . 5))))
 
 (use-package winner
-  :ensure nil
   :config
   (winner-mode 1))
 
 (use-package paren
-  :ensure nil
   :config
   (show-paren-mode t))
 
 (use-package hl-line
-  :ensure nil
   :hook
   (prog-mode . hl-line-mode))
 
@@ -553,20 +516,16 @@
 
 (use-package ivy-rich
   :ensure t
-  :custom
-  (ivy-rich-switch-buffer-name-max-length 60 "Increase max length of buffer name.")
   :config
   (ivy-rich-mode 1))
 
 (use-package isearch
-  :ensure nil
   :bind
   ;; TODO: maybe get a keybinding from global map
   (:map isearch-mode-map
         ("C-h" . isearch-delete-char)))
 
 (use-package mb-depth
-  :ensure nil
   :config
   (minibuffer-depth-indicate-mode 1))
 
@@ -587,7 +546,7 @@
 (use-package ace-jump-buffer
   :ensure t
   :bind
-  (("M-g b" . ace-jump-buffer)))
+  ("M-g b" . ace-jump-buffer))
 
 (use-package ace-window
   :ensure t
@@ -595,7 +554,7 @@
   (aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l) "Use home row for selecting.")
   (aw-scope 'frame "Highlight only current frame.")
   :bind
-  (("M-o" . ace-window)))
+  ("M-o" . ace-window))
 
 (use-package link-hint
   :ensure t
@@ -618,7 +577,6 @@
   (ace-link-setup-default))
 
 (use-package select
-  :ensure nil
   :custom
   (selection-coding-system 'utf-8)
   (select-enable-clipboard t "Use the clipboard"))
@@ -642,7 +600,7 @@
 (use-package copy-as-format
   :ensure t
   :custom
-  (copy-as-format-default "slack")
+  (copy-as-format-default "slack" "or Telegram")
   :bind
   (:map mode-specific-map
         :prefix-map copy-as-format-prefix-map
@@ -664,25 +622,29 @@
         ("s" . copy-as-format-slack)))
 
 (use-package man
-  :ensure nil
   :custom-face
   (Man-overstrike ((t (:inherit font-lock-type-face :bold t))))
   (Man-underline ((t (:inherit font-lock-keyword-face :underline t)))))
 
 (use-package keyfreq
+  :ensure t
   :config
   (keyfreq-mode 1)
   (keyfreq-autosave-mode 1))
 
 (use-package which-key
+  :ensure t
   :diminish which-key-mode
   :config
   (which-key-mode))
 
 (use-package free-keys
+  :ensure t
+  :defer t
   :commands free-keys)
 
 (use-package helpful
+  :ensure t
   :defer t)
 
 (use-package jabber
@@ -712,11 +674,12 @@
    '(jabber-show-resources nil)))
 
 (use-package jabber-otr
+  :ensure t
   :defer t)
 
 (use-package point-im
-  :ensure nil
   :defines point-im-reply-id-add-plus
+  :after jabber
   :quelpa
   (point-im :repo "a13/point-im.el" :fetcher github :version original)
   :config
@@ -725,6 +688,7 @@
   (jabber-chat-mode . point-im-mode))
 
 (use-package slack
+  :ensure t
   :secret
   (slack-start "work.el.gpg")
   :commands (slack-start)
@@ -734,25 +698,23 @@
 
 ;; TODO: move somewhere
 (use-package alert
+  :ensure t
   :commands (alert)
   :custom
   (alert-default-style 'libnotify))
 
 (use-package shr-color
   :defer t
-  :ensure nil
   :custom
   (shr-color-visible-luminance-min 80 "Improve the contrast"))
 
 (use-package eww
   :defer t
-  :ensure nil
   :custom
   (shr-use-fonts nil)
   (eww-search-prefix "https://duckduckgo.com/html/?kd=-1&q="))
 
 (use-package browse-url
-  :ensure nil
   :bind
   ([f5] . browse-url)
   :config
@@ -802,6 +764,7 @@
                 webjump-sample-sites)))
 
 (use-package atomic-chrome
+  :ensure t
   :defer t
   :custom
   (atomic-chrome-url-major-mode-alist
@@ -813,69 +776,56 @@
   (atomic-chrome-start-server))
 
 (use-package shr-tag-pre-highlight
+  :ensure t
   :defer t
   :after shr
   :config
   (add-to-list 'shr-external-rendering-functions
-               '(pre . shr-tag-pre-highlight))
-
-  (when (version< emacs-version "26")
-    (with-eval-after-load 'eww
-      (advice-add 'eww-display-html :around
-                  'eww-display-html--override-shr-external-rendering-functions))))
+               '(pre . shr-tag-pre-highlight)))
 
 (use-package google-this
+  :ensure t
   :bind
   (:map mode-specific-map
         ("g" . 'google-this-mode-submap)))
 
 (use-package multitran
+  :ensure t
   :defer t)
 
 (use-package imgbb
-  :ensure t)
+  :ensure t
+  :defer t)
+
+(use-package mu4e
+  ;; let's install it now, since mu4e packages aren't available yet
+  :ensure-system-package (mu . mu4e))
 
 (use-package smtpmail
-  :defer t
-  :ensure nil
-  ;; let's install it now, since mu4e packages aren't available yet
-  :ensure-system-package (mu . mu4e)
-  :config
+  :custom
+  (smtpmail-queue-mail nil "start in normal mode")
   ;;set up queue for offline email
-  ;;use mu mkdir  ~/Maildir/queue to set up first
-  (setq smtpmail-queue-mail nil  ;; start in normal mode
-        smtpmail-queue-dir "~/.mail/queue/cur"))
+  (smtpmail-queue-dir "~/.mail/queue/cur" "use `mu mkdir ~/.mail/queue` to set up first"))
 
 (use-package mu4e-vars
   :defer t
   :load-path "/usr/share/emacs/site-lisp/mu4e"
-  :ensure nil
+  :custom
+  (mu4e-view-show-images t "enable inline images")
+  (mu4e-maildir (expand-file-name "~/.mail/work"))
+  (mu4e-completing-read-function 'completing-read "ivy does all the work")
+  (mu4e-get-mail-command "mbsync work" "sync with mbsync")
+  (mu4e-change-filenames-when-moving t "rename files when moving, needed for mbsync")
   :config
-  ;;location of my maildir
-  ;; enable inline images
-  (setq mu4e-view-show-images t)
   ;; use imagemagick, if available
   (when (fboundp 'imagemagick-register-types)
-    (imagemagick-register-types))
-
-  (setq mu4e-maildir (expand-file-name "~/.mail/work"))
-  ;; ivy does all the work
-  (setq mu4e-completing-read-function 'completing-read)
-
-  ;;command used to get mail
-  ;; use this for testing
-  (setq mu4e-get-mail-command "true")
-  ;; use this to sync with mbsync
-  (setq mu4e-get-mail-command "mbsync work")
-  ;;rename files when moving
-  ;;NEEDED FOR MBSYNC
-  (setq mu4e-change-filenames-when-moving t))
+    (imagemagick-register-types)))
 
 (use-package mu4e-contrib
   :defer t
-  :ensure nil
   :custom
   (mu4e-html2text-command 'mu4e-shr2text))
+
 (use-package mu4e-alert
   :after mu4e
   :init
@@ -894,7 +844,7 @@
 
 (use-package calendar
   :defer t
-  :ensure nil
+
   :custom
   (calendar-week-start-day 1))
 
@@ -937,6 +887,7 @@
   (jiralib-url "http://jira:8080"))
 
 (use-package ibuffer-vc
+  :ensure t
   :config
   (define-ibuffer-column icon
     (:name "Icon" :inline t)
@@ -958,12 +909,15 @@
                  (ibuffer-do-sort-by-alphabetic)))))
 
 (use-package gitconfig-mode
+  :ensure t
   :defer t)
 
 (use-package gitignore-mode
+  :ensure t
   :defer t)
 
 (use-package magit
+  :ensure t
   :custom
   (magit-completing-read-function 'ivy-completing-read "Force Ivy usage.")
   :bind
@@ -997,6 +951,7 @@
          ("U" . magit-update-index))))
 
 (use-package magithub
+  :ensure t
   :after magit
   :custom
   (magithub-clone-default-directory "~/git/")
@@ -1010,6 +965,7 @@
   (magithub-feature-autoinject t))
 
 (use-package browse-at-remote
+  :ensure t
   :after link-hint
   :bind
   (:map link-hint-keymap
@@ -1018,10 +974,10 @@
 
 (use-package smerge-mode
   :defer t
-  :ensure nil
   :diminish smerge-mode)
 
 (use-package diff-hl
+  :ensure t
   :hook
   ((magit-post-refresh . diff-hl-magit-post-refresh)
    (prog-mode . diff-hl-mode)
@@ -1029,9 +985,11 @@
    (dired-mode . diff-hl-dired-mode)))
 
 (use-package smart-comment
+  :ensure t
   :bind ("M-;" . smart-comment))
 
 (use-package projectile
+  :ensure t
   :bind
   (:map mode-specific-map ("p" . projectile-command-map))
   :custom
@@ -1043,6 +1001,7 @@
   (projectile-completion-system 'ivy))
 
 (use-package counsel-projectile
+  :ensure t
   :after counsel projectile
   :config
   (counsel-projectile-mode))
@@ -1093,7 +1052,6 @@
                     nil 'prepend))
 
 (use-package autoinsert
-  :ensure nil
   :hook
   (find-file . auto-insert))
 
@@ -1118,7 +1076,6 @@
   (avy-flycheck-setup))
 
 (use-package lisp
-  :ensure nil
   :hook
   (after-save . check-parens))
 
@@ -1135,17 +1092,21 @@
   (emacs-lisp-mode . highlight-quoted-mode))
 
 (use-package eros
+  :ensure t
   :hook
   (emacs-lisp-mode . eros-mode))
 
 (use-package suggest
+  :ensure t
   :defer t)
 
 (use-package ipretty
+  :ensure t
   :config
   (ipretty-mode 1))
 
 (use-package nameless
+  :ensure t
   :hook
   (emacs-lisp-mode .  nameless-mode)
   :custom
@@ -1154,16 +1115,21 @@
 
 ;; bind-key can't bind to keymaps
 (use-package erefactor
+  :ensure t
   :defer t)
 
 (use-package flycheck-package
+  :ensure t
   :defer t
   :after flycheck
   (flycheck-package-setup))
 
-(use-package geiser)
+(use-package geiser
+  :ensure t
+  :defer t)
 
 (use-package clojure-mode
+  :ensure t
   :defer t
   :config
   (define-clojure-indent
@@ -1171,9 +1137,11 @@
     (mlet 'defun)))
 
 (use-package clojure-snippets
+  :ensure t
   :defer t)
 
 (use-package cider
+  :ensure t
   :defer t
   :custom
   (cider-repl-display-help-banner nil)
@@ -1183,9 +1151,11 @@
             '(:eval (format " 🍏%s" (cider--modeline-info)))))
 
 (use-package kibit-helper
+  :ensure t
   :defer t)
 
 (use-package slime
+  :ensure t
   :disabled
   :config
   (setq inferior-lisp-program "/usr/bin/sbcl"
@@ -1195,10 +1165,27 @@
   (slime-setup '(slime-fancy))
   (setq slime-net-coding-system 'utf-8-unix))
 
+(use-package erlang
+  :ensure t
+  :defer t
+  :custom
+  (erlang-compile-extra-opts '(debug_info))
+  :config
+  (require 'erlang-start))
+
+
+(use-package company-erlang
+  :ensure t
+  :hook
+  (erlang-mode #'company-erlang-init))
+
 (use-package lua-mode
+  :ensure t
   :defer t)
 
 (use-package conkeror-minor-mode
+  :ensure t
+  :disabled
   :defer t
   :hook
   (js-mode . (lambda ()
@@ -1206,15 +1193,16 @@
                  (conkeror-minor-mode 1)))))
 
 (use-package json-mode
+  :ensure t
   :defer t)
 
 (use-package graphql-mode
+  :ensure t
   :mode "\\.graphql\\'"
   :custom
   (graphql-url "http://localhost:8000/api/graphql/query"))
 
 (use-package sh-script
-  :ensure nil
   :mode (("zshecl" . sh-mode)
          ("\\.zsh\\'" . sh-mode))
   :custom
@@ -1222,13 +1210,14 @@
   (system-uses-terminfo nil))
 
 (use-package executable
-  :ensure nil
   :hook
   (after-save . executable-make-buffer-file-executable-if-script-p))
 
-(use-package apt-sources-list)
+(use-package apt-sources-list
+  :ensure t)
 
 (use-package ssh-config-mode
+  :ensure t
   :init
   (autoload 'ssh-config-mode "ssh-config-mode" t)
   :mode
@@ -1240,13 +1229,16 @@
   (ssh-config-mode . turn-on-font-lock))
 
 (use-package markdown-mode
+  :ensure t
   :ensure-system-package markdown
   :mode (("\\`README\\.md\\'" . gfm-mode)
          ("\\.md\\'"          . markdown-mode)
          ("\\.markdown\\'"    . markdown-mode))
-  :init (setq markdown-command "markdown"))
+  :custom
+  (markdown-command "markdown"))
 
 (use-package jira-markup-mode
+  :ensure t
   :defer t
   :after atomic-chrome
   :mode ("\\.confluence$" . jira-markup-mode)
@@ -1255,18 +1247,22 @@
                '("atlassian\\.net$" . jira-markup-mode)))
 
 (use-package csv-mode
+  :ensure t
   :mode
   (("\\.[Cc][Ss][Vv]\\'" . csv-mode)))
 
 (use-package restclient
+  :ensure t
   :mode
   ("\\.http\\'" . restclient-mode))
 
 (use-package restclient-test
+  :ensure t
   :hook
   (restclient-mode-hook . restclient-test-mode))
 
 (use-package ob-restclient
+  :ensure t
   :after org restclient
   :init
   (org-babel-do-load-languages
@@ -1274,6 +1270,7 @@
    '((restclient . t))))
 
 (use-package company-restclient
+  :ensure t
   :after (company restclient)
   :config
   (add-to-list 'company-backends 'company-restclient))
@@ -1304,16 +1301,24 @@
 
 ;; not sure if these two should be here
 (use-package dockerfile-mode
+  :ensure t
+  :defer t
   :mode "Dockerfile\\'")
 
-(use-package docker-compose-mode)
-
-(use-package emamux
+(use-package docker-compose-mode
+  :ensure t
   :defer t)
 
-(use-package debian-el)
+(use-package emamux
+  :ensure t
+  :defer t)
+
+(use-package debian-el
+  :ensure t
+  :defer t)
 
 (use-package reverse-im
+  :ensure t
   :config
   (add-to-list 'load-path "~/.xkb/contrib")
   (add-to-list 'reverse-im-modifiers 'super)
