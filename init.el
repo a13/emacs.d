@@ -897,6 +897,7 @@
   (org-src-tab-acts-natively t))
 
 (use-package org-bullets
+  :ensure t
   :custom
   ;; org-bullets-bullet-list
   ;; default: "◉ ○ ✸ ✿"
