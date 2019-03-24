@@ -22,10 +22,10 @@
 (put 'use-package 'lisp-indent-function 1)
 
 ;; for startup profiling only
-(use-package use-package-core
-  :custom
-  (use-package-verbose t)
-  (use-package-minimum-reported-time 0.01))
+;; (use-package use-package-core
+;;   :custom
+;;   (use-package-verbose t)
+;;   (use-package-minimum-reported-time 0.01))
 
 (use-package system-packages
   :ensure t
@@ -69,6 +69,7 @@
   (scroll-step 1)
   (inhibit-startup-screen t "Don't show splash screen")
   (use-dialog-box nil "Disable dialog boxes")
+  (x-gtk-use-system-tooltips nil)
   (enable-recursive-minibuffers t "Allow minibuffer commands in the minibuffer")
   (indent-tabs-mode nil "Spaces!")
   (debug-on-quit nil))
@@ -155,6 +156,8 @@
 
 (use-package tramp
   :defer t
+  :config
+  (put 'temporary-file-directory 'standard-value '("/tmp"))
   :custom
   (tramp-backup-directory-alist backup-directory-alist)
   (tramp-default-method "ssh")
@@ -279,6 +282,12 @@
   :defer t
   :custom
   (flyspell-delay 1))
+
+(use-package flyspell-correct-ivy
+  :ensure t
+  :demand t
+  :bind (:map flyspell-mode-map
+              ("C-c $" . flyspell-correct-at-point)))
 
 (use-package faces
   :defer 0.1
@@ -408,6 +417,15 @@
   :ensure t
   :hook
   (prog-mode . highlight-numbers-mode))
+
+(use-package highlight-escape-sequences
+  :ensure t
+  :config (hes-mode))
+
+(use-package hl-todo
+  :ensure t
+  :hook ((prog-mode . hl-todo-mode)
+         (yaml-mode . hl-todo-mode)))
 
 (use-package page-break-lines
   :ensure t
@@ -603,6 +621,12 @@
    ("p" . er/mark-paragraph)
    ("P" . er/mark-text-paragraph)))
 
+(use-package elec-pair
+  :config
+  (electric-pair-mode))
+
+
+
 
 (use-package edit-indirect
   :ensure t
@@ -613,6 +637,7 @@
 
 (use-package clipmon
   :ensure t
+  :defer 0.1
   :config
   (clipmon-mode))
 
@@ -646,6 +671,11 @@
   :custom-face
   (Man-overstrike ((t (:inherit font-lock-type-face :bold t))))
   (Man-underline ((t (:inherit font-lock-keyword-face :underline t)))))
+
+(use-package info-colors
+  :ensure t
+  :hook
+  (Info-selection #'info-colors-fontify-node))
 
 (use-package keyfreq
   :ensure t
@@ -823,6 +853,7 @@
   :defer t)
 
 (use-package mu4e
+  :load-path "/usr/share/emacs/site-lisp/mu4e"
   ;; let's install it now, since mu4e packages aren't available yet
   :ensure-system-package (mu . mu4e))
 
@@ -834,7 +865,6 @@
 
 (use-package mu4e-vars
   :defer t
-  :load-path "/usr/share/emacs/site-lisp/mu4e"
   :custom
   (mu4e-view-show-images t "enable inline images")
   (mu4e-maildir (expand-file-name "~/.mail/work"))
@@ -851,25 +881,8 @@
   :custom
   (mu4e-html2text-command 'mu4e-shr2text))
 
-(use-package mu4e-alert
-  :after mu4e
-  :init
-  (mu4e-alert-set-default-style 'notifications)
-  :hook ((after-init . mu4e-alert-enable-mode-line-display)
-         (after-init . mu4e-alert-enable-notifications)))
-
-(use-package mu4e-maildirs-extension
-  :after mu4e
-  :defines mu4e-maildirs-extension-before-insert-maildir-hook
-  :init
-  (mu4e-maildirs-extension)
-  :config
-  ;; don't draw a newline
-  (setq mu4e-maildirs-extension-before-insert-maildir-hook '()))
-
 (use-package calendar
   :defer t
-
   :custom
   (calendar-week-start-day 1))
 
@@ -903,6 +916,7 @@
   (org-html-htmlize-font-prefix "org-"))
 
 (use-package org-password-manager
+  :ensure t
   :hook
   (org-mode . org-password-manager-key-bindings))
 
