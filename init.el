@@ -85,7 +85,7 @@
 
 (use-package simple
   :custom
-  (kill-ring-max 300)
+  (kill-ring-max 3000)
   :diminish
   (visual-line-mode . " ↩")
   (auto-fill-function . " ↵")
@@ -126,6 +126,12 @@
 
 (use-package autorevert
   :diminish auto-revert-mode)
+
+(use-package recentf
+  :custom
+  (recentf-auto-cleanup 30)
+  :config
+  (run-with-idle-timer 30 t 'recentf-save-list))
 
 (use-package iqa
   :ensure t
@@ -194,8 +200,11 @@
   :hook (eshell-mode . esh-autosuggest-mode))
 
 (use-package eshell-toggle
+  :custom
+  (eshell-toggle-use-projectile-root t)
+  (eshell-toggle-run-command nil)
   :quelpa
-  (eshell-toggle :repo "4DA/eshell-toggle" :fetcher github :version original)
+  (eshell-toggle :repo "a13/eshell-toggle" :fetcher github :version original)
   :bind
   ("M-`" . eshell-toggle))
 
@@ -256,6 +265,12 @@
   :ensure t
   :hook
   (dired-mode . dired-launch-mode))
+
+(use-package dired-git-info
+  :ensure t
+  :bind
+  (:map dired-mode-map
+        (")" . dired-git-info-mode)))
 
 (use-package mule
   :config
@@ -625,9 +640,6 @@
   :config
   (electric-pair-mode))
 
-
-
-
 (use-package edit-indirect
   :ensure t
   :after expand-region ; to use region-prefix-map
@@ -706,23 +718,23 @@
   (setq jabber-history-enabled t
         jabber-use-global-history nil
         fsm-debug nil)
-  (custom-set-variables
-   '(jabber-auto-reconnect t)
-   '(jabber-chat-buffer-format "*-jc-%n-*")
-   '(jabber-groupchat-buffer-format "*-jg-%n-*")
-   '(jabber-chat-foreign-prompt-format "▼ [%t] %n> ")
-   '(jabber-chat-local-prompt-format "▲ [%t] %n> ")
-   '(jabber-muc-colorize-foreign t)
-   '(jabber-muc-private-buffer-format "*-jmuc-priv-%g-%n-*")
-   '(jabber-rare-time-format "%e %b %Y %H:00")
-   '(jabber-resource-line-format "   %r - %s [%p]")
-   '(jabber-roster-buffer "*-jroster-*")
-   '(jabber-roster-line-format "%c %-17n")
-   '(jabber-roster-show-bindings nil)
-   '(jabber-roster-show-title nil)
-   '(jabber-roster-sort-functions (quote (jabber-roster-sort-by-status jabber-roster-sort-by-displayname jabber-roster-sort-by-group)))
-   '(jabber-show-offline-contacts nil)
-   '(jabber-show-resources nil)))
+  :custom
+  (jabber-auto-reconnect t)
+  (jabber-chat-buffer-format "*-jc-%n-*")
+  (jabber-groupchat-buffer-format "*-jg-%n-*")
+  (jabber-chat-foreign-prompt-format "▼ [%t] %n> ")
+  (jabber-chat-local-prompt-format "▲ [%t] %n> ")
+  (jabber-muc-colorize-foreign t)
+  (jabber-muc-private-buffer-format "*-jmuc-priv-%g-%n-*")
+  (jabber-rare-time-format "%e %b %Y %H:00")
+  (jabber-resource-line-format "   %r - %s [%p]")
+  (jabber-roster-buffer "*-jroster-*")
+  (jabber-roster-line-format "%c %-17n")
+  (jabber-roster-show-bindings nil)
+  (jabber-roster-show-title nil)
+  (jabber-roster-sort-functions (quote (jabber-roster-sort-by-status jabber-roster-sort-by-displayname jabber-roster-sort-by-group)))
+  (jabber-show-offline-contacts nil)
+  (jabber-show-resources nil))
 
 (use-package jabber-otr
   :ensure t
@@ -979,8 +991,8 @@
          ("m" . magit)
          ("M" . magit-merge)
          ("n" . magit-notes-edit)
-         ("p" . magit-pull)
-         ("P" . magit-push)
+         ("p" . magit-pull-branch)
+         ("P" . magit-push-current)
          ("r" . magit-reset)
          ("R" . magit-rebase)
          ("s" . magit-status)
@@ -1163,6 +1175,10 @@
   :defer t
   :after flycheck
   (flycheck-package-setup))
+
+(use-package dash
+  :custom
+  (dash-enable-fontlock t))
 
 (use-package geiser
   :ensure t
