@@ -4,11 +4,18 @@
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="http://www.pirilampo.org/styles/readtheorg/css/readtheorg.css"/>
 #+PROPERTY: header-args:emacs-lisp :tangle "init.el"
 * Foreword and keynotes
+** Use Use-package
+   I try to keep my configuration as declarative as possible, thanks to [[https://github.com/jwiegley/use-package][Use-package]] — it's very easy now.
 
-** Declarative
-   I try to keep my configuration as declarative as possible, thanks to [[https://github.com/jwiegley/use-package][Use-package]] — it's very easy now:
-   - [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Setting-Variables.html][setq]] is almost always can be rewritten with [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Applying-Customizations.html][customize-set-variable]] and therefore with [[https://github.com/jwiegley/use-package#customizing-variables][:custom]] keyword, it even supports comments! At the same time I don't use [[http://www.gnu.org/software/emacs/manual/html_node/emacs/Easy-Customization.html][Customization]] interface, and my own [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Saving-Customizations.html][custom-file]] is =/dev/null=.
-     An example
+   - use-package is used for built-in packages or libraries too (without :ensure)
+
+   - each variable/face setting or each function call belongs to the one and only package which provides the symbol
+   To find out, where do they belong to, use /M-x describe-variable/, /M-x describe-face/ or /M-x describe-function/ accordingly.
+
+   - [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Setting-Variables.html][setq]] is almost always means changing customizable variable, so can be rewritten with [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Applying-Customizations.html][customize-set-variable]] and therefore with [[https://github.com/jwiegley/use-package#customizing-variables][:custom]] keyword, besides that some defcustoms [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Variable-Definitions.html#Variable-Definitions][have get/set functions]], and just setq-ing them won't do the trick. It even supports inline comments so you can trace the changes.
+
+   At the same time I don't use [[http://www.gnu.org/software/emacs/manual/html_node/emacs/Easy-Customization.html][Customization]] interface, and my own [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Saving-Customizations.html][custom-file]] is =/dev/null=.
+   An example
      #+BEGIN_SRC emacs-lisp :tangle no
        ;; "Don't show splash screen"
        (setq inhibit-startup-screen t)
@@ -30,6 +37,7 @@
      #+END_SRC
    - [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Hooks.html][add-hook]] → [[https://github.com/jwiegley/use-package#hooks][:hook]]
    - [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Changing-Key-Bindings.html][define-key]] → [[https://github.com/jwiegley/use-package#key-binding][:bind]]
+   - Don't forget to use [[https://github.com/jwiegley/use-package#loading-packages-in-sequence][:after]] if you need one package to be loaded after another.
 
    All defuns should go to packages/libraries. [[https://github.com/quelpa/quelpa][Quelpa]] really helps with that — I can make a package from whatever source I want.
 
@@ -173,7 +181,8 @@
        (("C-w" . backward-kill-word)
         ("C-h" . delete-backward-char)
         :map ctl-x-map
-        ("C-k" . kill-region)))
+        ("C-k" . kill-region)
+        ("K" . kill-current-buffer)))
    #+END_SRC
 
    But we still need to access help somehow

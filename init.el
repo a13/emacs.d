@@ -97,7 +97,8 @@
   (("C-w" . backward-kill-word)
    ("C-h" . delete-backward-char)
    :map ctl-x-map
-   ("C-k" . kill-region)))
+   ("C-k" . kill-region)
+   ("K" . kill-current-buffer)))
 
 (use-package help
   :bind
