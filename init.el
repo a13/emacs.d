@@ -909,6 +909,14 @@
   :custom
   (org-src-tab-acts-natively t))
 
+(use-package org-passwords
+  :ensure org-plus-contrib
+  :bind
+  (:map org-mode-map
+        ("C-c C-p p" . org-passwords-copy-password)
+        ("C-c C-p u" . org-passwords-copy-username)
+        ("C-c C-p o" . org-passwords-open-url)))
+
 (use-package org-bullets
   :ensure t
   :custom
@@ -928,11 +936,6 @@
   :custom
   (org-html-htmlize-output-type 'css)
   (org-html-htmlize-font-prefix "org-"))
-
-(use-package org-password-manager
-  :ensure t
-  :hook
-  (org-mode . org-password-manager-key-bindings))
 
 (use-package org-jira
   :defer t
