@@ -21,6 +21,9 @@
 
 (put 'use-package 'lisp-indent-function 1)
 
+(use-package use-package-core
+  :custom
+  (use-package-enable-imenu-support t))
 ;; for startup profiling only
 ;; (use-package use-package-core
 ;;   :custom
@@ -48,6 +51,10 @@
   (quelpa-update-melpa-p nil "Don't update the MELPA git repo."))
 
 (use-package quelpa-use-package :ensure t)
+
+(use-package use-package-custom-update
+  :quelpa
+  (use-package-custom-update :repo "a13/use-package-custom-update" :fetcher github :version original))
 
 (use-package use-package-secrets
   :custom
@@ -563,8 +570,10 @@
   (avy-setup-default)
   :bind
   (("C-:" .   avy-goto-char-timer)
-   ("M-g M-g" . avy-goto-line)
-   ("M-s M-s" . avy-goto-word-1)))
+   :map goto-map
+   ("M-g" . avy-goto-line)
+   :map search-map
+   ("M-s" . avy-goto-word-1)))
 
 (use-package avy-zap
   :ensure t
@@ -574,7 +583,8 @@
 (use-package ace-jump-buffer
   :ensure t
   :bind
-  ("M-g b" . ace-jump-buffer))
+  (:map goto-map
+        ("b" . ace-jump-buffer)))
 
 (use-package ace-window
   :ensure t
@@ -845,11 +855,12 @@
 
 (use-package shr-tag-pre-highlight
   :ensure t
-  :defer t
+  ;;:defer t
   :after shr
   :config
-  (add-to-list 'shr-external-rendering-functions
-               '(pre . shr-tag-pre-highlight)))
+  :custom-update
+  (shr-external-rendering-functions
+   '((pre . shr-tag-pre-highlight))))
 
 (use-package google-this
   :ensure t
@@ -1075,6 +1086,7 @@
   (dumb-jump-prefer-searcher 'ag))
 
 (use-package company
+  :ensure t
   :diminish company-mode
   :bind
   (:map company-active-map
@@ -1084,6 +1096,7 @@
   (after-init . global-company-mode))
 
 (use-package company-quickhelp
+  :ensure t
   :defer t
   :custom
   (company-quickhelp-delay 3)
@@ -1091,15 +1104,21 @@
   (company-quickhelp-mode 1))
 
 (use-package company-shell
+  :ensure t
+  :after company
   :defer t
-  :config
-  (add-to-list 'company-backends 'company-shell))
+  :custom-update
+  (company-backends '(company-shell)))
 
 (use-package company-emoji
+  :ensure t
+  :after company
   :defer t
   ;; :ensure-system-package fonts-symbola
+  :custom-update
+  (company-backends '(company-emoji))
+
   :config
-  (add-to-list 'company-backends 'company-emoji)
   (set-fontset-font t 'symbol
                     (font-spec :family
                                (if (eq system-type 'darwin)
@@ -1180,9 +1199,9 @@
   :after flycheck
   (flycheck-package-setup))
 
-(use-package dash
-  :custom
-  (dash-enable-fontlock t))
+;; (use-package dash
+;;   :custom
+;;   (dash-enable-fontlock t))
 
 (use-package geiser
   :ensure t
@@ -1302,9 +1321,9 @@
   :defer t
   :after atomic-chrome
   :mode ("\\.confluence$" . jira-markup-mode)
-  :config
-  (add-to-list 'atomic-chrome-url-major-mode-alist
-               '("atlassian\\.net$" . jira-markup-mode)))
+  :custom-update
+  (atomic-chrome-url-major-mode-alist
+   '(("atlassian\\.net$" . jira-markup-mode))))
 
 (use-package csv-mode
   :ensure t
@@ -1332,8 +1351,8 @@
 (use-package company-restclient
   :ensure t
   :after (company restclient)
-  :config
-  (add-to-list 'company-backends 'company-restclient))
+  :custom-update
+  (company-backends '(company-restclient)))
 
 (use-package net-utils
   :ensure-system-package traceroute
@@ -1379,13 +1398,14 @@
 
 (use-package reverse-im
   :ensure t
+  :custom-update
+  (load-path "~/.xkb/contrib")
+  (reverse-im-modifiers '(super))
+  (reverse-im-input-methods
+   (if (require 'unipunct nil t)
+       "russian-unipunct"
+     "russian-computer"))
   :config
-  (add-to-list 'load-path "~/.xkb/contrib")
-  (add-to-list 'reverse-im-modifiers 'super)
-  (add-to-list 'reverse-im-input-methods
-               (if (require 'unipunct nil t)
-                   "russian-unipunct"
-                 "russian-computer"))
   (reverse-im-mode t))
 
 ;; Local Variables:
