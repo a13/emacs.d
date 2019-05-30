@@ -171,7 +171,7 @@
 (use-package tramp
   :defer t
   :config
-  (put 'temporary-file-directory 'standard-value '("/tmp"))
+  (put 'temporary-file-directory 'standard-value `(,temporary-file-directory))
   :custom
   (tramp-backup-directory-alist backup-directory-alist)
   (tramp-default-method "ssh")
@@ -219,7 +219,7 @@
 (use-package eshell-fringe-status
   :ensure t
   :hook
-  (eshell-mode . 'eshell-fringe-status-mode))
+  (eshell-mode . eshell-fringe-status-mode))
 
 (use-package ls-lisp
   :defer t
@@ -570,6 +570,7 @@
   (avy-setup-default)
   :bind
   (("C-:" .   avy-goto-char-timer)
+   ("C-." .   avy-goto-word-1)
    :map goto-map
    ("M-g" . avy-goto-line)
    :map search-map
@@ -1212,6 +1213,12 @@
   :defer t
   :config
   (define-clojure-indent
+    (if-let-failed? 'defun)
+    (if-let-ok? 'defun)
+    (when-let-failed? 'defun)
+    (when-let-ok? 'defun)
+    (attempt-all 'defun)
+    (alet 'defun)
     (alet 'defun)
     (mlet 'defun)))
 
