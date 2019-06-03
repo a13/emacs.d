@@ -207,6 +207,12 @@
   :ensure t
   :hook (eshell-mode . esh-autosuggest-mode))
 
+(use-package eshell-prompt-extras
+  :ensure t
+  :after esh-opt
+  :custom
+  (eshell-prompt-function #'epe-theme-dakrone))
+
 (use-package eshell-toggle
   :custom
   (eshell-toggle-use-projectile-root t)
