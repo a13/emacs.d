@@ -133,9 +133,11 @@
   (version-control t))
 
 (use-package autorevert
+  :defer 0.1
   :diminish auto-revert-mode)
 
 (use-package recentf
+  :defer 0.1
   :custom
   (recentf-auto-cleanup 30)
   :config
@@ -153,6 +155,7 @@
   (custom-file null-device "Don't store customizations"))
 
 (use-package vlf
+  :defer t
   :ensure t
   :after (ivy counsel)
   :config
@@ -214,11 +217,10 @@
   (eshell-prompt-function #'epe-theme-dakrone))
 
 (use-package eshell-toggle
+  :ensure t
   :custom
   (eshell-toggle-use-projectile-root t)
   (eshell-toggle-run-command nil)
-  :quelpa
-  (eshell-toggle :repo "a13/eshell-toggle" :fetcher github :version original)
   :bind
   ("M-`" . eshell-toggle))
 
@@ -313,6 +315,7 @@
   (flyspell-delay 1))
 
 (use-package flyspell-correct-ivy
+  :defer t
   :ensure t
   :demand t
   :bind (:map flyspell-mode-map
@@ -409,14 +412,10 @@
   :config
   (all-the-icons-ivy-setup))
 
-(use-package doom-modeline
+(use-package mood-line
   :ensure t
   :hook
-  (after-init . doom-modeline-init)
-  :custom
-  (doom-modeline-major-mode-icon t)
-  (doom-modeline-buffer-file-name-style 'buffer-name)
-  (doom-modeline-icon t))
+  (after-init . mood-line-mode))
 
 (use-package dashboard
   :ensure t
@@ -435,6 +434,7 @@
   (winner-mode 1))
 
 (use-package paren
+  :defer t
   :config
   (show-paren-mode t))
 
@@ -483,7 +483,7 @@
   :hook prog-mode)
 
 ;; counsel-M-x can use this one
-(use-package smex :ensure t)
+(use-package smex :ensure t :defer t)
 
 (use-package ivy
   :ensure t
@@ -696,6 +696,7 @@
         ("s" . copy-as-format-slack)))
 
 (use-package man
+  :defer t
   :custom
   (Man-notify-method 'pushy "show manpage HERE")
   :custom-face
@@ -708,6 +709,7 @@
   (Info-selection #'info-colors-fontify-node))
 
 (use-package keyfreq
+  :defer 0.1
   :ensure t
   :config
   (keyfreq-mode 1)
@@ -870,6 +872,7 @@
    '((pre . shr-tag-pre-highlight))))
 
 (use-package google-this
+  :defer t
   :ensure t
   :bind
   (:map mode-specific-map
@@ -884,11 +887,13 @@
   :defer t)
 
 (use-package mu4e
+  :defer t
   :load-path "/usr/share/emacs/site-lisp/mu4e"
   ;; let's install it now, since mu4e packages aren't available yet
   :ensure-system-package (mu . mu4e))
 
 (use-package smtpmail
+  :defer t
   :custom
   (smtpmail-queue-mail nil "start in normal mode")
   ;;set up queue for offline email
@@ -961,6 +966,7 @@
   (jiralib-url "http://jira:8080"))
 
 (use-package ibuffer-vc
+  :defer t
   :ensure t
   :config
   (define-ibuffer-column icon
@@ -1075,6 +1081,7 @@
   (projectile-completion-system 'ivy))
 
 (use-package counsel-projectile
+  :defer t
   :ensure t
   :after counsel projectile
   :config
@@ -1183,6 +1190,7 @@
   :defer t)
 
 (use-package ipretty
+  :defer t
   :ensure t
   :config
   (ipretty-mode 1))
