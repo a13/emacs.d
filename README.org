@@ -16,15 +16,15 @@
 
    At the same time I don't use [[http://www.gnu.org/software/emacs/manual/html_node/emacs/Easy-Customization.html][Customization]] interface, and my own [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Saving-Customizations.html][custom-file]] is =/dev/null=.
    An example
-     #+BEGIN_SRC emacs-lisp :tangle no
-       ;; "Don't show splash screen"
-       (setq inhibit-startup-screen t)
-     #+END_SRC
-     becomes
-     #+BEGIN_SRC emacs-lisp :tangle no
-       :custom
-       (inhibit-startup-screen t "Don't show splash screen")
-     #+END_SRC
+   #+BEGIN_SRC emacs-lisp :tangle no
+     ;; "Don't show splash screen"
+     (setq inhibit-startup-screen t)
+   #+END_SRC
+   becomes
+   #+BEGIN_SRC emacs-lisp :tangle no
+     :custom
+     (inhibit-startup-screen t "Don't show splash screen")
+   #+END_SRC
 
    - [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Face-Attributes.html][set-face-attribute]] and stuff like that → [[https://github.com/jwiegley/use-package#customizing-faces][:custom-face]]
      #+BEGIN_SRC emacs-lisp :tangle no
@@ -57,6 +57,7 @@
 ** Initialization
    By default, Emacs knows about [[https://elpa.gnu.org/][GNU ELPA]] only, add [[https://melpa.org][some]] [[https://orgmode.org/elpa.html][more]] repositories.
    #+BEGIN_SRC emacs-lisp
+     ;;; -*- lexical-binding: t; -*-
      (require 'package)
      (setq package-archives
            `(,@package-archives
@@ -67,13 +68,12 @@
              ;; ("emacswiki" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/emacswiki/")
              ;; ("sunrise" . "http://joseito.republika.pl/sunrise-commander/")
              ))
+     (setq package-enable-at-startup nil)
      (package-initialize)
    #+END_SRC
 ** [[https://github.com/jwiegley/use-package][Use-package]] installation and setup
    It can't install itself so we have to bootstrap it
    #+BEGIN_SRC emacs-lisp
-     (setq package-enable-at-startup nil)
-
      (unless (package-installed-p 'use-package)
        (package-refresh-contents)
        (package-install 'use-package))
@@ -85,17 +85,21 @@
 
      (use-package use-package-core
        :custom
-       (use-package-verbose t)
-       (use-package-minimum-reported-time 0.005)
+       ;; (use-package-verbose t)
+       ;; (use-package-minimum-reported-time 0.005)
        (use-package-enable-imenu-support t))
-     ;; for startup profiling only
-     ;; (use-package use-package-core
-     ;;   :custom
-     ;;   (use-package-verbose t)
-     ;;   (use-package-minimum-reported-time 0.01))
    #+END_SRC
 
-   Now we can use it to extend its own functionality by some more useful keywords.
+   Now we can enable [[https://gitlab.com/koral/gcmh][the Garbage Collector Magic Hack]]
+   #+begin_src emacs-lisp
+     (use-package gcmh
+       :ensure t
+       :init
+       (gcmh-mode 1))
+   #+end_src
+
+
+   Use use-package to extend its own functionality by some more useful keywords.
    #+BEGIN_SRC emacs-lisp
      (use-package system-packages
        :ensure t
@@ -121,7 +125,10 @@
 
      (use-package use-package-custom-update
        :quelpa
-       (use-package-custom-update :repo "a13/use-package-custom-update" :fetcher github :version original))
+       (use-package-custom-update
+        :repo "a13/use-package-custom-update"
+        :fetcher github
+        :version original))
 
      (use-package use-package-secrets
        :custom
@@ -139,6 +146,7 @@
        :config
        (paradox-enable))
    #+END_SRC
+
 
 * Global defaults
 ** Common
@@ -1156,131 +1164,157 @@
 
   #+END_SRC
 
+* Writing
+
+** Thesaurus
+   #+begin_src emacs-lisp
+     (use-package synosaurus
+       :defer t
+       :ensure t
+       :config
+       (synosaurus-mode))
+   #+end_src
+
+** Style
+   #+begin_src emacs-lisp
+     (use-package writegood-mode
+       :defer t
+       :ensure t)
+   #+end_src
+
 * Programming-related
 
-   #+BEGIN_SRC emacs-lisp
-     (use-package ibuffer-vc
-       :defer t
-       :ensure t
-       :config
-       (define-ibuffer-column icon
-         (:name "Icon" :inline t)
-         (all-the-icons-ivy--icon-for-mode major-mode))
-       :custom
-       (ibuffer-formats
-        '((mark modified read-only vc-status-mini " "
-                (name 18 18 :left :elide)
-                " "
-                (size 9 -1 :right)
-                " "
-                (mode 16 16 :left :elide)
-                " "
-                filename-and-process)) "include vc status info")
-       :hook
-       (ibuffer . (lambda ()
-                    (ibuffer-vc-set-filter-groups-by-vc-root)
-                    (unless (eq ibuffer-sorting-mode 'alphabetic)
-                      (ibuffer-do-sort-by-alphabetic)))))
+  #+BEGIN_SRC emacs-lisp
+    (use-package ibuffer-vc
+      :defer t
+      :ensure t
+      :config
+      (define-ibuffer-column icon
+        (:name "Icon" :inline t)
+        (all-the-icons-ivy--icon-for-mode major-mode))
+      :custom
+      (ibuffer-formats
+       '((mark modified read-only vc-status-mini " "
+               (name 18 18 :left :elide)
+               " "
+               (size 9 -1 :right)
+               " "
+               (mode 16 16 :left :elide)
+               " "
+               filename-and-process)) "include vc status info")
+      :hook
+      (ibuffer . (lambda ()
+                   (ibuffer-vc-set-filter-groups-by-vc-root)
+                   (unless (eq ibuffer-sorting-mode 'alphabetic)
+                     (ibuffer-do-sort-by-alphabetic)))))
 
-     (use-package gitconfig-mode
-       :ensure t
-       :defer t)
+    (use-package gitconfig-mode
+      :ensure t
+      :defer t)
 
-     (use-package gitignore-mode
-       :ensure t
-       :defer t)
+    (use-package gitignore-mode
+      :ensure t
+      :defer t)
 
-     (use-package magit
-       :ensure t
-       :custom
-       (magit-completing-read-function 'ivy-completing-read "Force Ivy usage.")
-       :bind
-       (:map mode-specific-map
-             :prefix-map magit-prefix-map
-             :prefix "m"
-             (("a" . magit-stage-file) ; the closest analog to git add
-              ("b" . magit-blame)
-              ("B" . magit-branch)
-              ("c" . magit-checkout)
-              ("C" . magit-commit)
-              ("d" . magit-diff)
-              ("D" . magit-discard)
-              ("f" . magit-fetch)
-              ("g" . vc-git-grep)
-              ("G" . magit-gitignore)
-              ("i" . magit-init)
-              ("l" . magit-log)
-              ("m" . magit)
-              ("M" . magit-merge)
-              ("n" . magit-notes-edit)
-              ("p" . magit-pull-branch)
-              ("P" . magit-push-current)
-              ("r" . magit-reset)
-              ("R" . magit-rebase)
-              ("s" . magit-status)
-              ("S" . magit-stash)
-              ("t" . magit-tag)
-              ("T" . magit-tag-delete)
-              ("u" . magit-unstage)
-              ("U" . magit-update-index))))
+    (use-package magit
+      :ensure t
+      :custom
+      (magit-completing-read-function 'ivy-completing-read "Force Ivy usage.")
+      :bind
+      (:map mode-specific-map
+            :prefix-map magit-prefix-map
+            :prefix "m"
+            (("a" . magit-stage-file) ; the closest analog to git add
+             ("b" . magit-blame)
+             ("B" . magit-branch)
+             ("c" . magit-checkout)
+             ("C" . magit-commit)
+             ("d" . magit-diff)
+             ("D" . magit-discard)
+             ("f" . magit-fetch)
+             ("g" . vc-git-grep)
+             ("G" . magit-gitignore)
+             ("i" . magit-init)
+             ("l" . magit-log)
+             ("m" . magit)
+             ("M" . magit-merge)
+             ("n" . magit-notes-edit)
+             ("p" . magit-pull-branch)
+             ("P" . magit-push-current)
+             ("r" . magit-reset)
+             ("R" . magit-rebase)
+             ("s" . magit-status)
+             ("S" . magit-stash)
+             ("t" . magit-tag)
+             ("T" . magit-tag-delete)
+             ("u" . magit-unstage)
+             ("U" . magit-update-index))))
 
-     (use-package magithub
-       :ensure t
-       :after magit
-       :custom
-       (magithub-clone-default-directory "~/git/")
-       :bind
-       (:map magit-prefix-map
-             ("h b" . magithub-browse)
-             ("h c" . magithub-clone)
-             ("h C" . magithub-create)
-             ("h f" . magithub-fork))
-       :config
-       (magithub-feature-autoinject t))
+    (use-package magithub
+      :ensure t
+      :after magit
+      :custom
+      (magithub-clone-default-directory "~/git/")
+      :bind
+      (:map magit-prefix-map
+            ("h b" . magithub-browse)
+            ("h c" . magithub-clone)
+            ("h C" . magithub-create)
+            ("h f" . magithub-fork))
+      :config
+      (magithub-feature-autoinject t))
 
-     (use-package browse-at-remote
-       :ensure t
-       :after link-hint
-       :bind
-       (:map link-hint-keymap
-             ("r" . browse-at-remote)
-             ("k" . browse-at-remote-kill)))
+    (use-package git-timemachine
+      :ensure t
+      :defer t)
 
-     (use-package smerge-mode
-       :defer t
-       :diminish smerge-mode)
+    (use-package browse-at-remote
+      :ensure t
+      :after link-hint
+      :bind
+      (:map link-hint-keymap
+            ("r" . browse-at-remote)
+            ("k" . browse-at-remote-kill)))
 
-     (use-package diff-hl
-       :ensure t
-       :hook
-       ((magit-post-refresh . diff-hl-magit-post-refresh)
-        (prog-mode . diff-hl-mode)
-        (org-mode . diff-hl-mode)
-        (dired-mode . diff-hl-dired-mode)))
+    (use-package smerge-mode
+      :defer t
+      :diminish smerge-mode)
 
-     (use-package smart-comment
-       :ensure t
-       :bind ("M-;" . smart-comment))
+    (use-package diff-hl
+      :ensure t
+      :hook
+      ((magit-post-refresh . diff-hl-magit-post-refresh)
+       (prog-mode . diff-hl-mode)
+       (org-mode . diff-hl-mode)
+       (dired-mode . diff-hl-dired-mode)))
 
-     (use-package projectile
-       :ensure t
-       :bind
-       (:map mode-specific-map ("p" . projectile-command-map))
-       :custom
-       (projectile-project-root-files-functions
-        '(projectile-root-local
-          projectile-root-top-down
-          projectile-root-bottom-up
-          projectile-root-top-down-recurring))
-       (projectile-completion-system 'ivy))
+    (use-package smart-comment
+      :ensure t
+      :bind ("M-;" . smart-comment))
 
-     (use-package counsel-projectile
-       :defer t
-       :ensure t
-       :after counsel projectile
-       :config
-       (counsel-projectile-mode))
-   #+END_SRC
+    (use-package ag
+      :defer t
+      :ensure t)
+
+    (use-package projectile
+      :ensure t
+      :bind
+      (:map mode-specific-map ("p" . projectile-command-map))
+      :custom
+      (projectile-project-root-files-functions
+       '(projectile-root-local
+         projectile-root-top-down
+         projectile-root-bottom-up
+         projectile-root-top-down-recurring))
+      (projectile-completion-system 'ivy))
+
+    (use-package counsel-projectile
+      :defer t
+      :ensure t
+      :after counsel projectile
+      :config
+      (counsel-projectile-mode))
+  #+END_SRC
 ** Search
    #+BEGIN_SRC emacs-lisp
      (use-package ag

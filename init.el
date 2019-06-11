@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 (require 'package)
 (setq package-archives
       `(,@package-archives
@@ -8,9 +9,8 @@
         ;; ("emacswiki" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/emacswiki/")
         ;; ("sunrise" . "http://joseito.republika.pl/sunrise-commander/")
         ))
-(package-initialize)
-
 (setq package-enable-at-startup nil)
+(package-initialize)
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -23,12 +23,14 @@
 
 (use-package use-package-core
   :custom
+  ;; (use-package-verbose t)
+  ;; (use-package-minimum-reported-time 0.005)
   (use-package-enable-imenu-support t))
-;; for startup profiling only
-;; (use-package use-package-core
-;;   :custom
-;;   (use-package-verbose t)
-;;   (use-package-minimum-reported-time 0.01))
+
+(use-package gcmh
+  :ensure t
+  :init
+  (gcmh-mode 1))
 
 (use-package system-packages
   :ensure t
@@ -54,7 +56,10 @@
 
 (use-package use-package-custom-update
   :quelpa
-  (use-package-custom-update :repo "a13/use-package-custom-update" :fetcher github :version original))
+  (use-package-custom-update
+   :repo "a13/use-package-custom-update"
+   :fetcher github
+   :version original))
 
 (use-package use-package-secrets
   :custom
@@ -965,6 +970,16 @@
   :custom
   (jiralib-url "http://jira:8080"))
 
+(use-package synosaurus
+  :defer t
+  :ensure t
+  :config
+  (synosaurus-mode))
+
+(use-package writegood-mode
+  :defer t
+  :ensure t)
+
 (use-package ibuffer-vc
   :defer t
   :ensure t
@@ -1044,6 +1059,10 @@
   :config
   (magithub-feature-autoinject t))
 
+(use-package git-timemachine
+  :ensure t
+  :defer t)
+
 (use-package browse-at-remote
   :ensure t
   :after link-hint
@@ -1067,6 +1086,10 @@
 (use-package smart-comment
   :ensure t
   :bind ("M-;" . smart-comment))
+
+(use-package ag
+  :defer t
+  :ensure t)
 
 (use-package projectile
   :ensure t
