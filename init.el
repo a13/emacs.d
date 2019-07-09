@@ -327,19 +327,19 @@
               ("C-c $" . flyspell-correct-at-point)))
 
 (use-package faces
-  :defer 0.1
+  :defer t
   :custom
   (face-font-family-alternatives '(("Consolas" "Monaco" "Monospace")))
+  :custom-face
+  (default ((t (:family "Consolas" :height 160))))
+  ;; workaround for old charsets
   :config
-  (set-face-attribute 'default
-                      nil
-                      :family (caar face-font-family-alternatives)
-                      :weight 'regular
-                      :width 'semi-condensed
-                      ;; (/ (* 19 (display-pixel-height)) (display-mm-height))
-                      :height 160)
   (set-fontset-font "fontset-default" 'cyrillic
                     (font-spec :registry "iso10646-1" :script 'cyrillic)))
+
+(use-package font-lock
+  :custom-face
+  (font-lock-string-face ((t (:inherit font-lock-string-face :italic t)))))
 
 (use-package lor-theme
   :config
@@ -422,24 +422,11 @@
   :hook
   (after-init . mood-line-mode))
 
-(use-package dashboard
-  :ensure t
-  :config
-  (dashboard-setup-startup-hook)
-  :custom
-  (initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
-  (dashboard-items '((recents  . 5)
-                     (bookmarks . 5)
-                     (projects . 5)
-                     ;; (agenda . 5)
-                     (registers . 5))))
-
 (use-package winner
   :config
   (winner-mode 1))
 
 (use-package paren
-  :defer t
   :config
   (show-paren-mode t))
 
@@ -458,6 +445,8 @@
 
 (use-package hl-todo
   :ensure t
+  :custom-face
+  (hl-todo ((t (:inherit hl-todo :italic t))))
   :hook ((prog-mode . hl-todo-mode)
          (yaml-mode . hl-todo-mode)))
 
@@ -810,8 +799,13 @@
   :bind
   ([f5] . browse-url)
   :config
-  (setq browse-url-browser-function 'browse-url-generic
-        browse-url-generic-program "x-www-browser")
+  (defun browse-url-chromium-new-app (url &optional new-window)
+    "Open URL in app mode in chromium."
+    (interactive (browse-url-interactive-arg "URL: "))
+    (unless
+        (string= ""
+                 (shell-command-to-string
+                  (concat browse-url-chromium-program " --new-window --app='" url "'")))))
 
   (defun feh-browse (url &rest ignore)
     "Browse image using feh."
@@ -844,7 +838,7 @@
          (mapcar (lambda (re)
                    (cons re #'mpv-browse))
                  browse-url-videos-re)
-         '(("." . browse-url-xdg-open)))))
+         '(("." . browse-url-chromium-new-app)))))
 
 (use-package webjump
   :bind
@@ -877,11 +871,10 @@
    '((pre . shr-tag-pre-highlight))))
 
 (use-package google-this
-  :defer t
   :ensure t
   :bind
   (:map mode-specific-map
-        ("g" . 'google-this-mode-submap)))
+        ("g" . #'google-this-mode-submap)))
 
 (use-package multitran
   :ensure t
@@ -1104,7 +1097,6 @@
   (projectile-completion-system 'ivy))
 
 (use-package counsel-projectile
-  :defer t
   :ensure t
   :after counsel projectile
   :config
