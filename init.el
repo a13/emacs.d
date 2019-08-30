@@ -320,7 +320,6 @@
   (flyspell-delay 1))
 
 (use-package flyspell-correct-ivy
-  :defer t
   :ensure t
   :demand t
   :bind (:map flyspell-mode-map
@@ -475,9 +474,12 @@
   :ensure t
   :diminish rainbow-mode
   :hook prog-mode)
+(use-package so-long
+  :quelpa (so-long :url "https://raw.githubusercontent.com/emacs-mirror/emacs/master/lisp/so-long.el" :fetcher url)
+  :config (global-so-long-mode))
 
 ;; counsel-M-x can use this one
-(use-package smex :ensure t :defer t)
+(use-package amx :ensure t :defer t)
 
 (use-package ivy
   :ensure t
@@ -553,6 +555,11 @@
   :ensure t
   :config
   (ivy-rich-mode 1))
+
+(use-package helm-make
+  :defer t
+  :ensure t
+  :custom (helm-make-completion-method 'ivy))
 
 (use-package isearch
   :bind
@@ -1109,6 +1116,7 @@
   (ag-highlight-search t "Highlight the current search term."))
 
 (use-package dumb-jump
+  :ensure t
   :defer t
   :custom
   (dumb-jump-selector 'ivy)
@@ -1183,6 +1191,13 @@
   :hook
   (after-save . check-parens))
 
+(use-package elisp-mode
+  :bind
+  (:map emacs-lisp-mode-map
+        ("C-c C-d C-d" . describe-function)
+        ("C-c C-d d" . describe-function)
+        ("C-c C-k" . eval-buffer)))
+
 (use-package highlight-defined
   :ensure t
   :custom
@@ -1194,6 +1209,14 @@
   :ensure t
   :hook
   (emacs-lisp-mode . highlight-quoted-mode))
+
+(use-package highlight-sexp
+  :quelpa
+  (highlight-sexp :repo "daimrod/highlight-sexp" :fetcher github :version original)
+  :hook
+  (clojure-mode . highlight-sexp-mode)
+  (emacs-lisp-mode . highlight-sexp-mode)
+  (lisp-mode . highlight-sexp-mode))
 
 (use-package eros
   :ensure t
