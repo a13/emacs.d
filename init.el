@@ -474,6 +474,7 @@
   :ensure t
   :diminish rainbow-mode
   :hook prog-mode)
+
 (use-package so-long
   :quelpa (so-long :url "https://raw.githubusercontent.com/emacs-mirror/emacs/master/lisp/so-long.el" :fetcher url)
   :config (global-so-long-mode))
@@ -973,6 +974,8 @@
 (use-package synosaurus
   :defer t
   :ensure t
+  :custom
+  (synosaurus-choose-method 'default)
   :config
   (synosaurus-mode))
 
@@ -1455,15 +1458,15 @@
   :ensure t
   :defer t)
 
+(use-package unipunct
+  :quelpa (unipunct :url "https://raw.githubusercontent.com/a13/xkb-custom/master/contrib/unipunct.el" :fetcher url :version original))
+
 (use-package reverse-im
   :ensure t
+  :after unipunct
   :custom-update
-  (load-path "~/.xkb/contrib")
   (reverse-im-modifiers '(super))
-  (reverse-im-input-methods
-   (if (require 'unipunct nil t)
-       "russian-unipunct"
-     "russian-computer"))
+  (reverse-im-input-methods "russian-unipunct")
   :config
   (reverse-im-mode t))
 
