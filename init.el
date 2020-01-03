@@ -39,13 +39,6 @@
 
 (use-package use-package-ensure-system-package :ensure t)
 
-;; :diminish keyword
-(use-package diminish :ensure t)
-
-;; :bind keyword
-(use-package bind-key :ensure t)
-
-;; :quelpa keyword
 (use-package quelpa
   :ensure t
   :defer t
@@ -63,9 +56,12 @@
 
 (use-package use-package-secrets
   :custom
-  (use-package-secrets-default-directory "~/.emacs.d/secrets")
+  (use-package-secrets-directories '("~/.emacs.d/secrets"))
   :quelpa
-  (use-package-secrets :repo "a13/use-package-secrets" :fetcher github :version original))
+  (use-package-secrets
+   :repo "a13/use-package-secrets"
+   :fetcher github
+   :version original))
 
 (use-package try
   :ensure t
@@ -102,9 +98,6 @@
 (use-package simple
   :custom
   (kill-ring-max 3000)
-  :diminish
-  (visual-line-mode . " ↩")
-  (auto-fill-function . " ↵")
   :config
   (column-number-mode t)
   (toggle-truncate-lines 1)
@@ -142,8 +135,7 @@
   (version-control t))
 
 (use-package autorevert
-  :defer 0.1
-  :diminish auto-revert-mode)
+  :defer 0.1)
 
 (use-package recentf
   :defer 0.1
@@ -342,7 +334,7 @@
 
 (use-package font-lock
   :custom-face
-  (font-lock-string-face ((t (:inherit font-lock-string-face :italic t)))))
+  (font-lock-string-face ((t (:inherit font-lock-string-face :italic t)))))2
 
 (use-package lor-theme
   :config
@@ -468,7 +460,6 @@
 
 (use-package rainbow-mode
   :ensure t
-  :diminish rainbow-mode
   :hook prog-mode)
 
 (use-package so-long
@@ -480,7 +471,6 @@
 
 (use-package ivy
   :ensure t
-  :diminish ivy-mode
   :custom
   ;; (ivy-re-builders-alist '((t . ivy--regex-fuzzy)))
   (ivy-count-format "%d/%d " "Show anzu-like counter")
@@ -730,7 +720,6 @@
 
 (use-package which-key
   :ensure t
-  :diminish which-key-mode
   :config
   (which-key-mode))
 
@@ -1077,8 +1066,7 @@
         ("k" . browse-at-remote-kill)))
 
 (use-package smerge-mode
-  :defer t
-  :diminish smerge-mode)
+  :defer t)
 
 (use-package diff-hl
   :ensure t
@@ -1130,7 +1118,6 @@
 
 (use-package company
   :ensure t
-  :diminish company-mode
   :bind
   (:map company-active-map
         ("C-n" . company-select-next-or-abort)
@@ -1179,7 +1166,6 @@
 
 (use-package yasnippet
   :ensure t
-  :diminish yas-minor-mode
   :custom
   (yas-prompt-functions '(yas-completing-prompt yas-ido-prompt))
   :config
@@ -1188,7 +1174,6 @@
   (prog-mode  . yas-minor-mode))
 
 (use-package flycheck
-  :diminish flycheck-mode
   :hook
   (prog-mode . flycheck-mode))
 
@@ -1292,11 +1277,7 @@
   :ensure t
   :defer t
   :custom
-  (cider-repl-display-help-banner nil)
-  :config
-  ;; sadly, we can't use :diminish keyword here, yet
-  (diminish 'cider-mode
-            '(:eval (format " 🍏%s" (cider--modeline-info)))))
+  (cider-repl-display-help-banner nil))
 
 (use-package kibit-helper
   :ensure t
