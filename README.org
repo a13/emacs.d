@@ -1002,48 +1002,25 @@
 
      (use-package browse-url
        :bind
-       ([f5] . browse-url)
-       :config
-       (defun browse-url-chromium-new-app (url &optional new-window)
-         "Open URL in app mode in chromium."
-         (interactive (browse-url-interactive-arg "URL: "))
-         (unless
-             (string= ""
-                      (shell-command-to-string
-                       (concat browse-url-chromium-program " --new-window --app='" url "'")))))
+       ([f5] . browse-url))
 
-       (defun feh-browse (url &rest ignore)
-         "Browse image using feh."
-         (interactive (browse-url-interactive-arg "URL: "))
-         (start-process (concat "feh " url) nil "feh" url))
+     (use-package bruh
+       :quelpa
+       (bruh :repo "a13/bruh" :fetcher github)
+       :custom-update
+       (bruh-images-re
+        '("^https?://img-fotki\\.yandex\\.ru/get/"
+          "^https?://pics\\.livejournal\\.com/.*/pic/"
+          "^https?://l-userpic\\.livejournal\\.com/"
+          "^https?://img\\.leprosorium\\.com/[0-9]+$"))
+       :custom
+       (bruh-videos-browser-function #'bruh-mpv)
+       (browse-url-browser-function
+        (append
+         (bruh-videos-re-alist)
+         (bruh-images-re-alist)
+         '(("." . bruh-chromium-new-app)))))
 
-       (defun mpv-browse (url &rest ignore)
-         "Browse video using mpv."
-         (interactive (browse-url-interactive-arg "URL: "))
-         (start-process (concat "mpv --loop-file=inf" url) nil "mpv" "--loop-file=inf" url))
-
-       (defvar browse-url-images-re
-         '("\\.\\(jpe?g\\|png\\)\\(:large\\|:orig\\)?\\(\\?.*\\)?$"
-           "^https?://img-fotki\\.yandex\\.ru/get/"
-           "^https?://pics\\.livejournal\\.com/.*/pic/"
-           "^https?://l-userpic\\.livejournal\\.com/"
-           "^https?://img\\.leprosorium\\.com/[0-9]+$")
-         "Image URLs regular expressions list.")
-
-       (defvar browse-url-videos-re
-         '("\\.\\(gifv?\\|avi\\|AVI\\|mp[4g]\\|MP4\\|webm\\)$"
-           "^https?://\\(www\\.youtube\\.com\\|youtu\\.be\\|coub\\.com\\|vimeo\\.com\\|www\\.liveleak\\.com\\)/"
-           "^https?://www\\.facebook\\.com/.*/videos?/"))
-
-       (setq browse-url-browser-function
-             (append
-              (mapcar (lambda (re)
-                        (cons re #'eww-browse-url))
-                      browse-url-images-re)
-              (mapcar (lambda (re)
-                        (cons re #'mpv-browse))
-                      browse-url-videos-re)
-              '(("." . browse-url-chromium-new-app)))))
 
      (use-package webjump
        :bind
