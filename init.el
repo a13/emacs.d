@@ -1,15 +1,15 @@
 ;;; -*- lexical-binding: t; -*-
 (require 'package)
-(setq package-archives
-      `(,@package-archives
-        ("melpa" . "https://melpa.org/packages/")
-        ;; ("marmalade" . "https://marmalade-repo.org/packages/")
-        ("org" . "https://orgmode.org/elpa/")
-        ;; ("user42" . "https://download.tuxfamily.org/user42/elpa/packages/")
-        ;; ("emacswiki" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/emacswiki/")
-        ;; ("sunrise" . "http://joseito.republika.pl/sunrise-commander/")
-        ))
-(setq package-enable-at-startup nil)
+(customize-set-variable 'package-archives
+                        `(,@package-archives
+                          ("melpa" . "https://melpa.org/packages/")
+                          ;; ("marmalade" . "https://marmalade-repo.org/packages/")
+                          ("org" . "https://orgmode.org/elpa/")
+                          ;; ("user42" . "https://download.tuxfamily.org/user42/elpa/packages/")
+                          ;; ("emacswiki" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/emacswiki/")
+                          ;; ("sunrise" . "http://joseito.republika.pl/sunrise-commander/")
+                          ))
+(customize-set-variable 'package-enable-at-startup nil)
 (package-initialize)
 
 (unless (package-installed-p 'use-package)
@@ -66,6 +66,10 @@
   (use-package-secrets-default-directory "~/.emacs.d/secrets")
   :quelpa
   (use-package-secrets :repo "a13/use-package-secrets" :fetcher github :version original))
+
+(use-package try
+  :ensure t
+  :defer t)
 
 (use-package paradox
   :ensure t
@@ -163,7 +167,7 @@
   :defer t
   :ensure t
   :after (ivy counsel)
-  :config
+  :init
   (ivy-add-actions 'counsel-find-file '(("l" vlf "view large file"))))
 
 (use-package epa
@@ -378,14 +382,6 @@
   :hook
   (after-init . fancy-battery-mode))
 
-(use-package yahoo-weather
-  :ensure t
-  :bind (:map mode-specific-map
-              ("w" . yahoo-weather-mode))
-  :custom
-  (yahoo-weather-guess-location-function #'yahoo-weather-ipinfo)
-  (yahoo-weather-location "Kyiv, UA"))
-
 (use-package font-lock+
   :quelpa
   (font-lock+ :repo "emacsmirror/font-lock-plus" :fetcher github))
@@ -540,10 +536,25 @@
    ("w" . counsel-wmctrl)
    :map help-map
    ("F" . counsel-describe-face))
+  :custom
+  (counsel-search-engines-alist
+   '((google
+      "http://suggestqueries.google.com/complete/search"
+      "https://www.google.com/search?q="
+      counsel--search-request-data-google)
+     (ddg
+      "https://duckduckgo.com/ac/"
+      "https://duckduckgo.com/html/?q="
+      counsel--search-request-data-ddg)))
   :init
   (counsel-mode))
 
 (use-package swiper :ensure t)
+
+(use-package counsel-web
+  :defer t
+  :quelpa
+  (counsel-web :repo "mnewt/counsel-web" :fetcher github))
 
 (use-package counsel-world-clock
   :ensure t
@@ -1048,19 +1059,10 @@
          ("u" . magit-unstage)
          ("U" . magit-update-index))))
 
-(use-package magithub
-  :ensure t
+(use-package forge
+  :defer t
   :after magit
-  :custom
-  (magithub-clone-default-directory "~/git/")
-  :bind
-  (:map magit-prefix-map
-        ("h b" . magithub-browse)
-        ("h c" . magithub-clone)
-        ("h C" . magithub-create)
-        ("h f" . magithub-fork))
-  :config
-  (magithub-feature-autoinject t))
+  :ensure t)
 
 (use-package git-timemachine
   :ensure t
@@ -1095,6 +1097,7 @@
   :ensure t)
 
 (use-package projectile
+  :demand t
   :ensure t
   :bind
   (:map mode-specific-map ("p" . projectile-command-map))
@@ -1165,6 +1168,10 @@
                                    "Apple Color Emoji"
                                  "Symbola"))
                     nil 'prepend))
+
+(use-package hippie-exp
+  :bind
+  ([remap dabbrev-expand] . hippie-expand))
 
 (use-package autoinsert
   :hook
@@ -1392,6 +1399,14 @@
   :mode
   (("\\.[Cc][Ss][Vv]\\'" . csv-mode)))
 
+(use-package aql-mode
+  :defer t
+  :init (setq default-tab-width 4)
+  :quelpa
+  (aql-mode :repo "matthewrsilver/aql-mode" :fetcher github)
+  :mode
+  (("\\.arango$" . aql-mode)))
+
 (use-package restclient
   :ensure t
   :mode
@@ -1459,7 +1474,7 @@
   :defer t)
 
 (use-package unipunct
-  :quelpa (unipunct :url "https://raw.githubusercontent.com/a13/xkb-custom/master/contrib/unipunct.el" :fetcher url :version original))
+  :quelpa (unipunct :url "https://raw.githubusercontent.com/a13/xkb-custom/master/contrib/unipunct.el" :fetcher url))
 
 (use-package reverse-im
   :ensure t
@@ -1473,3 +1488,4 @@
 ;; Local Variables:
 ;; eval: (add-hook 'after-save-hook (lambda ()(org-babel-tangle)) nil t)
 ;; End:
+;;; init.el ends here

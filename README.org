@@ -5,7 +5,7 @@
 #+PROPERTY: header-args:emacs-lisp :tangle "init.el"
 * Foreword and keynotes
 ** Use Use-package
-   I try to keep my configuration as declarative as possible, thanks to [[https://github.com/jwiegley/use-package][Use-package]] — it's very easy now.
+   I try to keep my configuration as declarative as possible, thanks to [[https://github.com/jwiegley/use-package][Use-package]] — it's easy now.
 
    - use-package is used for built-in packages or libraries too (without :ensure)
 
@@ -45,7 +45,7 @@
    Hardcoding these can break themes, so I use [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Face-Attributes.html][:inherit]] for customizations.
 
 ** Keybindings
-   - I try not to hardcode bindings starting with /C-x/, /C-c/ and /C-h/, which are [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Prefix-Keymaps.html#Prefix-Keymaps][bound]] to ~ctl-x-map~, ~mode-specific-map~ and ~help-map~ respectively. Not that I'm not happy with all these defaults (except /C-h/, see *simple* package below), but just in case if I want to rebind them to something else (/SPC/, /mouse-1/, break, gas or whatever), I can do it, at least for my own bindings — sadly, some plugins hardcode them (and that causes many issues for alternative bindings users), but I hope it will change someday.
+   - I try not to hardcode bindings starting with /C-x/, /C-c/ and /C-h/, which are [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Prefix-Keymaps.html#Prefix-Keymaps][bound]] to ~ctl-x-map~, ~mode-specific-map~ and ~help-map~ respectively. Not that I'm not happy with all these defaults (except /C-h/, see *simple* package below), but just in case if I want to rebind them to something else (/SPC/, /mouse-1/, break, gas or whatever), I can do it, at least for my own bindings — sadly, some plugins hardcode them (and that causes issues for alternative bindings users), but I hope it will change someday.
 
    - I use named prefix keymaps so they are visible in minibuffer while [[https://github.com/justbur/emacs-which-key][Which-key]] is active.
 
@@ -59,16 +59,16 @@
    #+BEGIN_SRC emacs-lisp
      ;;; -*- lexical-binding: t; -*-
      (require 'package)
-     (setq package-archives
-           `(,@package-archives
-             ("melpa" . "https://melpa.org/packages/")
-             ;; ("marmalade" . "https://marmalade-repo.org/packages/")
-             ("org" . "https://orgmode.org/elpa/")
-             ;; ("user42" . "https://download.tuxfamily.org/user42/elpa/packages/")
-             ;; ("emacswiki" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/emacswiki/")
-             ;; ("sunrise" . "http://joseito.republika.pl/sunrise-commander/")
-             ))
-     (setq package-enable-at-startup nil)
+     (customize-set-variable 'package-archives
+                             `(,@package-archives
+                               ("melpa" . "https://melpa.org/packages/")
+                               ;; ("marmalade" . "https://marmalade-repo.org/packages/")
+                               ("org" . "https://orgmode.org/elpa/")
+                               ;; ("user42" . "https://download.tuxfamily.org/user42/elpa/packages/")
+                               ;; ("emacswiki" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/emacswiki/")
+                               ;; ("sunrise" . "http://joseito.republika.pl/sunrise-commander/")
+                               ))
+     (customize-set-variable 'package-enable-at-startup nil)
      (package-initialize)
    #+END_SRC
 ** [[https://github.com/jwiegley/use-package][Use-package]] installation and setup
@@ -107,14 +107,11 @@
        (system-packages-noconfirm t))
 
      (use-package use-package-ensure-system-package :ensure t)
+   #+END_SRC
 
-     ;; :diminish keyword
-     (use-package diminish :ensure t)
-
-     ;; :bind keyword
-     (use-package bind-key :ensure t)
-
-     ;; :quelpa keyword
+   [[https://github.com/quelpa/quelpa][Quelpa]] "is a tool to compile and install Emacs Lisp packages locally from local or remote source code"
+   No more manual package installation
+   #+BEGIN_SRC emacs-lisp
      (use-package quelpa
        :ensure t
        :defer t
@@ -122,7 +119,11 @@
        (quelpa-update-melpa-p nil "Don't update the MELPA git repo."))
 
      (use-package quelpa-use-package :ensure t)
+   #+END_SRC
 
+   now we can install packages directly from github.
+   These two add [[https://github.com/a13/use-package-custom-update][:custom-update]] and [[https://github.com/a13/use-package-secrets][:secret]] keywords to use-package.
+   #+BEGIN_SRC emacs-lisp
      (use-package use-package-custom-update
        :quelpa
        (use-package-custom-update
@@ -132,11 +133,21 @@
 
      (use-package use-package-secrets
        :custom
-       (use-package-secrets-default-directory "~/.emacs.d/secrets")
+       (use-package-secrets-directories '("~/.emacs.d/secrets"))
        :quelpa
-       (use-package-secrets :repo "a13/use-package-secrets" :fetcher github :version original))
+       (use-package-secrets
+        :repo "a13/use-package-secrets"
+        :fetcher github
+        :version original))
 
    #+END_SRC
+
+** [[http://github.com/larstvei/try][Try]] packages without installing
+   #+begin_src emacs-lisp
+     (use-package try
+       :ensure t
+       :defer t)
+   #+end_src
 
 ** [[https://github.com/Malabarba/paradox][Modernized Package Menu]]
    #+BEGIN_SRC emacs-lisp
@@ -182,6 +193,7 @@
    #+END_SRC
 
    Make /C-w/ and /C-h/ kill a word/char before cursor (see [[http://unix-kb.cat-v.org/][Unix keyboard shortcuts]], don't know what to do with /C-u/ though)
+   NB: rebinding C-h breaks /M-x kmacro-edit-lossage/, so you have to use something like /M-x edit-kbd-macro RET F1-l/ instead.
    #+BEGIN_SRC emacs-lisp
      (use-package simple
        :custom
@@ -273,7 +285,7 @@
        :defer t
        :ensure t
        :after (ivy counsel)
-       :config
+       :init
        (ivy-add-actions 'counsel-find-file '(("l" vlf "view large file"))))
 
      (use-package epa
@@ -455,7 +467,7 @@
 
 ** Fonts
    Though [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Font-Selection.html][face-font-family-alternatives]] here is not a list of proper font family lists,
-   it's the only way to set up substitutions for the font if it isn't present in the system.
+   it's the only known way to set up substitutions for the font if it isn't present in the system.
    #+BEGIN_SRC emacs-lisp
      (use-package faces
        :defer t
@@ -520,13 +532,6 @@
        :hook
        (after-init . fancy-battery-mode))
 
-     (use-package yahoo-weather
-       :ensure t
-       :bind (:map mode-specific-map
-                   ("w" . yahoo-weather-mode))
-       :custom
-       (yahoo-weather-guess-location-function #'yahoo-weather-ipinfo)
-       (yahoo-weather-location "Kyiv, UA"))
    #+END_SRC
 
    Fancy stuff
@@ -695,10 +700,25 @@
        ("w" . counsel-wmctrl)
        :map help-map
        ("F" . counsel-describe-face))
+      :custom
+      (counsel-search-engines-alist
+       '((google
+          "http://suggestqueries.google.com/complete/search"
+          "https://www.google.com/search?q="
+          counsel--search-request-data-google)
+         (ddg
+          "https://duckduckgo.com/ac/"
+          "https://duckduckgo.com/html/?q="
+          counsel--search-request-data-ddg)))
       :init
       (counsel-mode))
 
     (use-package swiper :ensure t)
+
+    (use-package counsel-web
+      :defer t
+      :quelpa
+      (counsel-web :repo "mnewt/counsel-web" :fetcher github))
 
     (use-package counsel-world-clock
       :ensure t
@@ -1251,19 +1271,10 @@
              ("u" . magit-unstage)
              ("U" . magit-update-index))))
 
-    (use-package magithub
-      :ensure t
+    (use-package forge
+      :defer t
       :after magit
-      :custom
-      (magithub-clone-default-directory "~/git/")
-      :bind
-      (:map magit-prefix-map
-            ("h b" . magithub-browse)
-            ("h c" . magithub-clone)
-            ("h C" . magithub-create)
-            ("h f" . magithub-fork))
-      :config
-      (magithub-feature-autoinject t))
+      :ensure t)
 
     (use-package git-timemachine
       :ensure t
@@ -1298,6 +1309,7 @@
       :ensure t)
 
     (use-package projectile
+      :demand t
       :ensure t
       :bind
       (:map mode-specific-map ("p" . projectile-command-map))
@@ -1375,7 +1387,13 @@
                                       "Symbola"))
                          nil 'prepend))
    #+END_SRC
+** Use hippie-expand
 
+   #+BEGIN_SRC emacs-lisp
+     (use-package hippie-exp
+       :bind
+       ([remap dabbrev-expand] . hippie-expand))
+   #+END_SRC
 
 
 ** Snippets
@@ -1654,6 +1672,15 @@
         :ensure t
         :mode
         (("\\.[Cc][Ss][Vv]\\'" . csv-mode)))
+
+      (use-package aql-mode
+        :defer t
+        :init (setq default-tab-width 4)
+        :quelpa
+        (aql-mode :repo "matthewrsilver/aql-mode" :fetcher github)
+        :mode
+        (("\\.arango$" . aql-mode)))
+
     #+END_SRC
 
 *** HTTP
@@ -1743,7 +1770,7 @@
   Shortcuts with non-English layout.
   #+BEGIN_SRC emacs-lisp
     (use-package unipunct
-      :quelpa (unipunct :url "https://raw.githubusercontent.com/a13/xkb-custom/master/contrib/unipunct.el" :fetcher url :version original))
+      :quelpa (unipunct :url "https://raw.githubusercontent.com/a13/xkb-custom/master/contrib/unipunct.el" :fetcher url))
 
     (use-package reverse-im
       :ensure t
@@ -1762,5 +1789,6 @@
     ;; Local Variables:
     ;; eval: (add-hook 'after-save-hook (lambda ()(org-babel-tangle)) nil t)
     ;; End:
+    ;;; init.el ends here
 
   #+END_SRC
