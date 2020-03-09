@@ -84,6 +84,7 @@
   (x-gtk-use-system-tooltips nil)
   (enable-recursive-minibuffers t "Allow minibuffer commands in the minibuffer")
   (indent-tabs-mode nil "Spaces!")
+  (tab-width 4)
   (debug-on-quit nil))
 
 (use-package frame
@@ -334,7 +335,7 @@
 
 (use-package font-lock
   :custom-face
-  (font-lock-string-face ((t (:inherit font-lock-string-face :italic t)))))2
+  (font-lock-string-face ((t (:inherit font-lock-string-face :italic t)))))
 
 (use-package lor-theme
   :config
@@ -564,6 +565,8 @@
   :custom (helm-make-completion-method 'ivy))
 
 (use-package isearch
+  :custom
+  (search-default-mode #'char-fold-to-regexp)
   :bind
   ;; TODO: maybe get a keybinding from global map
   (:map isearch-mode-map
@@ -706,6 +709,12 @@
   (Man-overstrike ((t (:inherit font-lock-type-face :bold t))))
   (Man-underline ((t (:inherit font-lock-keyword-face :underline t)))))
 
+(use-package woman
+  :defer t
+  :custom-face
+  (woman-bold ((t (:inherit font-lock-type-face :bold t))))
+  (woman-italic ((t (:inherit font-lock-keyword-face :underline t)))))
+
 (use-package info-colors
   :ensure t
   :hook
@@ -808,6 +817,7 @@
   ([f5] . browse-url))
 
 (use-package bruh
+  :after browse-url
   :quelpa
   (bruh :repo "a13/bruh" :fetcher github)
   :custom-update
@@ -817,12 +827,9 @@
      "^https?://l-userpic\\.livejournal\\.com/"
      "^https?://img\\.leprosorium\\.com/[0-9]+$"))
   :custom
-  (bruh-videos-browser-function #'bruh-mpv)
-  (browse-url-browser-function
-   (append
-    (bruh-videos-re-alist)
-    (bruh-images-re-alist)
-    '(("." . bruh-chromium-new-app)))))
+  (browse-url-browser-function #'bruh-browse-url)
+  (bruh-default-browser #'bruh-chromium-new-app)
+  (bruh-videos-browser-function #'bruh-mpv))
 
 
 (use-package webjump
@@ -850,7 +857,6 @@
   :ensure t
   ;;:defer t
   :after shr
-  :config
   :custom-update
   (shr-external-rendering-functions
    '((pre . shr-tag-pre-highlight))))
@@ -1357,9 +1363,17 @@
   :mode
   (("\\.[Cc][Ss][Vv]\\'" . csv-mode)))
 
+(use-package groovy-mode
+  :ensure t
+  :custom
+  (groovy-indent-offset 2))
+
+(use-package jenkinsfile-mode
+  :quelpa
+  (jenkinsfile-mode :repo "john2x/jenkinsfile-mode" :fetcher github))
+
 (use-package aql-mode
   :defer t
-  :init (setq default-tab-width 4)
   :quelpa
   (aql-mode :repo "matthewrsilver/aql-mode" :fetcher github)
   :mode
