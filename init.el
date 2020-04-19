@@ -128,8 +128,7 @@
   ;; backup settings
   (backup-by-copying t)
   (backup-directory-alist
-   `((".*" . ,(expand-file-name
-               (concat user-emacs-directory "backups")))))
+   `((".*" . ,(locate-user-emacs-file "backups"))))
   (delete-old-versions t)
   (kept-new-versions 6)
   (kept-old-versions 2)
@@ -148,7 +147,8 @@
 (use-package iqa
   :ensure t
   :custom
-  (iqa-user-init-file (concat user-emacs-directory "README.org") "Edit README.org by default.")
+  (iqa-user-init-file (locate-user-emacs-file "README.org")
+                      "Edit README.org by default.")
   :config
   (iqa-setup-default))
 
@@ -211,6 +211,10 @@
 (use-package esh-autosuggest
   :ensure t
   :hook (eshell-mode . esh-autosuggest-mode))
+
+(use-package esh-module
+  :custom-update
+  (eshell-modules-list '(eshell-tramp)))
 
 (use-package eshell-prompt-extras
   :ensure t
@@ -327,7 +331,7 @@
   :custom
   (face-font-family-alternatives '(("Consolas" "Monaco" "Monospace")))
   :custom-face
-  (default ((t (:family "Consolas" :height 160))))
+  (default ((t (:family "Consolas" :height 95))))
   ;; workaround for old charsets
   :config
   (set-fontset-font "fontset-default" 'cyrillic
@@ -848,7 +852,6 @@
 
 (use-package atomic-chrome
   :ensure t
-  :defer t
   :custom
   (atomic-chrome-url-major-mode-alist
    '(("reddit\\.com" . markdown-mode)
