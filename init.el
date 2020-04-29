@@ -1,4 +1,5 @@
 ;;; -*- lexical-binding: t; -*-
+
 (require 'package)
 (customize-set-variable 'package-archives
                         `(,@package-archives
@@ -45,7 +46,16 @@
   :custom
   (quelpa-update-melpa-p nil "Don't update the MELPA git repo."))
 
-(use-package quelpa-use-package :ensure t)
+(use-package quelpa-use-package
+  :init
+  (setq quelpa-use-package-inhibit-loading-quelpa t)
+  :ensure t)
+
+(use-package fnhh
+  :quelpa
+  (fnhh :repo "a13/fnhh" :fetcher github)
+  :config
+  (fnhh-mode 1))
 
 (use-package use-package-custom-update
   :quelpa
@@ -78,6 +88,10 @@
   (put 'narrow-to-region 'disabled nil)
   (put 'downcase-region 'disabled nil)
   :custom
+  (default-frame-alist '((menu-bar-lines 0)
+                         (tool-bar-lines 0)
+                         (vertical-scroll-bars)))
+  (initial-frame-alist '((vertical-scroll-bars)))
   (scroll-step 1)
   (inhibit-startup-screen t "Don't show splash screen")
   (use-dialog-box nil "Disable dialog boxes")
@@ -97,10 +111,11 @@
         ("C-g" . minibuffer-keyboard-quit)))
 
 (use-package simple
+  :defer 0.1
   :custom
-  (kill-ring-max 3000)
+  (kill-ring-max 30000)
+  (column-number-mode 1)
   :config
-  (column-number-mode t)
   (toggle-truncate-lines 1)
   :bind
   ;; remap ctrl-w/ctrl-h
@@ -111,6 +126,7 @@
    ("K" . kill-current-buffer)))
 
 (use-package help
+  :defer t
   :bind
   (("C-?" . help-command)
    :map mode-specific-map
@@ -153,6 +169,7 @@
   (iqa-setup-default))
 
 (use-package cus-edit
+  :defer t
   :custom
   (custom-file null-device "Don't store customizations"))
 
@@ -170,6 +187,7 @@
   (epa-pinentry-mode nil))
 
 (use-package uniquify
+  :defer 0.1
   :custom
   (uniquify-buffer-name-style 'forward))
 
@@ -183,6 +201,7 @@
   (tramp-default-proxies-alist nil))
 
 (use-package sudo-edit
+  :defer t
   :ensure t
   :bind (:map ctl-x-map
               ("M-s" . sudo-edit)))
@@ -218,7 +237,7 @@
 
 (use-package eshell-prompt-extras
   :ensure t
-  :after esh-opt
+  :after (eshell esh-opt)
   :custom
   (eshell-prompt-function #'epe-theme-dakrone))
 
@@ -274,8 +293,8 @@
 (use-package async
   :ensure t
   :defer t
-  :init
-  (dired-async-mode t))
+  :custom
+  (dired-async-mode 1))
 
 (use-package dired-rsync
   :ensure t
@@ -295,6 +314,7 @@
         (")" . dired-git-info-mode)))
 
 (use-package mule
+  :defer 0.1
   :config
   (prefer-coding-system 'utf-8)
   (set-language-environment "UTF-8")
@@ -322,7 +342,6 @@
 
 (use-package flyspell-correct-ivy
   :ensure t
-  :demand t
   :bind (:map flyspell-mode-map
               ("C-c $" . flyspell-correct-at-point)))
 
@@ -347,20 +366,6 @@
   :quelpa
   (lor-theme :repo "a13/lor-theme" :fetcher github :version original))
 
-(use-package tool-bar
-  :config
-  (tool-bar-mode -1))
-
-(use-package scroll-bar
-  :config
-  (scroll-bar-mode -1))
-
-(use-package menu-bar
-  :config
-  (menu-bar-mode -1)
-  :bind
-  ([S-f10] . menu-bar-mode))
-
 (use-package tooltip
   :defer t
   :custom
@@ -371,7 +376,6 @@
   :custom
   (display-time-default-load-average nil)
   (display-time-24hr-format t)
-  :config
   (display-time-mode t))
 
 (use-package fancy-battery
@@ -380,6 +384,7 @@
   (after-init . fancy-battery-mode))
 
 (use-package font-lock+
+  :defer t
   :quelpa
   (font-lock+ :repo "emacsmirror/font-lock-plus" :fetcher github))
 
@@ -402,6 +407,7 @@
   (dired-mode . all-the-icons-dired-mode))
 
 (use-package all-the-icons-ivy
+  :defer t
   :ensure t
   :after ivy
   :custom
@@ -444,8 +450,8 @@
 
 (use-package page-break-lines
   :ensure t
-  :config
-  (global-page-break-lines-mode))
+  :hook
+  (prog-mode . page-break-lines-mode))
 
 (use-package rainbow-delimiters
   :ensure t
@@ -460,7 +466,7 @@
   (rainbow-identifiers-choose-face-function
    #'rainbow-identifiers-cie-l*a*b*-choose-face)
   :hook
-  (emacs-lisp-mode . rainbow-identifiers-mode) ; actually, turns it off
+  (emacs-lisp-mode . rainbow-identifiers-mode) ; actually, turn it off
   (prog-mode . rainbow-identifiers-mode))
 
 (use-package rainbow-mode
@@ -559,8 +565,9 @@
         ("C" .  counsel-world-clock)))
 
 (use-package ivy-rich
+  :defer t
   :ensure t
-  :config
+  :custom
   (ivy-rich-mode 1))
 
 (use-package helm-make
@@ -575,6 +582,7 @@
         ("C-h" . isearch-delete-char)))
 
 (use-package char-fold
+  :defer 0.2
   :custom
   (char-fold-symmetric t)
   (search-default-mode #'char-fold-to-regexp)
@@ -587,8 +595,6 @@
 
 (use-package avy
   :ensure t
-  :config
-  (avy-setup-default)
   :bind
   (("C-:" .   avy-goto-char-timer)
    ("C-." .   avy-goto-word-1)
@@ -781,12 +787,13 @@
   :defer t)
 
 (use-package point-im
+  :defer t
   :defines point-im-reply-id-add-plus
   :after jabber
   :quelpa
   (point-im :repo "a13/point-im.el" :fetcher github :version original)
-  :config
-  (setq point-im-reply-id-add-plus nil)
+  :custom
+  (point-im-reply-id-add-plus nil)
   :hook
   (jabber-chat-mode . point-im-mode))
 
@@ -826,6 +833,7 @@
   ([f5] . browse-url))
 
 (use-package bruh
+  :defer t
   :after browse-url
   :quelpa
   (bruh :repo "a13/bruh" :fetcher github)
@@ -851,6 +859,7 @@
                 webjump-sample-sites)))
 
 (use-package atomic-chrome
+  :defer t
   :ensure t
   :custom
   (atomic-chrome-url-major-mode-alist
@@ -870,6 +879,7 @@
    '((pre . shr-tag-pre-highlight))))
 
 (use-package google-this
+  :defer 0.1
   :ensure t
   :bind
   (:map mode-specific-map
@@ -956,11 +966,6 @@
   :custom
   (org-html-htmlize-output-type 'css)
   (org-html-htmlize-font-prefix "org-"))
-
-(use-package org-jira
-  :defer t
-  :custom
-  (jiralib-url "http://jira:8080"))
 
 (use-package synosaurus
   :defer t
@@ -1076,7 +1081,7 @@
   :ensure t)
 
 (use-package projectile
-  :demand t
+  :defer 0.2
   :ensure t
   :bind
   (:map mode-specific-map ("p" . projectile-command-map))
@@ -1121,7 +1126,6 @@
   :defer t
   :custom
   (company-quickhelp-delay 3)
-  :config
   (company-quickhelp-mode 1))
 
 (use-package company-shell
@@ -1156,6 +1160,7 @@
   (find-file . auto-insert))
 
 (use-package yasnippet
+  :defer 0.1
   :ensure t
   :custom
   (yas-prompt-functions '(yas-completing-prompt yas-ido-prompt))
@@ -1282,8 +1287,7 @@
         lisp-indent-function 'common-lisp-indent-function
         slime-complete-symbol-function 'slime-fuzzy-complete-symbol
         slime-startup-animation nil)
-  (slime-setup '(slime-fancy))
-  (setq slime-net-coding-system 'utf-8-unix))
+  (slime-setup '(slime-fancy)))
 
 (use-package erlang
   :ensure t
@@ -1372,11 +1376,13 @@
   (("\\.[Cc][Ss][Vv]\\'" . csv-mode)))
 
 (use-package groovy-mode
+  :defer t
   :ensure t
   :custom
   (groovy-indent-offset 2))
 
 (use-package jenkinsfile-mode
+  :defer t
   :quelpa
   (jenkinsfile-mode :repo "john2x/jenkinsfile-mode" :fetcher github))
 
@@ -1445,6 +1451,14 @@
   :ensure t
   :defer t)
 
+(use-package k8s-mode
+  :ensure t
+  :hook (k8s-mode . yas-minor-mode))
+
+(use-package kubernetes
+  :ensure t
+  :commands (kubernetes-overview))
+
 (use-package emamux
   :ensure t
   :defer t)
@@ -1454,9 +1468,11 @@
   :defer t)
 
 (use-package unipunct
+  :defer 0.2
   :quelpa (unipunct :url "https://raw.githubusercontent.com/a13/xkb-custom/master/contrib/unipunct.el" :fetcher url))
 
 (use-package reverse-im
+  :defer 0.2
   :ensure t
   :demand t
   :after unipunct char-fold
