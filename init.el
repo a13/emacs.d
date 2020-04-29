@@ -565,9 +565,8 @@
         ("C" .  counsel-world-clock)))
 
 (use-package ivy-rich
-  :defer t
   :ensure t
-  :custom
+  :config
   (ivy-rich-mode 1))
 
 (use-package helm-make
@@ -859,7 +858,6 @@
                 webjump-sample-sites)))
 
 (use-package atomic-chrome
-  :defer t
   :ensure t
   :custom
   (atomic-chrome-url-major-mode-alist
