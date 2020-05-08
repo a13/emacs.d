@@ -1161,11 +1161,19 @@
   :defer 0.1
   :ensure t
   :custom
-  (yas-prompt-functions '(yas-completing-prompt yas-ido-prompt))
+  (yas-prompt-functions '(yas-completing-prompt))
   :config
   (yas-reload-all)
   :hook
   (prog-mode  . yas-minor-mode))
+
+(use-package doom-snippets
+  :quelpa
+  (doom-snippets
+   :repo "hlissner/doom-snippets"
+   :fetcher github
+   :files ("*" (:exclude ".*" "README.md")))
+  :after yasnippet)
 
 (use-package flycheck
   :hook
@@ -1301,6 +1309,46 @@
   :hook
   (erlang-mode #'company-erlang-init))
 
+(use-package go-mode
+  :ensure t
+  :defer t
+  :bind
+  (:map go-mode-map
+        ("M-." . godef-jump)
+        ("M-]" . next-error)
+        ("M-[" . previous-error))
+  :hook
+  (before-save . gofmt-before-save)
+  :custom
+  (gofmt-command "goimports")
+  :init
+  (setenv "GO111MODULE" "on")
+  (or (getenv "GOPATH")
+      (setenv "GOPATH" (expand-file-name "~/go")))
+  (setenv "PATH" (concat (getenv "GOPATH") "/bin" ":" (getenv "PATH"))))
+
+(use-package company-go
+  :after go-mode
+  :ensure t
+  :defer t
+  :config
+  (push 'company-go company-backends))
+
+(use-package go-guru
+  :ensure t
+  :hook
+  (go-mode . go-guru-hl-identifier-mode))
+
+(use-package flycheck-golangci-lint
+  :ensure t
+  :hook
+  (go-mode . flycheck-golangci-lint-setup))
+
+(use-package go-eldoc
+  :ensure t
+  :hook
+  (go-mode . go-eldoc-setup))
+
 (use-package lua-mode
   :ensure t
   :defer t)
@@ -1390,6 +1438,10 @@
   (aql-mode :repo "matthewrsilver/aql-mode" :fetcher github)
   :mode
   (("\\.arango$" . aql-mode)))
+
+
+(use-package sfz-mode
+  :ensure t)
 
 (use-package restclient
   :ensure t
@@ -1482,8 +1534,3 @@
   (reverse-im-input-methods '("russian-unipunct"))
   :config
   (reverse-im-mode t))
-
-;; Local Variables:
-;; eval: (add-hook 'after-save-hook (lambda ()(org-babel-tangle)) nil t)
-;; End:
-;;; init.el ends here
