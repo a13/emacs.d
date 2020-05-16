@@ -341,6 +341,13 @@
 ** Uncategorized
    [[https://github.com/purcell/exec-path-from-shell][Get environment variables from the shell]]
    #+BEGIN_SRC emacs-lisp
+     (use-package no-littering
+       :ensure t
+       :preface
+       (setq no-littering-etc-directory (expand-file-name "config/" user-emacs-directory))
+       (setq no-littering-var-directory (expand-file-name "data/" user-emacs-directory)))
+
+
      (use-package exec-path-from-shell
        :ensure t
        :defer 0.1
@@ -452,6 +459,14 @@
       :bind
       (:map dired-mode-map
             (")" . dired-git-info-mode)))
+
+    (use-package dired-recent
+      :ensure t
+      :bind
+      (:map
+       dired-recent-mode-map ("C-x C-d" . nil))
+      :config
+      (dired-recent-mode 1))
   #+END_SRC
 
 * Interface
@@ -511,6 +526,7 @@
        (font-lock-string-face ((t (:inherit font-lock-string-face :italic t)))))
    #+END_SRC
 
+
 ** Color themes
    #+BEGIN_SRC emacs-lisp
      (use-package lor-theme
@@ -521,6 +537,20 @@
    #+END_SRC
 
 ** GUI
+   (Almost) smooth mouse scrolling
+   #+BEGIN_SRC emacs-lisp
+     (use-package mwheel
+       :custom
+       (mouse-wheel-scroll-amount '(1
+                                    ((shift) . 5)
+                                    ((control))))
+       (mouse-wheel-progressive-speed nil))
+
+     (use-package pixel-scroll
+       :config
+       (pixel-scroll-mode))
+   #+END_SRC
+
    Disable gui elements we don't need:
    #+BEGIN_SRC emacs-lisp
      (use-package tooltip
@@ -712,6 +742,8 @@
        :map help-map
        ("F" . counsel-describe-face))
       :custom
+      (counsel-grep-base-command
+      "rg -i -M 120 --no-heading --line-number --color never %s %s")
       (counsel-search-engines-alist
        '((google
           "http://suggestqueries.google.com/complete/search"
@@ -1858,4 +1890,3 @@
     ;;; init.el ends here
 
   #+END_SRC
-

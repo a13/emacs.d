@@ -313,6 +313,14 @@
   (:map dired-mode-map
         (")" . dired-git-info-mode)))
 
+(use-package dired-recent
+  :ensure t
+  :bind
+  (:map
+   dired-recent-mode-map ("C-x C-d" . nil))
+  :config
+  (dired-recent-mode 1))
+
 (use-package mule
   :defer 0.1
   :config
@@ -365,6 +373,17 @@
   (load-theme 'lor t)
   :quelpa
   (lor-theme :repo "a13/lor-theme" :fetcher github :version original))
+
+(use-package mwheel
+  :custom
+  (mouse-wheel-scroll-amount '(1
+                               ((shift) . 5)
+                               ((control))))
+  (mouse-wheel-progressive-speed nil))
+
+(use-package pixel-scroll
+  :config
+  (pixel-scroll-mode))
 
 (use-package tooltip
   :defer t
@@ -538,6 +557,8 @@
    :map help-map
    ("F" . counsel-describe-face))
   :custom
+  (counsel-grep-base-command
+  "rg -i -M 120 --no-heading --line-number --color never %s %s")
   (counsel-search-engines-alist
    '((google
       "http://suggestqueries.google.com/complete/search"
