@@ -7,7 +7,7 @@
                           ;; ("marmalade" . "https://marmalade-repo.org/packages/")
                           ("org" . "https://orgmode.org/elpa/")
                           ;; ("user42" . "https://download.tuxfamily.org/user42/elpa/packages/")
-                          ;; ("emacswiki" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/emacswiki/")
+                           ("emacswiki" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/emacswiki/")
                           ;; ("sunrise" . "http://joseito.republika.pl/sunrise-commander/")
                           ))
 (customize-set-variable 'package-enable-at-startup nil)
@@ -91,7 +91,6 @@
   (default-frame-alist '((menu-bar-lines 0)
                          (tool-bar-lines 0)
                          (vertical-scroll-bars)))
-  (initial-frame-alist '((vertical-scroll-bars)))
   (scroll-step 1)
   (inhibit-startup-screen t "Don't show splash screen")
   (use-dialog-box nil "Disable dialog boxes")
@@ -103,7 +102,9 @@
 
 (use-package frame
   :bind
-  ("C-z" . nil))
+  ("C-z" . nil)
+  :custom
+  (initial-frame-alist '((vertical-scroll-bars))))
 
 (use-package delsel
   :bind
@@ -158,7 +159,7 @@
   :custom
   (recentf-auto-cleanup 30)
   :config
-  (run-with-idle-timer 30 t 'recentf-save-list))
+  (run-with-idle-timer 10 t 'recentf-save-list))
 
 (use-package iqa
   :ensure t
@@ -201,8 +202,8 @@
   (tramp-default-proxies-alist nil))
 
 (use-package sudo-edit
-  :defer t
   :ensure t
+  :config (sudo-edit-indicator-mode)
   :bind (:map ctl-x-map
               ("M-s" . sudo-edit)))
 
@@ -366,6 +367,7 @@
 
 (use-package font-lock
   :custom-face
+  (font-lock-doc-face ((t (:inherit font-lock-doc-face :italic t))))
   (font-lock-string-face ((t (:inherit font-lock-string-face :italic t)))))
 
 (use-package lor-theme
@@ -470,6 +472,7 @@
 (use-package page-break-lines
   :ensure t
   :hook
+  (help-mode . page-break-lines-mode)
   (prog-mode . page-break-lines-mode))
 
 (use-package rainbow-delimiters
@@ -736,6 +739,12 @@
         ("r" . copy-as-format-rst)
         ("s" . copy-as-format-slack)))
 
+(use-package hungry-delete
+  :ensure t
+  :hook
+  (text-mode . hungry-delete-mode)
+  (prog-mode . hungry-delete-mode))
+
 (use-package man
   :defer t
   :custom
@@ -764,6 +773,8 @@
 
 (use-package which-key
   :ensure t
+  :custom
+  (which-key-show-transient-maps t)
   :config
   (which-key-mode))
 
@@ -1291,6 +1302,19 @@
     (alet 'defun)
     (alet 'defun)
     (mlet 'defun)))
+
+(use-package clj-refactor
+  :ensure t)
+
+(use-package anakondo
+  :ensure t
+  :hook
+  (clojure-mode . anakondo-minor-mode)
+  (clojurescript-mode . anakondo-minor-mode)
+  (clojurec-mode . anakondo-minor-mode))
+
+(use-package flycheck-clj-kondo
+  :ensure t)
 
 (use-package clojure-snippets
   :ensure t

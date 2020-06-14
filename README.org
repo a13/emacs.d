@@ -6,9 +6,7 @@
 * Foreword and keynotes
 ** Use Use-package
    I try to keep my configuration as declarative as possible, thanks to [[https://github.com/jwiegley/use-package][Use-package]] — it's easy now.
-
    - use-package is used for built-in packages or libraries too (without :ensure)
-
    - each variable/face setting or each function call belongs to the one and only package which provides the symbol
    To find out, where do they belong to, use /M-x describe-variable/, /M-x describe-face/ or /M-x describe-function/ accordingly.
 
@@ -66,7 +64,7 @@
                                ;; ("marmalade" . "https://marmalade-repo.org/packages/")
                                ("org" . "https://orgmode.org/elpa/")
                                ;; ("user42" . "https://download.tuxfamily.org/user42/elpa/packages/")
-                               ;; ("emacswiki" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/emacswiki/")
+                                ("emacswiki" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/emacswiki/")
                                ;; ("sunrise" . "http://joseito.republika.pl/sunrise-commander/")
                                ))
      (customize-set-variable 'package-enable-at-startup nil)
@@ -185,7 +183,6 @@
        (default-frame-alist '((menu-bar-lines 0)
                               (tool-bar-lines 0)
                               (vertical-scroll-bars)))
-       (initial-frame-alist '((vertical-scroll-bars)))
        (scroll-step 1)
        (inhibit-startup-screen t "Don't show splash screen")
        (use-dialog-box nil "Disable dialog boxes")
@@ -194,14 +191,17 @@
        (indent-tabs-mode nil "Spaces!")
        (tab-width 4)
        (debug-on-quit nil))
+
    #+END_SRC
 **  Default keybindings customization and other built-in settings
 
-   Disable suspending on C-z
+   Disable suspending on /C-z/
    #+BEGIN_SRC emacs-lisp
      (use-package frame
        :bind
-       ("C-z" . nil))
+       ("C-z" . nil)
+       :custom
+       (initial-frame-alist '((vertical-scroll-bars))))
    #+END_SRC
 
    C-c C-g always quits minubuffer
@@ -277,7 +277,7 @@
        :custom
        (recentf-auto-cleanup 30)
        :config
-       (run-with-idle-timer 30 t 'recentf-save-list))
+       (run-with-idle-timer 10 t 'recentf-save-list))
    #+end_src
 
    [[https://github.com/a13/iqa.el][Quick access to init files]]
@@ -332,8 +332,8 @@
        (tramp-default-proxies-alist nil))
 
      (use-package sudo-edit
-       :defer t
        :ensure t
+       :config (sudo-edit-indicator-mode)
        :bind (:map ctl-x-map
                    ("M-s" . sudo-edit)))
 
@@ -341,13 +341,6 @@
 ** Uncategorized
    [[https://github.com/purcell/exec-path-from-shell][Get environment variables from the shell]]
    #+BEGIN_SRC emacs-lisp
-     (use-package no-littering
-       :ensure t
-       :preface
-       (setq no-littering-etc-directory (expand-file-name "config/" user-emacs-directory))
-       (setq no-littering-var-directory (expand-file-name "data/" user-emacs-directory)))
-
-
      (use-package exec-path-from-shell
        :ensure t
        :defer 0.1
@@ -523,6 +516,7 @@
 
      (use-package font-lock
        :custom-face
+       (font-lock-doc-face ((t (:inherit font-lock-doc-face :italic t))))
        (font-lock-string-face ((t (:inherit font-lock-string-face :italic t)))))
    #+END_SRC
 
@@ -650,6 +644,7 @@
      (use-package page-break-lines
        :ensure t
        :hook
+       (help-mode . page-break-lines-mode)
        (prog-mode . page-break-lines-mode))
 
      (use-package rainbow-delimiters
@@ -935,6 +930,12 @@
             ("r" . copy-as-format-rst)
             ("s" . copy-as-format-slack)))
 
+    (use-package hungry-delete
+      :ensure t
+      :hook
+      (text-mode . hungry-delete-mode)
+      (prog-mode . hungry-delete-mode))
+
   #+END_SRC
 
 * Help
@@ -967,6 +968,8 @@
 
     (use-package which-key
       :ensure t
+      :custom
+      (which-key-show-transient-maps t)
       :config
       (which-key-mode))
 
@@ -1556,6 +1559,19 @@
           (alet 'defun)
           (alet 'defun)
           (mlet 'defun)))
+
+      (use-package clj-refactor
+        :ensure t)
+
+      (use-package anakondo
+        :ensure t
+        :hook
+        (clojure-mode . anakondo-minor-mode)
+        (clojurescript-mode . anakondo-minor-mode)
+        (clojurec-mode . anakondo-minor-mode))
+
+      (use-package flycheck-clj-kondo
+        :ensure t)
 
       (use-package clojure-snippets
         :ensure t
