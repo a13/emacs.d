@@ -7,7 +7,7 @@
                           ;; ("marmalade" . "https://marmalade-repo.org/packages/")
                           ("org" . "https://orgmode.org/elpa/")
                           ;; ("user42" . "https://download.tuxfamily.org/user42/elpa/packages/")
-                           ("emacswiki" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/emacswiki/")
+                          ("emacswiki" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/emacswiki/")
                           ;; ("sunrise" . "http://joseito.republika.pl/sunrise-commander/")
                           ))
 (customize-set-variable 'package-enable-at-startup nil)
@@ -561,7 +561,7 @@
    ("F" . counsel-describe-face))
   :custom
   (counsel-grep-base-command
-  "rg -i -M 120 --no-heading --line-number --color never %s %s")
+   "rg -i -M 120 --no-heading --line-number --color never %s %s")
   (counsel-search-engines-alist
    '((google
       "http://suggestqueries.google.com/complete/search"

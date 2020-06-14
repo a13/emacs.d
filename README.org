@@ -1,53 +1,65 @@
-: Emacs Config
 #+INFOJS_OPT: view:t toc:t ltoc:t mouse:underline buttons:0 path:https://www.linux.org.ru/tango/combined.css
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="http://www.pirilampo.org/styles/readtheorg/css/htmlize.css"/>
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="http://www.pirilampo.org/styles/readtheorg/css/readtheorg.css"/>
 #+PROPERTY: header-args:emacs-lisp :tangle "init.el"
 * Foreword and keynotes
-** Use Use-package
-   I try to keep my configuration as declarative as possible, thanks to [[https://github.com/jwiegley/use-package][Use-package]] — it's easy now.
-   - use-package is used for built-in packages or libraries too (without :ensure)
+** Use-package
+   [[https://github.com/jwiegley/use-package][Use-package]] is an Emacs configuration manager (*not* a package manager!) that allows you to keep init file(s) clean, tidy and declarative.
+
+   - use it for built-in packages/libraries too (without ~:ensure t~)
    - each variable/face setting or each function call belongs to the one and only package which provides the symbol
    To find out, where do they belong to, use /M-x describe-variable/, /M-x describe-face/ or /M-x describe-function/ accordingly.
 
-   - [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Setting-Variables.html][setq]] is almost always means changing customizable variable, so can be rewritten with [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Applying-Customizations.html][customize-set-variable]] and therefore with [[https://github.com/jwiegley/use-package#customizing-variables][:custom]] keyword, besides that some defcustoms [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Variable-Definitions.html#Variable-Definitions][have get/set functions]], and just setq-ing them won't do the trick. It even supports inline comments so you can trace the changes.
+*** Setting variables
+    "Traditional" [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Setting-Variables.html][setq]] is almost always means changing a customizable variable, so can be rewritten with [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Applying-Customizations.html][customize-set-variable]] and therefore with [[https://github.com/jwiegley/use-package#customizing-variables][:custom]] keyword, it supports inline comments. Besides that some defcustoms [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Variable-Definitions.html#Variable-Definitions][have get/set functions]] so ~setq~-ing will have no effect unless you run a setter manually .
 
-   At the same time I don't use [[http://www.gnu.org/software/emacs/manual/html_node/emacs/Easy-Customization.html][Customization]] interface, and my own [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Saving-Customizations.html][custom-file]] is =/dev/null=.
-   An example
-   #+BEGIN_SRC emacs-lisp :tangle no
-     ;; "Don't show splash screen"
-     (setq inhibit-startup-screen t)
-   #+END_SRC
-   becomes
-   #+BEGIN_SRC emacs-lisp :tangle no
-     :custom
-     (inhibit-startup-screen t "Don't show splash screen")
-   #+END_SRC
+    /At the same time I don't use [[http://www.gnu.org/software/emacs/manual/html_node/emacs/Easy-Customization.html][Customization]] interface, and my own [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Saving-Customizations.html][custom-file]] is =/dev/null=./
 
-   - [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Face-Attributes.html][set-face-attribute]] and stuff like that → [[https://github.com/jwiegley/use-package#customizing-faces][:custom-face]]
-     #+BEGIN_SRC emacs-lisp :tangle no
-       (set-face-attributes 'Man-overstrike nil :inherit font-lock-type-face :bold t)
-     #+END_SRC
-     becomes
-     #+BEGIN_SRC emacs-lisp :tangle no
-       :custom-face
-       (Man-overstrike ((t (:inherit font-lock-type-face :bold t))))
-     #+END_SRC
-   - [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Hooks.html][add-hook]] → [[https://github.com/jwiegley/use-package#hooks][:hook]]
-   - [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Changing-Key-Bindings.html][define-key]] → [[https://github.com/jwiegley/use-package#key-binding][:bind]]
-   - Don't forget to use [[https://github.com/jwiegley/use-package#loading-packages-in-sequence][:after]] if you need one package to be loaded after another.
+    An example
+    #+BEGIN_SRC emacs-lisp :tangle no
+      ;; "Don't show splash screen"
+      (setq inhibit-startup-screen t)
+    #+END_SRC
+    becomes
+    #+BEGIN_SRC emacs-lisp :tangle no
+      :custom
+      (inhibit-startup-screen t "Don't show splash screen")
+    #+END_SRC
 
-   All defuns should go to packages/libraries. [[https://github.com/quelpa/quelpa][Quelpa]] really helps with that — I can make a package from whatever source I want.
+*** Faces
+    There's [[https://github.com/jwiegley/use-package#customizing-faces][:custom-face]], so
+    #+BEGIN_SRC emacs-lisp :tangle no
+      (set-face-attributes 'Man-overstrike nil :inherit font-lock-type-face :bold t)
+    #+END_SRC
+    becomes
+    #+BEGIN_SRC emacs-lisp :tangle no
+      :custom-face
+      (Man-overstrike ((t (:inherit font-lock-type-face :bold t))))
+    #+END_SRC
 
-** Fonts and colors.
-   Hardcoding these can break themes, so I use [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Face-Attributes.html][:inherit]] for customizations.
+    Hardcoded faces can break themes, so I use [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Face-Attributes.html][:inherit]] for customizations, if possible.
 
-** Keybindings
-   - I try not to hardcode bindings starting with /C-x/, /C-c/ and /C-h/, which are [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Prefix-Keymaps.html#Prefix-Keymaps][bound]] to ~ctl-x-map~, ~mode-specific-map~ and ~help-map~ respectively. Not that I'm not happy with all these defaults (except /C-h/, see *simple* package below), but just in case if I want to rebind them to something else (/SPC/, /mouse-1/, break, gas or whatever), I can do it, at least for my own bindings — sadly, some plugins hardcode them (and that causes issues for alternative bindings users), but I hope it will change someday.
+*** Hooks
+    [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Hooks.html][add-hook]] → [[https://github.com/jwiegley/use-package#hooks][:hook]]
+
+*** Key-binding
+    [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Changing-Key-Bindings.html][define-key]] → [[https://github.com/jwiegley/use-package#key-binding][:bind]]
+
+*** Sequential loading
+    use [[https://github.com/jwiegley/use-package#loading-packages-in-sequence][:after]] if you want to load a package after another one
+
+*** Installing packages from source code
+    There are some ways to do it, but I prefer [[https://github.com/quelpa/quelpa][Quelpa]] since it's compatible with Emacs [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Packages.html][Package manager]]
+
+*** Definitions
+    I put all defuns to separate packages/libraries to keep the config itself declarative
+
+** More on key-binding
+   - I try not to hardcode bindings starting with /C-x/, /C-c/ and /C-h/, which are [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Prefix-Keymaps.html#Prefix-Keymaps][bound]] to ~ctl-x-map~, ~mode-specific-map~ and ~help-map~ respectively. Not that I'm not happy with all these defaults (except /C-h/, see *simple* package below), but I want to be able to rebind them to something else (/SPC/, /mouse-1/, break, gas or whatever), at least for my own bindings — sadly, some plugins hardcode them (and that causes issues for alternative bindings users), but I hope it will change someday.
 
    - I use named prefix keymaps so they are visible in minibuffer while [[https://github.com/justbur/emacs-which-key][Which-key]] is active.
 
-   - I use [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Remapping-Commands.html][remap]] if I want to rebind a command to a "better" version of it and do an explicit keys declaration, when I rebind it to something completely different.
+   - I use [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Remapping-Commands.html][remap]] if I want to rebind a command to a "better" version of it and do an explicit keys declaration when I rebind it to something completely different.
 
    - Where mnemonics conflicts with ergonomics - prefer the former.
 
@@ -64,7 +76,7 @@
                                ;; ("marmalade" . "https://marmalade-repo.org/packages/")
                                ("org" . "https://orgmode.org/elpa/")
                                ;; ("user42" . "https://download.tuxfamily.org/user42/elpa/packages/")
-                                ("emacswiki" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/emacswiki/")
+                               ("emacswiki" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/emacswiki/")
                                ;; ("sunrise" . "http://joseito.republika.pl/sunrise-commander/")
                                ))
      (customize-set-variable 'package-enable-at-startup nil)
@@ -738,7 +750,7 @@
        ("F" . counsel-describe-face))
       :custom
       (counsel-grep-base-command
-      "rg -i -M 120 --no-heading --line-number --color never %s %s")
+       "rg -i -M 120 --no-heading --line-number --color never %s %s")
       (counsel-search-engines-alist
        '((google
           "http://suggestqueries.google.com/complete/search"
