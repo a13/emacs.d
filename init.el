@@ -244,6 +244,7 @@
 
 (use-package eshell-toggle
   :ensure t
+  :after projectile
   :custom
   (eshell-toggle-use-projectile-root t)
   (eshell-toggle-run-command nil)
@@ -367,6 +368,7 @@
 
 (use-package font-lock
   :custom-face
+  (font-lock-comment-face ((t (:inherit font-lock-comment-face :italic t))))
   (font-lock-doc-face ((t (:inherit font-lock-doc-face :italic t))))
   (font-lock-string-face ((t (:inherit font-lock-string-face :italic t)))))
 
@@ -493,7 +495,7 @@
 
 (use-package rainbow-mode
   :ensure t
-  :hook prog-mode)
+  :hook '(prog-mode help-mode))
 
 (use-package so-long
   :quelpa (so-long :url "https://raw.githubusercontent.com/emacs-mirror/emacs/master/lisp/so-long.el" :fetcher url)
@@ -1232,6 +1234,7 @@
   :custom
   (highlight-defined-face-use-itself t)
   :hook
+  (help-mode . highlight-defined-mode)
   (emacs-lisp-mode . highlight-defined-mode))
 
 (use-package highlight-quoted
