@@ -87,6 +87,7 @@
   :init
   (put 'narrow-to-region 'disabled nil)
   (put 'downcase-region 'disabled nil)
+  (fset 'x-popup-menu #'ignore)
   :custom
   (default-frame-alist '((menu-bar-lines 0)
                          (tool-bar-lines 0)
@@ -95,10 +96,24 @@
   (inhibit-startup-screen t "Don't show splash screen")
   (use-dialog-box nil "Disable dialog boxes")
   (x-gtk-use-system-tooltips nil)
+  (use-file-dialog nil)
   (enable-recursive-minibuffers t "Allow minibuffer commands in the minibuffer")
   (indent-tabs-mode nil "Spaces!")
   (tab-width 4)
-  (debug-on-quit nil))
+  (debug-on-quit nil)
+  :config
+  ;; Terminal emacs doesn't have it
+  (when (fboundp 'set-fontset-font)
+    ;; a workaround for old charsets
+    (set-fontset-font "fontset-default" 'cyrillic
+                      (font-spec :registry "iso10646-1" :script 'cyrillic))
+    ;; TODO: is it possible to not hardcode fonts?
+    (set-fontset-font t 'symbol
+                      (font-spec :family
+                                 (if (eq system-type 'darwin)
+                                     "Apple Color Emoji"
+                                   "Symbola"))
+                      nil 'prepend)))
 
 (use-package frame
   :bind
@@ -251,10 +266,10 @@
   :bind
   ("M-`" . eshell-toggle))
 
-(use-package eshell-fringe-status
-  :ensure t
-  :hook
-  (eshell-mode . eshell-fringe-status-mode))
+;; (use-package eshell-fringe-status
+;;   :ensure t
+;;   :hook
+;;   (eshell-mode . eshell-fringe-status-mode))
 
 (use-package ls-lisp
   :defer t
@@ -360,11 +375,7 @@
   :custom
   (face-font-family-alternatives '(("Consolas" "Monaco" "Monospace")))
   :custom-face
-  (default ((t (:family "Consolas" :height 95))))
-  ;; workaround for old charsets
-  :config
-  (set-fontset-font "fontset-default" 'cyrillic
-                    (font-spec :registry "iso10646-1" :script 'cyrillic)))
+  (default ((t (:family "Consolas" :height 95)))))
 
 (use-package font-lock
   :custom-face
@@ -474,6 +485,7 @@
 (use-package page-break-lines
   :ensure t
   :hook
+  (compilation-mode . page-break-lines-mode)
   (help-mode . page-break-lines-mode)
   (prog-mode . page-break-lines-mode))
 
@@ -832,15 +844,17 @@
 
 (use-package slack
   :ensure t
+  :defer t
   :secret
   (slack-start "work.el.gpg")
   :commands (slack-start)
   :custom
-  (slack-buffer-emojify t) ;; if you want to enable emoji, default nil
+  (slack-buffer-emojify t "enable emoji")
   (slack-prefer-current-team t))
 
 ;; TODO: move somewhere
 (use-package alert
+  :defer t
   :ensure t
   :commands (alert)
   :custom
@@ -925,37 +939,6 @@
   :ensure t
   :defer t)
 
-(use-package mu4e
-  :defer t
-  :load-path "/usr/share/emacs/site-lisp/mu4e"
-  ;; let's install it now, since mu4e packages aren't available yet
-  :ensure-system-package (mu . mu4e))
-
-(use-package smtpmail
-  :defer t
-  :custom
-  (smtpmail-queue-mail nil "start in normal mode")
-  ;;set up queue for offline email
-  (smtpmail-queue-dir "~/.mail/queue/cur" "use `mu mkdir ~/.mail/queue` to set up first"))
-
-(use-package mu4e-vars
-  :defer t
-  :custom
-  (mu4e-view-show-images t "enable inline images")
-  (mu4e-maildir (expand-file-name "~/.mail/work"))
-  (mu4e-completing-read-function 'completing-read "ivy does all the work")
-  (mu4e-get-mail-command "mbsync work" "sync with mbsync")
-  (mu4e-change-filenames-when-moving t "rename files when moving, needed for mbsync")
-  :config
-  ;; use imagemagick, if available
-  (when (fboundp 'imagemagick-register-types)
-    (imagemagick-register-types)))
-
-(use-package mu4e-contrib
-  :defer t
-  :custom
-  (mu4e-html2text-command 'mu4e-shr2text))
-
 (use-package calendar
   :defer t
   :custom
@@ -964,22 +947,22 @@
 (use-package org
   :defer t
   ;; to be sure we have the latest Org version
-  :ensure org-plus-contrib
+  ;; :ensure org-plus-contrib
   :hook
   (org-mode . variable-pitch-mode)
   (org-mode . visual-line-mode)
   :custom
   (org-src-tab-acts-natively t))
 
-(use-package org-passwords
-  :ensure org-plus-contrib
-  :bind
-  (:map org-mode-map
-        ("C-c C-p p" . org-passwords-copy-password)
-        ("C-c C-p u" . org-passwords-copy-username)
-        ("C-c C-p o" . org-passwords-open-url)))
+;; (use-package org-passwords
+;;   :ensure org-plus-contrib
+;;   :bind
+;;   (:map org-mode-map
+;;         ("C-c C-p p" . org-passwords-copy-password)
+;;         ("C-c C-p u" . org-passwords-copy-username)
+;;         ("C-c C-p o" . org-passwords-open-url)))
 
-(use-package org-bullets
+ (use-package org-bullets
   :ensure t
   :custom
   ;; org-bullets-bullet-list
@@ -994,6 +977,7 @@
   (org-mode . org-bullets-mode))
 
 (use-package htmlize
+  :ensure t
   :defer t
   :custom
   (org-html-htmlize-output-type 'css)
@@ -1128,6 +1112,7 @@
   (counsel-projectile-mode))
 
 (use-package ag
+  :ensure t
   :defer t
   :ensure-system-package (ag . silversearcher-ag)
   :custom
@@ -1169,15 +1154,7 @@
   :defer t
   ;; :ensure-system-package fonts-symbola
   :custom-update
-  (company-backends '(company-emoji))
-
-  :config
-  (set-fontset-font t 'symbol
-                    (font-spec :family
-                               (if (eq system-type 'darwin)
-                                   "Apple Color Emoji"
-                                 "Symbola"))
-                    nil 'prepend))
+  (company-backends '(company-emoji)))
 
 (use-package hippie-exp
   :bind
@@ -1206,10 +1183,12 @@
   :after yasnippet)
 
 (use-package flycheck
+  :ensure t
   :hook
   (prog-mode . flycheck-mode))
 
 (use-package avy-flycheck
+  :ensure t
   :defer t
   :config
   (avy-flycheck-setup))
@@ -1276,8 +1255,8 @@
 
 (use-package flycheck-package
   :ensure t
-  :defer t
-  :after flycheck
+  :defer 1
+  :config
   (flycheck-package-setup))
 
 ;; (use-package dash
@@ -1479,7 +1458,7 @@
 (use-package aql-mode
   :defer t
   :quelpa
-  (aql-mode :repo "matthewrsilver/aql-mode" :fetcher github)
+  (aql-mode :repo "a13/aql-mode" :fetcher github)
   :mode
   (("\\.arango$" . aql-mode)))
 

@@ -30,3 +30,8 @@ jobs:
         check: load-file
         file: init.el
         ignore_warnings: ${{ matrix.ignore_warnings }}
+    - uses: leotaku/elisp-check@master
+      with:
+        check: byte-compile
+        file: init.el
+        ignore_warnings: ${{ matrix.ignore_warnings }}
