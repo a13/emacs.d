@@ -1108,10 +1108,6 @@
   :ensure t
   :bind ("M-;" . smart-comment))
 
-(use-package ag
-  :defer t
-  :ensure t)
-
 (use-package projectile
   :defer 0.2
   :ensure t
@@ -1567,7 +1563,10 @@
 
 (use-package unipunct
   :defer 0.2
-  :quelpa (unipunct :url "https://raw.githubusercontent.com/a13/xkb-custom/master/contrib/unipunct.el" :fetcher url))
+  :quelpa
+  (unipunct
+   :fetcher url
+   :url "https://raw.githubusercontent.com/a13/xkb-custom/master/contrib/unipunct.el"))
 
 (use-package reverse-im
   :defer 0.2
