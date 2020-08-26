@@ -174,6 +174,7 @@
   :custom
   (recentf-auto-cleanup 30)
   :config
+  (recentf-mode)
   (run-with-idle-timer 10 t 'recentf-save-list))
 
 (use-package iqa
@@ -373,9 +374,12 @@
 (use-package faces
   :defer t
   :custom
-  (face-font-family-alternatives '(("Consolas" "Monaco" "Monospace")))
+  (face-font-family-alternatives
+   '(("CMU Typewriter Text" "Consolas" "Monaco" "Monospace")))
   :custom-face
-  (default ((t (:family "Consolas" :height 95)))))
+  (variable-pitch ((t (:background "#272C2D" :family "CMU Serif"))))
+  (fixed-pitch ((t (:family "CMU Typewriter Text"))))
+  (default ((t (:family "CMU Typewriter Text" :height 110)))))
 
 (use-package font-lock
   :custom-face
@@ -417,6 +421,11 @@
   :hook
   (after-init . fancy-battery-mode))
 
+(use-package olivetti
+  :ensure t
+  :custom
+  (olivetti-body-width 95))
+
 (use-package font-lock+
   :defer t
   :quelpa
@@ -451,6 +460,8 @@
 
 (use-package mood-line
   :ensure t
+  :custom-face
+  (mode-line ((t (:inherit default (:box (:line-width -1 :style released-button))))))
   :hook
   (after-init . mood-line-mode))
 
@@ -995,6 +1006,10 @@
   :defer t
   :ensure t)
 
+(use-package flycheck-grammarly
+  :quelpa
+  (flycheck-grammarly :repo "jcs-elpa/flycheck-grammarly"  :fetcher github))
+
 (use-package ibuffer-vc
   :defer t
   :ensure t
@@ -1148,14 +1163,6 @@
   :custom-update
   (company-backends '(company-shell)))
 
-(use-package company-emoji
-  :ensure t
-  :after company
-  :defer t
-  ;; :ensure-system-package fonts-symbola
-  :custom-update
-  (company-backends '(company-emoji)))
-
 (use-package hippie-exp
   :bind
   ([remap dabbrev-expand] . hippie-expand))
@@ -1275,6 +1282,7 @@
     (if-let-failed? 'defun)
     (if-let-ok? 'defun)
     (when-let-failed? 'defun)
+    (when-failed 'defun)
     (when-let-ok? 'defun)
     (attempt-all 'defun)
     (alet 'defun)
