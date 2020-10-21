@@ -375,11 +375,14 @@
   :defer t
   :custom
   (face-font-family-alternatives
-   '(("CMU Typewriter Text" "Consolas" "Monaco" "Monospace")))
+   '(("Monospace" "courier" "fixed")
+     ("Consolas" "Monaco" "Roboto Mono" "PT Mono" "Terminus" "Monospace")
+     ("Monospace Serif" "CMU Typewriter Text" "Courier 10 Pitch" "Monospace")
+     ("Serif" "CMU Serif" "Georgia" "Cambria" "Times New Roman" "DejaVu Serif" "serif")))
   :custom-face
-  (variable-pitch ((t (:background "#272C2D" :family "CMU Serif"))))
-  (fixed-pitch ((t (:family "CMU Typewriter Text"))))
-  (default ((t (:family "CMU Typewriter Text" :height 110)))))
+  (variable-pitch ((t (:family "Serif" :height 110))))
+  (fixed-pitch ((t (:family "Monospace Serif" :height 110))))
+  (default ((t (:family "Monospace Serif" :height 110)))))
 
 (use-package font-lock
   :custom-face
@@ -496,9 +499,10 @@
 (use-package page-break-lines
   :ensure t
   :hook
-  (compilation-mode . page-break-lines-mode)
   (help-mode . page-break-lines-mode)
-  (prog-mode . page-break-lines-mode))
+  (prog-mode . page-break-lines-mode)
+  (special-mode . page-break-lines-mode)
+  (compilation-mode . page-break-lines-mode))
 
 (use-package rainbow-delimiters
   :ensure t
@@ -994,6 +998,11 @@
   (org-html-htmlize-output-type 'css)
   (org-html-htmlize-font-prefix "org-"))
 
+(use-package org-jira
+  :ensure t
+  :init
+  (make-directory "~/.org-jira" t))
+
 (use-package synosaurus
   :defer t
   :ensure t
@@ -1044,6 +1053,7 @@
 (use-package magit
   :ensure t
   :custom
+  (magit-clone-default-directory (expand-file-name "~/git"))
   (magit-completing-read-function 'ivy-completing-read "Force Ivy usage.")
   :bind
   (:map mode-specific-map
@@ -1266,6 +1276,11 @@
   :config
   (flycheck-package-setup))
 
+(use-package flycheck-elsa
+  :ensure t
+  :hook
+  (emacs-lisp-mode . flycheck-elsa-setup))
+
 ;; (use-package dash
 ;;   :custom
 ;;   (dash-enable-fontlock t))
@@ -1285,7 +1300,6 @@
     (when-failed 'defun)
     (when-let-ok? 'defun)
     (attempt-all 'defun)
-    (alet 'defun)
     (alet 'defun)
     (mlet 'defun)))
 
