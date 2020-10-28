@@ -837,7 +837,7 @@
   :defer t)
 
 (use-package secrets-jabber
-  :ensure nil
+  :no-require t
   :after jabber)
 
 (use-package point-im
@@ -860,7 +860,7 @@
   (slack-prefer-current-team t))
 
 (use-package secrets-slack
-  :ensure nil
+  :no-require t
   :after slack)
 
 ;; TODO: move somewhere
