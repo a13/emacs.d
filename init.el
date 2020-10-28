@@ -75,7 +75,7 @@
   (paradox-enable))
 
 (use-package emacs
-  :load-path "~/.emacs.d/secrets"
+  :load-path "secrets"
   :init
   (put 'narrow-to-region 'disabled nil)
   (put 'downcase-region 'disabled nil)
@@ -837,7 +837,7 @@
   :defer t)
 
 (use-package secrets-jabber
-  :unless (getenv "CI")
+  :ensure nil
   :after jabber)
 
 (use-package point-im
@@ -860,7 +860,7 @@
   (slack-prefer-current-team t))
 
 (use-package secrets-slack
-  :unless (getenv "CI")
+  :ensure nil
   :after slack)
 
 ;; TODO: move somewhere
