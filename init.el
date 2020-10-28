@@ -837,6 +837,7 @@
   :defer t)
 
 (use-package secrets-jabber
+  :unless (getenv "CI")
   :after jabber)
 
 (use-package point-im
@@ -858,7 +859,8 @@
   (slack-buffer-emojify t "enable emoji")
   (slack-prefer-current-team t))
 
-(use-package secret-slack
+(use-package secrets-slack
+  :unless (getenv "CI")
   :after slack)
 
 ;; TODO: move somewhere
