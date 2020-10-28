@@ -64,15 +64,6 @@
    :fetcher github
    :version original))
 
-(use-package use-package-secrets
-  :custom
-  (use-package-secrets-directories '("~/.emacs.d/secrets"))
-  :quelpa
-  (use-package-secrets
-   :repo "a13/use-package-secrets"
-   :fetcher github
-   :version original))
-
 (use-package try
   :ensure t
   :defer t)
@@ -84,6 +75,7 @@
   (paradox-enable))
 
 (use-package emacs
+  :load-path "~/.emacs.d/secrets"
   :init
   (put 'narrow-to-region 'disabled nil)
   (put 'downcase-region 'disabled nil)
@@ -818,8 +810,6 @@
 
 (use-package jabber
   :defer t
-  :secret
-  (jabber-connect-all "jabber.el.gpg")
   :config
   (setq jabber-history-enabled t
         jabber-use-global-history nil
@@ -846,6 +836,9 @@
   :ensure t
   :defer t)
 
+(use-package secrets-jabber
+  :after jabber)
+
 (use-package point-im
   :defer t
   :defines point-im-reply-id-add-plus
@@ -860,12 +853,13 @@
 (use-package slack
   :ensure t
   :defer t
-  :secret
-  (slack-start "work.el.gpg")
   :commands (slack-start)
   :custom
   (slack-buffer-emojify t "enable emoji")
   (slack-prefer-current-team t))
+
+(use-package secret-slack
+  :after slack)
 
 ;; TODO: move somewhere
 (use-package alert

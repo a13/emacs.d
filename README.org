@@ -146,7 +146,7 @@
        (fnhh-mode 1))
    #+END_SRC
 
-   These two add [[https://github.com/a13/use-package-custom-update][:custom-update]] and [[https://github.com/a13/use-package-secrets][:secret]] keywords to use-package.
+   This adds  [[https://github.com/a13/use-package-custom-update][:custom-update]] keyword to use-package.
    #+BEGIN_SRC emacs-lisp
      (use-package use-package-custom-update
        :quelpa
@@ -154,16 +154,6 @@
         :repo "a13/use-package-custom-update"
         :fetcher github
         :version original))
-
-     (use-package use-package-secrets
-       :custom
-       (use-package-secrets-directories '("~/.emacs.d/secrets"))
-       :quelpa
-       (use-package-secrets
-        :repo "a13/use-package-secrets"
-        :fetcher github
-        :version original))
-
    #+END_SRC
 
 ** [[http://github.com/larstvei/try][Try]] packages without installing
@@ -188,6 +178,7 @@
    These were defined in C code, so use ~emacs~ pseudo-package to set them.
    #+BEGIN_SRC emacs-lisp
      (use-package emacs
+       :load-path "~/.emacs.d/secrets"
        :init
        (put 'narrow-to-region 'disabled nil)
        (put 'downcase-region 'disabled nil)
@@ -1028,8 +1019,6 @@
    #+BEGIN_SRC emacs-lisp
      (use-package jabber
        :defer t
-       :secret
-       (jabber-connect-all "jabber.el.gpg")
        :config
        (setq jabber-history-enabled t
              jabber-use-global-history nil
@@ -1056,6 +1045,9 @@
        :ensure t
        :defer t)
 
+     (use-package secrets-jabber
+       :after jabber)
+
      (use-package point-im
        :defer t
        :defines point-im-reply-id-add-plus
@@ -1074,12 +1066,13 @@
      (use-package slack
        :ensure t
        :defer t
-       :secret
-       (slack-start "work.el.gpg")
        :commands (slack-start)
        :custom
        (slack-buffer-emojify t "enable emoji")
        (slack-prefer-current-team t))
+
+     (use-package secret-slack
+       :after slack)
 
      ;; TODO: move somewhere
      (use-package alert
