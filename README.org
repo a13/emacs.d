@@ -49,10 +49,10 @@
     use [[https://github.com/jwiegley/use-package#loading-packages-in-sequence][:after]] if you want to load a package after another one
 
 *** Installing packages from source code
-    There are some ways to do it, but I prefer [[https://github.com/quelpa/quelpa][Quelpa]] since it's compatible with Emacs [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Packages.html][Package manager]]
+    There are several ways to do it, but I prefer [[https://github.com/quelpa/quelpa][Quelpa]] since it's compatible with Emacs [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Packages.html][Package manager]]
 
 *** Definitions
-    I put all defuns to separate packages/libraries to keep the config itself declarative
+    I put all defuns to separate packages/libraries to keep the config declarative
 
 ** More on key-binding
    - I try not to hardcode bindings starting with /C-x/, /C-c/ and /C-h/, which are [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Prefix-Keymaps.html#Prefix-Keymaps][bound]] to ~ctl-x-map~, ~mode-specific-map~ and ~help-map~ respectively. Not that I'm not happy with all these defaults (except /C-h/, see *simple* package below), but I want to be able to rebind them to something else (/SPC/, /mouse-1/, break, gas or whatever), at least for my own bindings — sadly, some plugins hardcode them (and that causes issues for alternative bindings users), but I hope it will change someday.
@@ -105,7 +105,8 @@
    #+begin_src emacs-lisp
      (use-package gcmh
        :ensure t
-       :init
+       :demand t
+       :config
        (gcmh-mode 1))
    #+end_src
 
@@ -222,7 +223,7 @@
        (initial-frame-alist '((vertical-scroll-bars))))
    #+END_SRC
 
-   C-c C-g always quits minubuffer
+   /C-c C-g/ always quits minubuffer
    #+BEGIN_SRC emacs-lisp
      (use-package delsel
        :bind
@@ -232,7 +233,7 @@
 
    Make /C-w/ and /C-h/ kill a word/char before cursor (see [[http://unix-kb.cat-v.org/][Unix keyboard shortcuts]], don't know what to do with /C-u/ though).
 
-   NB: rebinding C-h breaks /M-x kmacro-edit-lossage/, so you have to use something like /M-x edit-kbd-macro RET F1-l/ instead.
+   NB: rebinding /C-h/ breaks /M-x kmacro-edit-lossage/, so you have to use something like /M-x edit-kbd-macro RET F1-l/ instead.
    #+BEGIN_SRC emacs-lisp
      (use-package simple
        :defer 0.1
@@ -296,7 +297,7 @@
        (recentf-auto-cleanup 30)
        :config
        (recentf-mode)
-       (run-with-idle-timer 10 t 'recentf-save-list))
+       (run-with-idle-timer 30 t 'recentf-save-list))
    #+end_src
 
    [[https://github.com/a13/iqa.el][Quick access to init files]]
@@ -365,6 +366,10 @@
        :defer 0.1
        :config
        (exec-path-from-shell-initialize))
+
+     (use-package xr
+       :ensure t
+       :defer t)
    #+END_SRC
 
 * Eshell
@@ -389,6 +394,7 @@
       :hook (eshell-mode . esh-autosuggest-mode))
 
     (use-package esh-module
+      :defer t
       :custom-update
       (eshell-modules-list '(eshell-tramp)))
 
@@ -522,24 +528,25 @@
 ** Fonts
    We have to provide [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Font-Selection.html][face-font-family-alternatives]] for all the fonts we are going to use to avoid errors in case of their absense.
    #+BEGIN_SRC emacs-lisp
-     (use-package faces
-       :defer t
-       :custom
-       (face-font-family-alternatives
-        '(("Monospace" "courier" "fixed")
-          ("Consolas" "Monaco" "Roboto Mono" "PT Mono" "Terminus" "Monospace")
-          ("Monospace Serif" "CMU Typewriter Text" "Courier 10 Pitch" "Monospace")
-          ("Serif" "CMU Serif" "Georgia" "Cambria" "Times New Roman" "DejaVu Serif" "serif")))
-       :custom-face
-       (variable-pitch ((t (:family "Serif" :height 110))))
-       (fixed-pitch ((t (:family "Monospace Serif" :height 110))))
-       (default ((t (:family "Monospace Serif" :height 110)))))
+          (use-package faces
+            :defer t
+            :custom
+            (face-font-family-alternatives
+             '(("Monospace" "courier" "fixed")
+               ("Consolas" "Monaco" "Roboto Mono" "PT Mono" "Terminus" "Monospace")
+               ("Monospace Serif" "CMU Typewriter Text" "Courier 10 Pitch" "Monospace")
+               ("Serif" "CMU Serif" "Georgia" "Cambria" "Times New Roman" "DejaVu Serif" "serif")))
+            :custom-face
+            (variable-pitch ((t (:family "Serif" :height 120))))
+            (fixed-pitch ((t (:family "Monospace Serif" :height 110))))
+            (default ((t (:family "Monospace Serif" :height 110)))))
 
-     (use-package font-lock
-       :custom-face
-       (font-lock-comment-face ((t (:inherit font-lock-comment-face :italic t))))
-       (font-lock-doc-face ((t (:inherit font-lock-doc-face :italic t))))
-       (font-lock-string-face ((t (:inherit font-lock-string-face :italic t)))))
+          (use-package font-lock
+            :defer t
+            :custom-face
+            (font-lock-comment-face ((t (:inherit font-lock-comment-face :italic t))))
+            (font-lock-doc-face ((t (:inherit font-lock-doc-face :italic t))))
+            (font-lock-string-face ((t (:inherit font-lock-string-face :italic t)))))
    #+END_SRC
 
 
@@ -843,7 +850,12 @@
        :map search-map
        ("M-s" . avy-goto-word-1)))
 
+    (use-package ivy-avy
+      :after (ivy avy)
+      :ensure t)
+
     (use-package avy-zap
+      :defer t
       :ensure t
       :bind
       ([remap zap-to-char] . avy-zap-to-char))
@@ -1134,6 +1146,7 @@
                      webjump-sample-sites)))
 
      (use-package atomic-chrome
+       :defer 0.3
        :ensure t
        :custom
        (atomic-chrome-url-major-mode-alist
@@ -1278,10 +1291,12 @@
       :ensure t
       :defer t)
 
+    (use-package generic-x)
+
     (use-package magit
       :ensure t
       :custom
-      (magit-clone-default-directory (expand-file-name "~/git"))
+      (magit-clone-default-directory (expand-file-name "~/git/"))
       (magit-completing-read-function 'ivy-completing-read "Force Ivy usage.")
       :bind
       (:map mode-specific-map
@@ -1434,6 +1449,7 @@
        (prog-mode  . yas-minor-mode))
 
      (use-package doom-snippets
+       :defer t
        :quelpa
        (doom-snippets
         :repo "hlissner/doom-snippets"
@@ -1525,9 +1541,8 @@
 
       (use-package flycheck-package
         :ensure t
-        :defer 1
-        :config
-        (flycheck-package-setup))
+        :hook
+        (emacs-lisp-mode . flycheck-package-setup))
 
       (use-package flycheck-elsa
         :ensure t
@@ -1564,6 +1579,7 @@
           (mlet 'defun)))
 
       (use-package clj-refactor
+        :defer t
         :ensure t)
 
       (use-package anakondo
@@ -1781,6 +1797,7 @@
 
 
       (use-package sfz-mode
+        :defer t
         :ensure t)
     #+END_SRC
 
