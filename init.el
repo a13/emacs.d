@@ -30,7 +30,8 @@
 
 (use-package gcmh
   :ensure t
-  :init
+  :demand t
+  :config
   (gcmh-mode 1))
 
 (use-package system-packages
@@ -167,7 +168,7 @@
   (recentf-auto-cleanup 30)
   :config
   (recentf-mode)
-  (run-with-idle-timer 10 t 'recentf-save-list))
+  (run-with-idle-timer 30 t 'recentf-save-list))
 
 (use-package iqa
   :ensure t
@@ -221,6 +222,10 @@
   :config
   (exec-path-from-shell-initialize))
 
+(use-package xr
+  :ensure t
+  :defer t)
+
 (use-package em-smart
   :defer t
   :config
@@ -241,6 +246,7 @@
   :hook (eshell-mode . esh-autosuggest-mode))
 
 (use-package esh-module
+  :defer t
   :custom-update
   (eshell-modules-list '(eshell-tramp)))
 
@@ -372,11 +378,12 @@
      ("Monospace Serif" "CMU Typewriter Text" "Courier 10 Pitch" "Monospace")
      ("Serif" "CMU Serif" "Georgia" "Cambria" "Times New Roman" "DejaVu Serif" "serif")))
   :custom-face
-  (variable-pitch ((t (:family "Serif" :height 110))))
+  (variable-pitch ((t (:family "Serif" :height 120))))
   (fixed-pitch ((t (:family "Monospace Serif" :height 110))))
   (default ((t (:family "Monospace Serif" :height 110)))))
 
 (use-package font-lock
+  :defer t
   :custom-face
   (font-lock-comment-face ((t (:inherit font-lock-comment-face :italic t))))
   (font-lock-doc-face ((t (:inherit font-lock-doc-face :italic t))))
@@ -647,7 +654,12 @@
    :map search-map
    ("M-s" . avy-goto-word-1)))
 
+(use-package ivy-avy
+  :after (ivy avy)
+  :ensure t)
+
 (use-package avy-zap
+  :defer t
   :ensure t
   :bind
   ([remap zap-to-char] . avy-zap-to-char))
@@ -917,6 +929,7 @@
                 webjump-sample-sites)))
 
 (use-package atomic-chrome
+  :defer 0.3
   :ensure t
   :custom
   (atomic-chrome-url-major-mode-alist
@@ -1046,10 +1059,12 @@
   :ensure t
   :defer t)
 
+(use-package generic-x)
+
 (use-package magit
   :ensure t
   :custom
-  (magit-clone-default-directory (expand-file-name "~/git"))
+  (magit-clone-default-directory (expand-file-name "~/git/"))
   (magit-completing-read-function 'ivy-completing-read "Force Ivy usage.")
   :bind
   (:map mode-specific-map
@@ -1188,6 +1203,7 @@
   (prog-mode  . yas-minor-mode))
 
 (use-package doom-snippets
+  :defer t
   :quelpa
   (doom-snippets
    :repo "hlissner/doom-snippets"
@@ -1268,9 +1284,8 @@
 
 (use-package flycheck-package
   :ensure t
-  :defer 1
-  :config
-  (flycheck-package-setup))
+  :hook
+  (emacs-lisp-mode . flycheck-package-setup))
 
 (use-package flycheck-elsa
   :ensure t
@@ -1300,6 +1315,7 @@
     (mlet 'defun)))
 
 (use-package clj-refactor
+  :defer t
   :ensure t)
 
 (use-package anakondo
@@ -1482,6 +1498,7 @@
 
 
 (use-package sfz-mode
+  :defer t
   :ensure t)
 
 (use-package restclient
