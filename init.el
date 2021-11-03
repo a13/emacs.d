@@ -850,9 +850,10 @@
   :ensure t
   :defer t)
 
-(use-package secrets-jabber
-  :load t
-  :after jabber)
+;; (use-package secrets-jabber
+;;   :defer t
+;;   :load t
+;;   :after jabber)
 
 (use-package point-im
   :defer t
@@ -873,9 +874,9 @@
   (slack-buffer-emojify t "enable emoji")
   (slack-prefer-current-team t))
 
-(use-package secrets-slack
-  :load t
-  :after slack)
+;; (use-package secrets-slack
+;;   :load t
+;;   :after slack)
 
 ;; TODO: move somewhere
 (use-package alert
