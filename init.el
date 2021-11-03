@@ -1057,11 +1057,7 @@
                (unless (eq ibuffer-sorting-mode 'alphabetic)
                  (ibuffer-do-sort-by-alphabetic)))))
 
-(use-package gitconfig-mode
-  :ensure t
-  :defer t)
-
-(use-package gitignore-mode
+(use-package git-modes
   :ensure t
   :defer t)
 
