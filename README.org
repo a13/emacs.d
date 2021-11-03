@@ -120,42 +120,39 @@
 
      (use-package use-package-ensure-system-package :ensure t)
    #+END_SRC
+*** [[https://github.com/quelpa/quelpa][Quelpa]] "is a tool to compile and install Emacs Lisp packages locally from local or remote source code"
 
-   [[https://github.com/quelpa/quelpa][Quelpa]] "is a tool to compile and install Emacs Lisp packages locally from local or remote source code". No more manual package installation
-   #+BEGIN_SRC emacs-lisp
-     (use-package quelpa
-       :ensure t
-       :defer t
-       :custom
-       (quelpa-update-melpa-p nil "Don't update the MELPA git repo."))
+    #+BEGIN_SRC emacs-lisp
+      (use-package quelpa
+        :ensure t
+        :defer t
+        :custom
+        (quelpa-update-melpa-p nil "Don't update the MELPA git repo."))
 
-     (use-package quelpa-use-package
-       :init
-       (setq quelpa-use-package-inhibit-loading-quelpa t)
-       :ensure t)
+      (use-package quelpa-use-package
+        :ensure t)
 
-   #+END_SRC
+    #+END_SRC
+    No more manual package installation, now we can install packages directly from github.
 
-   now we can install packages directly from github.
+    This one tries to speed up Emacs startup a little bit
+    #+BEGIN_SRC emacs-lisp
+      (use-package fnhh
+        :quelpa
+        (fnhh :repo "a13/fnhh" :fetcher github)
+        :config
+        (fnhh-mode 1))
+    #+END_SRC
 
-   This one tries to speed up Emacs startup a little bit
-   #+BEGIN_SRC emacs-lisp
-     (use-package fnhh
-       :quelpa
-       (fnhh :repo "a13/fnhh" :fetcher github)
-       :config
-       (fnhh-mode 1))
-   #+END_SRC
-
-   This adds  [[https://github.com/a13/use-package-custom-update][:custom-update]] keyword to use-package.
-   #+BEGIN_SRC emacs-lisp
-     (use-package use-package-custom-update
-       :quelpa
-       (use-package-custom-update
-        :repo "a13/use-package-custom-update"
-        :fetcher github
-        :version original))
-   #+END_SRC
+    This adds  [[https://github.com/a13/use-package-custom-update][:custom-update]] keyword to use-package.
+    #+BEGIN_SRC emacs-lisp
+      (use-package use-package-custom-update
+        :quelpa
+        (use-package-custom-update
+         :repo "a13/use-package-custom-update"
+         :fetcher github
+         :version original))
+    #+END_SRC
 
 ** [[http://github.com/larstvei/try][Try]] packages without installing
    #+begin_src emacs-lisp
@@ -185,6 +182,7 @@
        (put 'downcase-region 'disabled nil)
        (fset 'x-popup-menu #'ignore)
        :custom
+       (frame-resize-pixelwise t)
        (default-frame-alist '((menu-bar-lines 0)
                               (tool-bar-lines 0)
                               (vertical-scroll-bars)))
@@ -311,11 +309,12 @@
        (iqa-setup-default))
    #+END_SRC
 
-   I don't use [[http://www.gnu.org/software/emacs/manual/html_node/emacs/Easy-Customization.html][Customize]], so put [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Saving-Customizations.html][custom-file]] "nowhere". Alternatively, one can use `(make-temp-file "emacs-custom")'
+   I don't use [[http://www.gnu.org/software/emacs/manual/html_node/emacs/Easy-Customization.html][Customize]], so put [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Saving-Customizations.html][custom-file]] "nowhere".
    #+BEGIN_SRC emacs-lisp
      (use-package cus-edit
        :defer t
        :custom
+       ;; (custom-file (make-temp-file "emacs-custom") "Store customizations in a temp file")
        (custom-file null-device "Don't store customizations"))
    #+END_SRC
 
@@ -526,27 +525,33 @@
    #+END_SRC
 
 ** Fonts
-   We have to provide [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Font-Selection.html][face-font-family-alternatives]] for all the fonts we are going to use to avoid errors in case of their absense.
+   Provide [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Font-Selection.html][face-font-family-alternatives]] for all the fonts we are going to use to avoid errors in case of their absense.
    #+BEGIN_SRC emacs-lisp
-          (use-package faces
-            :defer t
-            :custom
-            (face-font-family-alternatives
-             '(("Monospace" "courier" "fixed")
-               ("Consolas" "Monaco" "Roboto Mono" "PT Mono" "Terminus" "Monospace")
-               ("Monospace Serif" "CMU Typewriter Text" "Courier 10 Pitch" "Monospace")
-               ("Serif" "CMU Serif" "Georgia" "Cambria" "Times New Roman" "DejaVu Serif" "serif")))
-            :custom-face
-            (variable-pitch ((t (:family "Serif" :height 120))))
-            (fixed-pitch ((t (:family "Monospace Serif" :height 110))))
-            (default ((t (:family "Monospace Serif" :height 110)))))
+     (use-package faces
+       :defer t
+       :custom
+       (face-font-family-alternatives
+        '(("Monospace" "courier" "fixed")
+          ("Consolas" "Monaco" "Roboto Mono" "PT Mono" "Terminus" "Monospace")
+          ("Monospace Serif" "CMU Typewriter Text" "Courier 10 Pitch" "Monospace")
+          ("Serif" "CMU Serif" "Georgia" "Cambria" "Times New Roman" "DejaVu Serif" "serif")))
+       :custom-face
+       (variable-pitch ((t (:family "Serif" :height 125))))
+       (fixed-pitch ((t (:family "Monospace Serif" :height 125))))
+       (default ((t (:family "Monospace Serif" :height 125)))))
 
-          (use-package font-lock
-            :defer t
-            :custom-face
-            (font-lock-comment-face ((t (:inherit font-lock-comment-face :italic t))))
-            (font-lock-doc-face ((t (:inherit font-lock-doc-face :italic t))))
-            (font-lock-string-face ((t (:inherit font-lock-string-face :italic t)))))
+
+     (use-package fnhh
+       :quelpa
+       (justify-kp :repo "Fuco1/justify-kp" :fetcher github))
+
+
+     (use-package font-lock
+       :defer t
+       :custom-face
+       (font-lock-comment-face ((t (:inherit font-lock-comment-face :italic t))))
+       (font-lock-doc-face ((t (:inherit font-lock-doc-face :italic t))))
+       (font-lock-string-face ((t (:inherit font-lock-string-face :italic t)))))
    #+END_SRC
 
 
@@ -601,6 +606,7 @@
    Fancy stuff
    #+BEGIN_SRC emacs-lisp
      (use-package olivetti
+       :defer t
        :ensure t
        :custom
        (olivetti-body-width 95))
@@ -1228,9 +1234,12 @@
       (org-html-htmlize-font-prefix "org-"))
 
     (use-package org-jira
+      :defer t
       :ensure t
       :init
       (make-directory "~/.org-jira" t))
+
+    ;; (use-package secrets-jira)
   #+END_SRC
 
 * Writing
@@ -1253,6 +1262,7 @@
        :ensure t)
 
      (use-package flycheck-grammarly
+       :defer t
        :quelpa
        (flycheck-grammarly :repo "jcs-elpa/flycheck-grammarly"  :fetcher github))
    #+end_src
@@ -1366,6 +1376,7 @@
       :bind
       (:map mode-specific-map ("p" . projectile-command-map))
       :custom
+      (projectile-create-missing-test-files t)
       (projectile-project-root-files-functions
        '(projectile-root-local
          projectile-root-top-down
@@ -1446,7 +1457,7 @@
        :config
        (yas-reload-all)
        :hook
-       (prog-mode  . yas-minor-mode))
+       ((prog-mode feature-mode)  . yas-minor-mode))
 
      (use-package doom-snippets
        :defer t
@@ -1543,6 +1554,10 @@
         :ensure t
         :hook
         (emacs-lisp-mode . flycheck-package-setup))
+
+      (use-package elsa
+        :defer t
+        :ensure t)
 
       (use-package flycheck-elsa
         :ensure t
@@ -1897,24 +1912,23 @@
 
   Shortcuts with non-English layout.
   #+BEGIN_SRC emacs-lisp
-    (use-package unipunct
-      :defer 0.2
+    (use-package unipunct-ng
       :quelpa
-      (unipunct
+      (unipunct-ng
        :fetcher url
-       :url "https://raw.githubusercontent.com/a13/xkb-custom/master/contrib/unipunct.el"))
+       :url "https://raw.githubusercontent.com/a13/xkb-custom/master/contrib/unipunct-ng.el"))
 
     (use-package reverse-im
       :defer 0.2
       :ensure t
       :demand t
-      :after unipunct char-fold
+      :after unipunct-ng char-fold
       :bind
       ("M-T" . reverse-im-translate-word)
       :custom
       (reverse-im-char-fold t)
       (reverse-im-read-char-advice-function #'reverse-im-read-char-exclude)
-      (reverse-im-input-methods '("russian-unipunct"))
+      (reverse-im-input-methods '("russian-unipunct-ng"))
       :config
       (reverse-im-mode t))
   #+END_SRC

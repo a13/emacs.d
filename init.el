@@ -48,8 +48,6 @@
   (quelpa-update-melpa-p nil "Don't update the MELPA git repo."))
 
 (use-package quelpa-use-package
-  :init
-  (setq quelpa-use-package-inhibit-loading-quelpa t)
   :ensure t)
 
 (use-package fnhh
@@ -82,6 +80,7 @@
   (put 'downcase-region 'disabled nil)
   (fset 'x-popup-menu #'ignore)
   :custom
+  (frame-resize-pixelwise t)
   (default-frame-alist '((menu-bar-lines 0)
                          (tool-bar-lines 0)
                          (vertical-scroll-bars)))
@@ -181,6 +180,7 @@
 (use-package cus-edit
   :defer t
   :custom
+  ;; (custom-file (make-temp-file "emacs-custom") "Store customizations in a temp file")
   (custom-file null-device "Don't store customizations"))
 
 (use-package vlf
@@ -378,9 +378,15 @@
      ("Monospace Serif" "CMU Typewriter Text" "Courier 10 Pitch" "Monospace")
      ("Serif" "CMU Serif" "Georgia" "Cambria" "Times New Roman" "DejaVu Serif" "serif")))
   :custom-face
-  (variable-pitch ((t (:family "Serif" :height 120))))
-  (fixed-pitch ((t (:family "Monospace Serif" :height 110))))
-  (default ((t (:family "Monospace Serif" :height 110)))))
+  (variable-pitch ((t (:family "Serif" :height 125))))
+  (fixed-pitch ((t (:family "Monospace Serif" :height 125))))
+  (default ((t (:family "Monospace Serif" :height 125)))))
+
+
+(use-package fnhh
+  :quelpa
+  (justify-kp :repo "Fuco1/justify-kp" :fetcher github))
+
 
 (use-package font-lock
   :defer t
@@ -424,6 +430,7 @@
   (after-init . fancy-battery-mode))
 
 (use-package olivetti
+  :defer t
   :ensure t
   :custom
   (olivetti-body-width 95))
@@ -1008,9 +1015,12 @@
   (org-html-htmlize-font-prefix "org-"))
 
 (use-package org-jira
+  :defer t
   :ensure t
   :init
   (make-directory "~/.org-jira" t))
+
+;; (use-package secrets-jira)
 
 (use-package synosaurus
   :defer t
@@ -1025,6 +1035,7 @@
   :ensure t)
 
 (use-package flycheck-grammarly
+  :defer t
   :quelpa
   (flycheck-grammarly :repo "jcs-elpa/flycheck-grammarly"  :fetcher github))
 
@@ -1134,6 +1145,7 @@
   :bind
   (:map mode-specific-map ("p" . projectile-command-map))
   :custom
+  (projectile-create-missing-test-files t)
   (projectile-project-root-files-functions
    '(projectile-root-local
      projectile-root-top-down
@@ -1200,7 +1212,7 @@
   :config
   (yas-reload-all)
   :hook
-  (prog-mode  . yas-minor-mode))
+  ((prog-mode feature-mode)  . yas-minor-mode))
 
 (use-package doom-snippets
   :defer t
@@ -1286,6 +1298,10 @@
   :ensure t
   :hook
   (emacs-lisp-mode . flycheck-package-setup))
+
+(use-package elsa
+  :defer t
+  :ensure t)
 
 (use-package flycheck-elsa
   :ensure t
@@ -1575,23 +1591,22 @@
   :ensure t
   :defer t)
 
-(use-package unipunct
-  :defer 0.2
+(use-package unipunct-ng
   :quelpa
-  (unipunct
+  (unipunct-ng
    :fetcher url
-   :url "https://raw.githubusercontent.com/a13/xkb-custom/master/contrib/unipunct.el"))
+   :url "https://raw.githubusercontent.com/a13/xkb-custom/master/contrib/unipunct-ng.el"))
 
 (use-package reverse-im
   :defer 0.2
   :ensure t
   :demand t
-  :after unipunct char-fold
+  :after unipunct-ng char-fold
   :bind
   ("M-T" . reverse-im-translate-word)
   :custom
   (reverse-im-char-fold t)
   (reverse-im-read-char-advice-function #'reverse-im-read-char-exclude)
-  (reverse-im-input-methods '("russian-unipunct"))
+  (reverse-im-input-methods '("russian-unipunct-ng"))
   :config
   (reverse-im-mode t))
