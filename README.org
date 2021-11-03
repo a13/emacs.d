@@ -49,10 +49,10 @@
     use [[https://github.com/jwiegley/use-package#loading-packages-in-sequence][:after]] if you want to load a package after another one
 
 *** Installing packages from source code
-    There are some ways to do it, but I prefer [[https://github.com/quelpa/quelpa][Quelpa]] since it's compatible with Emacs [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Packages.html][Package manager]]
+    There are several ways to do it, but I prefer [[https://github.com/quelpa/quelpa][Quelpa]] since it's compatible with Emacs [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Packages.html][Package manager]]
 
 *** Definitions
-    I put all defuns to separate packages/libraries to keep the config itself declarative
+    I put all defuns to separate packages/libraries to keep the config declarative
 
 ** More on key-binding
    - I try not to hardcode bindings starting with /C-x/, /C-c/ and /C-h/, which are [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Prefix-Keymaps.html#Prefix-Keymaps][bound]] to ~ctl-x-map~, ~mode-specific-map~ and ~help-map~ respectively. Not that I'm not happy with all these defaults (except /C-h/, see *simple* package below), but I want to be able to rebind them to something else (/SPC/, /mouse-1/, break, gas or whatever), at least for my own bindings — sadly, some plugins hardcode them (and that causes issues for alternative bindings users), but I hope it will change someday.
@@ -71,14 +71,9 @@
 
      (require 'package)
      (customize-set-variable 'package-archives
-                             `(,@package-archives
-                               ("melpa" . "https://melpa.org/packages/")
-                               ;; ("marmalade" . "https://marmalade-repo.org/packages/")
+                             `(("melpa" . "https://melpa.org/packages/")
                                ("org" . "https://orgmode.org/elpa/")
-                               ;; ("user42" . "https://download.tuxfamily.org/user42/elpa/packages/")
-                               ("emacswiki" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/emacswiki/")
-                               ;; ("sunrise" . "http://joseito.republika.pl/sunrise-commander/")
-                               ))
+                               ,@package-archives))
      (customize-set-variable 'package-enable-at-startup nil)
      (package-initialize)
    #+END_SRC
@@ -105,7 +100,8 @@
    #+begin_src emacs-lisp
      (use-package gcmh
        :ensure t
-       :init
+       :demand t
+       :config
        (gcmh-mode 1))
    #+end_src
 
@@ -119,42 +115,39 @@
 
      (use-package use-package-ensure-system-package :ensure t)
    #+END_SRC
+*** [[https://github.com/quelpa/quelpa][Quelpa]] "is a tool to compile and install Emacs Lisp packages locally from local or remote source code"
 
-   [[https://github.com/quelpa/quelpa][Quelpa]] "is a tool to compile and install Emacs Lisp packages locally from local or remote source code". No more manual package installation
-   #+BEGIN_SRC emacs-lisp
-     (use-package quelpa
-       :ensure t
-       :defer t
-       :custom
-       (quelpa-update-melpa-p nil "Don't update the MELPA git repo."))
+    #+BEGIN_SRC emacs-lisp
+      (use-package quelpa
+        :ensure t
+        :defer t
+        :custom
+        (quelpa-update-melpa-p nil "Don't update the MELPA git repo."))
 
-     (use-package quelpa-use-package
-       :init
-       (setq quelpa-use-package-inhibit-loading-quelpa t)
-       :ensure t)
+      (use-package quelpa-use-package
+        :ensure t)
 
-   #+END_SRC
+    #+END_SRC
+    No more manual package installation, now we can install packages directly from github.
 
-   now we can install packages directly from github.
+    This one tries to speed up Emacs startup a little bit
+    #+BEGIN_SRC emacs-lisp
+      (use-package fnhh
+        :quelpa
+        (fnhh :repo "a13/fnhh" :fetcher github)
+        :config
+        (fnhh-mode 1))
+    #+END_SRC
 
-   This one tries to speed up Emacs startup a little bit
-   #+BEGIN_SRC emacs-lisp
-     (use-package fnhh
-       :quelpa
-       (fnhh :repo "a13/fnhh" :fetcher github)
-       :config
-       (fnhh-mode 1))
-   #+END_SRC
-
-   This adds  [[https://github.com/a13/use-package-custom-update][:custom-update]] keyword to use-package.
-   #+BEGIN_SRC emacs-lisp
-     (use-package use-package-custom-update
-       :quelpa
-       (use-package-custom-update
-        :repo "a13/use-package-custom-update"
-        :fetcher github
-        :version original))
-   #+END_SRC
+    This adds  [[https://github.com/a13/use-package-custom-update][:custom-update]] keyword to use-package.
+    #+BEGIN_SRC emacs-lisp
+      (use-package use-package-custom-update
+        :quelpa
+        (use-package-custom-update
+         :repo "a13/use-package-custom-update"
+         :fetcher github
+         :version original))
+    #+END_SRC
 
 ** [[http://github.com/larstvei/try][Try]] packages without installing
    #+begin_src emacs-lisp
@@ -184,6 +177,7 @@
        (put 'downcase-region 'disabled nil)
        (fset 'x-popup-menu #'ignore)
        :custom
+       (frame-resize-pixelwise t)
        (default-frame-alist '((menu-bar-lines 0)
                               (tool-bar-lines 0)
                               (vertical-scroll-bars)))
@@ -222,7 +216,7 @@
        (initial-frame-alist '((vertical-scroll-bars))))
    #+END_SRC
 
-   C-c C-g always quits minubuffer
+   /C-c C-g/ always quits minubuffer
    #+BEGIN_SRC emacs-lisp
      (use-package delsel
        :bind
@@ -232,7 +226,7 @@
 
    Make /C-w/ and /C-h/ kill a word/char before cursor (see [[http://unix-kb.cat-v.org/][Unix keyboard shortcuts]], don't know what to do with /C-u/ though).
 
-   NB: rebinding C-h breaks /M-x kmacro-edit-lossage/, so you have to use something like /M-x edit-kbd-macro RET F1-l/ instead.
+   NB: rebinding /C-h/ breaks /M-x kmacro-edit-lossage/, so you have to use something like /M-x edit-kbd-macro RET F1-l/ instead.
    #+BEGIN_SRC emacs-lisp
      (use-package simple
        :defer 0.1
@@ -296,7 +290,7 @@
        (recentf-auto-cleanup 30)
        :config
        (recentf-mode)
-       (run-with-idle-timer 10 t 'recentf-save-list))
+       (run-with-idle-timer 30 t 'recentf-save-list))
    #+end_src
 
    [[https://github.com/a13/iqa.el][Quick access to init files]]
@@ -310,11 +304,12 @@
        (iqa-setup-default))
    #+END_SRC
 
-   I don't use [[http://www.gnu.org/software/emacs/manual/html_node/emacs/Easy-Customization.html][Customize]], so put [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Saving-Customizations.html][custom-file]] "nowhere". Alternatively, one can use `(make-temp-file "emacs-custom")'
+   I don't use [[http://www.gnu.org/software/emacs/manual/html_node/emacs/Easy-Customization.html][Customize]], so put [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Saving-Customizations.html][custom-file]] "nowhere".
    #+BEGIN_SRC emacs-lisp
      (use-package cus-edit
        :defer t
        :custom
+       ;; (custom-file (make-temp-file "emacs-custom") "Store customizations in a temp file")
        (custom-file null-device "Don't store customizations"))
    #+END_SRC
 
@@ -365,6 +360,10 @@
        :defer 0.1
        :config
        (exec-path-from-shell-initialize))
+
+     (use-package xr
+       :ensure t
+       :defer t)
    #+END_SRC
 
 * Eshell
@@ -389,6 +388,7 @@
       :hook (eshell-mode . esh-autosuggest-mode))
 
     (use-package esh-module
+      :defer t
       :custom-update
       (eshell-modules-list '(eshell-tramp)))
 
@@ -520,7 +520,7 @@
    #+END_SRC
 
 ** Fonts
-   We have to provide [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Font-Selection.html][face-font-family-alternatives]] for all the fonts we are going to use to avoid errors in case of their absense.
+   Provide [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Font-Selection.html][face-font-family-alternatives]] for all the fonts we are going to use to avoid errors in case of their absense.
    #+BEGIN_SRC emacs-lisp
      (use-package faces
        :defer t
@@ -531,11 +531,18 @@
           ("Monospace Serif" "CMU Typewriter Text" "Courier 10 Pitch" "Monospace")
           ("Serif" "CMU Serif" "Georgia" "Cambria" "Times New Roman" "DejaVu Serif" "serif")))
        :custom-face
-       (variable-pitch ((t (:family "Serif" :height 110))))
-       (fixed-pitch ((t (:family "Monospace Serif" :height 110))))
-       (default ((t (:family "Monospace Serif" :height 110)))))
+       (variable-pitch ((t (:family "Serif" :height 125))))
+       (fixed-pitch ((t (:family "Monospace Serif" :height 125))))
+       (default ((t (:family "Monospace Serif" :height 125)))))
+
+
+     (use-package fnhh
+       :quelpa
+       (justify-kp :repo "Fuco1/justify-kp" :fetcher github))
+
 
      (use-package font-lock
+       :defer t
        :custom-face
        (font-lock-comment-face ((t (:inherit font-lock-comment-face :italic t))))
        (font-lock-doc-face ((t (:inherit font-lock-doc-face :italic t))))
@@ -594,6 +601,7 @@
    Fancy stuff
    #+BEGIN_SRC emacs-lisp
      (use-package olivetti
+       :defer t
        :ensure t
        :custom
        (olivetti-body-width 95))
@@ -843,7 +851,12 @@
        :map search-map
        ("M-s" . avy-goto-word-1)))
 
+    (use-package ivy-avy
+      :after (ivy avy)
+      :ensure t)
+
     (use-package avy-zap
+      :defer t
       :ensure t
       :bind
       ([remap zap-to-char] . avy-zap-to-char))
@@ -1017,48 +1030,49 @@
 * Internet
 ** Jabber
    #+BEGIN_SRC emacs-lisp
-     (use-package jabber
-       :defer t
-       :config
-       (setq jabber-history-enabled t
-             jabber-use-global-history nil
-             fsm-debug nil)
-       :custom
-       (jabber-auto-reconnect t)
-       (jabber-chat-buffer-format "*-jc-%n-*")
-       (jabber-groupchat-buffer-format "*-jg-%n-*")
-       (jabber-chat-foreign-prompt-format "▼ [%t] %n> ")
-       (jabber-chat-local-prompt-format "▲ [%t] %n> ")
-       (jabber-muc-colorize-foreign t)
-       (jabber-muc-private-buffer-format "*-jmuc-priv-%g-%n-*")
-       (jabber-rare-time-format "%e %b %Y %H:00")
-       (jabber-resource-line-format "   %r - %s [%p]")
-       (jabber-roster-buffer "*-jroster-*")
-       (jabber-roster-line-format "%c %-17n")
-       (jabber-roster-show-bindings nil)
-       (jabber-roster-show-title nil)
-       (jabber-roster-sort-functions (quote (jabber-roster-sort-by-status jabber-roster-sort-by-displayname jabber-roster-sort-by-group)))
-       (jabber-show-offline-contacts nil)
-       (jabber-show-resources nil))
+     ;; (use-package jabber
+     ;;   :defer t
+     ;;   :config
+     ;;   (setq jabber-history-enabled t
+     ;;         jabber-use-global-history nil
+     ;;         fsm-debug nil)
+     ;;   :custom
+     ;;   (jabber-auto-reconnect t)
+     ;;   (jabber-chat-buffer-format "*-jc-%n-*")
+     ;;   (jabber-groupchat-buffer-format "*-jg-%n-*")
+     ;;   (jabber-chat-foreign-prompt-format "▼ [%t] %n> ")
+     ;;   (jabber-chat-local-prompt-format "▲ [%t] %n> ")
+     ;;   (jabber-muc-colorize-foreign t)
+     ;;   (jabber-muc-private-buffer-format "*-jmuc-priv-%g-%n-*")
+     ;;   (jabber-rare-time-format "%e %b %Y %H:00")
+     ;;   (jabber-resource-line-format "   %r - %s [%p]")
+     ;;   (jabber-roster-buffer "*-jroster-*")
+     ;;   (jabber-roster-line-format "%c %-17n")
+     ;;   (jabber-roster-show-bindings nil)
+     ;;   (jabber-roster-show-title nil)
+     ;;   (jabber-roster-sort-functions (quote (jabber-roster-sort-by-status jabber-roster-sort-by-displayname jabber-roster-sort-by-group)))
+     ;;   (jabber-show-offline-contacts nil)
+     ;;   (jabber-show-resources nil))
 
-     (use-package jabber-otr
-       :ensure t
-       :defer t)
+     ;; (use-package jabber-otr
+     ;;   :ensure t
+     ;;   :defer t)
 
-     (use-package secrets-jabber
-       :load t
-       :after jabber)
+     ;; (use-package secrets-jabber
+     ;;   :defer t
+     ;;   :load t
+     ;;   :after jabber)
 
-     (use-package point-im
-       :defer t
-       :defines point-im-reply-id-add-plus
-       :after jabber
-       :quelpa
-       (point-im :repo "a13/point-im.el" :fetcher github :version original)
-       :custom
-       (point-im-reply-id-add-plus nil)
-       :hook
-       (jabber-chat-mode . point-im-mode))
+     ;; (use-package point-im
+     ;;   :defer t
+     ;;   :defines point-im-reply-id-add-plus
+     ;;   :after jabber
+     ;;   :quelpa
+     ;;   (point-im :repo "a13/point-im.el" :fetcher github :version original)
+     ;;   :custom
+     ;;   (point-im-reply-id-add-plus nil)
+     ;;   :hook
+     ;;   (jabber-chat-mode . point-im-mode))
 
    #+END_SRC
 
@@ -1072,9 +1086,9 @@
        (slack-buffer-emojify t "enable emoji")
        (slack-prefer-current-team t))
 
-     (use-package secrets-slack
-       :load t
-       :after slack)
+     ;; (use-package secrets-slack
+     ;;   :load t
+     ;;   :after slack)
 
      ;; TODO: move somewhere
      (use-package alert
@@ -1134,6 +1148,7 @@
                      webjump-sample-sites)))
 
      (use-package atomic-chrome
+       :defer 0.3
        :ensure t
        :custom
        (atomic-chrome-url-major-mode-alist
@@ -1215,9 +1230,12 @@
       (org-html-htmlize-font-prefix "org-"))
 
     (use-package org-jira
+      :defer t
       :ensure t
       :init
       (make-directory "~/.org-jira" t))
+
+    ;; (use-package secrets-jira)
   #+END_SRC
 
 * Writing
@@ -1240,6 +1258,7 @@
        :ensure t)
 
      (use-package flycheck-grammarly
+       :defer t
        :quelpa
        (flycheck-grammarly :repo "jcs-elpa/flycheck-grammarly"  :fetcher github))
    #+end_src
@@ -1270,18 +1289,16 @@
                    (unless (eq ibuffer-sorting-mode 'alphabetic)
                      (ibuffer-do-sort-by-alphabetic)))))
 
-    (use-package gitconfig-mode
+    (use-package git-modes
       :ensure t
       :defer t)
 
-    (use-package gitignore-mode
-      :ensure t
-      :defer t)
+    (use-package generic-x)
 
     (use-package magit
       :ensure t
       :custom
-      (magit-clone-default-directory (expand-file-name "~/git"))
+      (magit-clone-default-directory (expand-file-name "~/git/"))
       (magit-completing-read-function 'ivy-completing-read "Force Ivy usage.")
       :bind
       (:map mode-specific-map
@@ -1351,6 +1368,7 @@
       :bind
       (:map mode-specific-map ("p" . projectile-command-map))
       :custom
+      (projectile-create-missing-test-files t)
       (projectile-project-root-files-functions
        '(projectile-root-local
          projectile-root-top-down
@@ -1431,9 +1449,10 @@
        :config
        (yas-reload-all)
        :hook
-       (prog-mode  . yas-minor-mode))
+       ((prog-mode feature-mode)  . yas-minor-mode))
 
      (use-package doom-snippets
+       :defer t
        :quelpa
        (doom-snippets
         :repo "hlissner/doom-snippets"
@@ -1525,9 +1544,12 @@
 
       (use-package flycheck-package
         :ensure t
-        :defer 1
-        :config
-        (flycheck-package-setup))
+        :hook
+        (emacs-lisp-mode . flycheck-package-setup))
+
+      (use-package elsa
+        :defer t
+        :ensure t)
 
       (use-package flycheck-elsa
         :ensure t
@@ -1564,6 +1586,7 @@
           (mlet 'defun)))
 
       (use-package clj-refactor
+        :defer t
         :ensure t)
 
       (use-package anakondo
@@ -1781,6 +1804,7 @@
 
 
       (use-package sfz-mode
+        :defer t
         :ensure t)
     #+END_SRC
 
@@ -1880,24 +1904,23 @@
 
   Shortcuts with non-English layout.
   #+BEGIN_SRC emacs-lisp
-    (use-package unipunct
-      :defer 0.2
+    (use-package unipunct-ng
       :quelpa
-      (unipunct
+      (unipunct-ng
        :fetcher url
-       :url "https://raw.githubusercontent.com/a13/xkb-custom/master/contrib/unipunct.el"))
+       :url "https://raw.githubusercontent.com/a13/xkb-custom/master/contrib/unipunct-ng.el"))
 
     (use-package reverse-im
       :defer 0.2
       :ensure t
       :demand t
-      :after unipunct char-fold
+      :after unipunct-ng char-fold
       :bind
       ("M-T" . reverse-im-translate-word)
       :custom
       (reverse-im-char-fold t)
       (reverse-im-read-char-advice-function #'reverse-im-read-char-exclude)
-      (reverse-im-input-methods '("russian-unipunct"))
+      (reverse-im-input-methods '("russian-unipunct-ng"))
       :config
       (reverse-im-mode t))
   #+END_SRC

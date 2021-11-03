@@ -2,14 +2,9 @@
 
 (require 'package)
 (customize-set-variable 'package-archives
-                        `(,@package-archives
-                          ("melpa" . "https://melpa.org/packages/")
-                          ;; ("marmalade" . "https://marmalade-repo.org/packages/")
+                        `(("melpa" . "https://melpa.org/packages/")
                           ("org" . "https://orgmode.org/elpa/")
-                          ;; ("user42" . "https://download.tuxfamily.org/user42/elpa/packages/")
-                          ("emacswiki" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/emacswiki/")
-                          ;; ("sunrise" . "http://joseito.republika.pl/sunrise-commander/")
-                          ))
+                          ,@package-archives))
 (customize-set-variable 'package-enable-at-startup nil)
 (package-initialize)
 
@@ -30,7 +25,8 @@
 
 (use-package gcmh
   :ensure t
-  :init
+  :demand t
+  :config
   (gcmh-mode 1))
 
 (use-package system-packages
@@ -47,8 +43,6 @@
   (quelpa-update-melpa-p nil "Don't update the MELPA git repo."))
 
 (use-package quelpa-use-package
-  :init
-  (setq quelpa-use-package-inhibit-loading-quelpa t)
   :ensure t)
 
 (use-package fnhh
@@ -81,6 +75,7 @@
   (put 'downcase-region 'disabled nil)
   (fset 'x-popup-menu #'ignore)
   :custom
+  (frame-resize-pixelwise t)
   (default-frame-alist '((menu-bar-lines 0)
                          (tool-bar-lines 0)
                          (vertical-scroll-bars)))
@@ -167,7 +162,7 @@
   (recentf-auto-cleanup 30)
   :config
   (recentf-mode)
-  (run-with-idle-timer 10 t 'recentf-save-list))
+  (run-with-idle-timer 30 t 'recentf-save-list))
 
 (use-package iqa
   :ensure t
@@ -180,6 +175,7 @@
 (use-package cus-edit
   :defer t
   :custom
+  ;; (custom-file (make-temp-file "emacs-custom") "Store customizations in a temp file")
   (custom-file null-device "Don't store customizations"))
 
 (use-package vlf
@@ -221,6 +217,10 @@
   :config
   (exec-path-from-shell-initialize))
 
+(use-package xr
+  :ensure t
+  :defer t)
+
 (use-package em-smart
   :defer t
   :config
@@ -241,6 +241,7 @@
   :hook (eshell-mode . esh-autosuggest-mode))
 
 (use-package esh-module
+  :defer t
   :custom-update
   (eshell-modules-list '(eshell-tramp)))
 
@@ -372,11 +373,18 @@
      ("Monospace Serif" "CMU Typewriter Text" "Courier 10 Pitch" "Monospace")
      ("Serif" "CMU Serif" "Georgia" "Cambria" "Times New Roman" "DejaVu Serif" "serif")))
   :custom-face
-  (variable-pitch ((t (:family "Serif" :height 110))))
-  (fixed-pitch ((t (:family "Monospace Serif" :height 110))))
-  (default ((t (:family "Monospace Serif" :height 110)))))
+  (variable-pitch ((t (:family "Serif" :height 125))))
+  (fixed-pitch ((t (:family "Monospace Serif" :height 125))))
+  (default ((t (:family "Monospace Serif" :height 125)))))
+
+
+(use-package fnhh
+  :quelpa
+  (justify-kp :repo "Fuco1/justify-kp" :fetcher github))
+
 
 (use-package font-lock
+  :defer t
   :custom-face
   (font-lock-comment-face ((t (:inherit font-lock-comment-face :italic t))))
   (font-lock-doc-face ((t (:inherit font-lock-doc-face :italic t))))
@@ -417,6 +425,7 @@
   (after-init . fancy-battery-mode))
 
 (use-package olivetti
+  :defer t
   :ensure t
   :custom
   (olivetti-body-width 95))
@@ -647,7 +656,12 @@
    :map search-map
    ("M-s" . avy-goto-word-1)))
 
+(use-package ivy-avy
+  :after (ivy avy)
+  :ensure t)
+
 (use-package avy-zap
+  :defer t
   :ensure t
   :bind
   ([remap zap-to-char] . avy-zap-to-char))
@@ -808,48 +822,49 @@
   :ensure t
   :defer t)
 
-(use-package jabber
-  :defer t
-  :config
-  (setq jabber-history-enabled t
-        jabber-use-global-history nil
-        fsm-debug nil)
-  :custom
-  (jabber-auto-reconnect t)
-  (jabber-chat-buffer-format "*-jc-%n-*")
-  (jabber-groupchat-buffer-format "*-jg-%n-*")
-  (jabber-chat-foreign-prompt-format "▼ [%t] %n> ")
-  (jabber-chat-local-prompt-format "▲ [%t] %n> ")
-  (jabber-muc-colorize-foreign t)
-  (jabber-muc-private-buffer-format "*-jmuc-priv-%g-%n-*")
-  (jabber-rare-time-format "%e %b %Y %H:00")
-  (jabber-resource-line-format "   %r - %s [%p]")
-  (jabber-roster-buffer "*-jroster-*")
-  (jabber-roster-line-format "%c %-17n")
-  (jabber-roster-show-bindings nil)
-  (jabber-roster-show-title nil)
-  (jabber-roster-sort-functions (quote (jabber-roster-sort-by-status jabber-roster-sort-by-displayname jabber-roster-sort-by-group)))
-  (jabber-show-offline-contacts nil)
-  (jabber-show-resources nil))
+;; (use-package jabber
+;;   :defer t
+;;   :config
+;;   (setq jabber-history-enabled t
+;;         jabber-use-global-history nil
+;;         fsm-debug nil)
+;;   :custom
+;;   (jabber-auto-reconnect t)
+;;   (jabber-chat-buffer-format "*-jc-%n-*")
+;;   (jabber-groupchat-buffer-format "*-jg-%n-*")
+;;   (jabber-chat-foreign-prompt-format "▼ [%t] %n> ")
+;;   (jabber-chat-local-prompt-format "▲ [%t] %n> ")
+;;   (jabber-muc-colorize-foreign t)
+;;   (jabber-muc-private-buffer-format "*-jmuc-priv-%g-%n-*")
+;;   (jabber-rare-time-format "%e %b %Y %H:00")
+;;   (jabber-resource-line-format "   %r - %s [%p]")
+;;   (jabber-roster-buffer "*-jroster-*")
+;;   (jabber-roster-line-format "%c %-17n")
+;;   (jabber-roster-show-bindings nil)
+;;   (jabber-roster-show-title nil)
+;;   (jabber-roster-sort-functions (quote (jabber-roster-sort-by-status jabber-roster-sort-by-displayname jabber-roster-sort-by-group)))
+;;   (jabber-show-offline-contacts nil)
+;;   (jabber-show-resources nil))
 
-(use-package jabber-otr
-  :ensure t
-  :defer t)
+;; (use-package jabber-otr
+;;   :ensure t
+;;   :defer t)
 
-(use-package secrets-jabber
-  :load t
-  :after jabber)
+;; (use-package secrets-jabber
+;;   :defer t
+;;   :load t
+;;   :after jabber)
 
-(use-package point-im
-  :defer t
-  :defines point-im-reply-id-add-plus
-  :after jabber
-  :quelpa
-  (point-im :repo "a13/point-im.el" :fetcher github :version original)
-  :custom
-  (point-im-reply-id-add-plus nil)
-  :hook
-  (jabber-chat-mode . point-im-mode))
+;; (use-package point-im
+;;   :defer t
+;;   :defines point-im-reply-id-add-plus
+;;   :after jabber
+;;   :quelpa
+;;   (point-im :repo "a13/point-im.el" :fetcher github :version original)
+;;   :custom
+;;   (point-im-reply-id-add-plus nil)
+;;   :hook
+;;   (jabber-chat-mode . point-im-mode))
 
 (use-package slack
   :ensure t
@@ -859,9 +874,9 @@
   (slack-buffer-emojify t "enable emoji")
   (slack-prefer-current-team t))
 
-(use-package secrets-slack
-  :load t
-  :after slack)
+;; (use-package secrets-slack
+;;   :load t
+;;   :after slack)
 
 ;; TODO: move somewhere
 (use-package alert
@@ -917,6 +932,7 @@
                 webjump-sample-sites)))
 
 (use-package atomic-chrome
+  :defer 0.3
   :ensure t
   :custom
   (atomic-chrome-url-major-mode-alist
@@ -995,9 +1011,12 @@
   (org-html-htmlize-font-prefix "org-"))
 
 (use-package org-jira
+  :defer t
   :ensure t
   :init
   (make-directory "~/.org-jira" t))
+
+;; (use-package secrets-jira)
 
 (use-package synosaurus
   :defer t
@@ -1012,6 +1031,7 @@
   :ensure t)
 
 (use-package flycheck-grammarly
+  :defer t
   :quelpa
   (flycheck-grammarly :repo "jcs-elpa/flycheck-grammarly"  :fetcher github))
 
@@ -1038,18 +1058,16 @@
                (unless (eq ibuffer-sorting-mode 'alphabetic)
                  (ibuffer-do-sort-by-alphabetic)))))
 
-(use-package gitconfig-mode
+(use-package git-modes
   :ensure t
   :defer t)
 
-(use-package gitignore-mode
-  :ensure t
-  :defer t)
+(use-package generic-x)
 
 (use-package magit
   :ensure t
   :custom
-  (magit-clone-default-directory (expand-file-name "~/git"))
+  (magit-clone-default-directory (expand-file-name "~/git/"))
   (magit-completing-read-function 'ivy-completing-read "Force Ivy usage.")
   :bind
   (:map mode-specific-map
@@ -1119,6 +1137,7 @@
   :bind
   (:map mode-specific-map ("p" . projectile-command-map))
   :custom
+  (projectile-create-missing-test-files t)
   (projectile-project-root-files-functions
    '(projectile-root-local
      projectile-root-top-down
@@ -1185,9 +1204,10 @@
   :config
   (yas-reload-all)
   :hook
-  (prog-mode  . yas-minor-mode))
+  ((prog-mode feature-mode)  . yas-minor-mode))
 
 (use-package doom-snippets
+  :defer t
   :quelpa
   (doom-snippets
    :repo "hlissner/doom-snippets"
@@ -1268,9 +1288,12 @@
 
 (use-package flycheck-package
   :ensure t
-  :defer 1
-  :config
-  (flycheck-package-setup))
+  :hook
+  (emacs-lisp-mode . flycheck-package-setup))
+
+(use-package elsa
+  :defer t
+  :ensure t)
 
 (use-package flycheck-elsa
   :ensure t
@@ -1300,6 +1323,7 @@
     (mlet 'defun)))
 
 (use-package clj-refactor
+  :defer t
   :ensure t)
 
 (use-package anakondo
@@ -1482,6 +1506,7 @@
 
 
 (use-package sfz-mode
+  :defer t
   :ensure t)
 
 (use-package restclient
@@ -1558,23 +1583,22 @@
   :ensure t
   :defer t)
 
-(use-package unipunct
-  :defer 0.2
+(use-package unipunct-ng
   :quelpa
-  (unipunct
+  (unipunct-ng
    :fetcher url
-   :url "https://raw.githubusercontent.com/a13/xkb-custom/master/contrib/unipunct.el"))
+   :url "https://raw.githubusercontent.com/a13/xkb-custom/master/contrib/unipunct-ng.el"))
 
 (use-package reverse-im
   :defer 0.2
   :ensure t
   :demand t
-  :after unipunct char-fold
+  :after unipunct-ng char-fold
   :bind
   ("M-T" . reverse-im-translate-word)
   :custom
   (reverse-im-char-fold t)
   (reverse-im-read-char-advice-function #'reverse-im-read-char-exclude)
-  (reverse-im-input-methods '("russian-unipunct"))
+  (reverse-im-input-methods '("russian-unipunct-ng"))
   :config
   (reverse-im-mode t))
