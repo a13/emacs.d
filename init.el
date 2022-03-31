@@ -3,7 +3,6 @@
 (require 'package)
 (customize-set-variable 'package-archives
                         `(("melpa" . "https://melpa.org/packages/")
-                          ("org" . "https://orgmode.org/elpa/")
                           ,@package-archives))
 (customize-set-variable 'package-enable-at-startup nil)
 (package-initialize)
@@ -365,23 +364,16 @@
               ("C-c $" . flyspell-correct-at-point)))
 
 (use-package faces
-  :defer t
   :custom
   (face-font-family-alternatives
    '(("Monospace" "courier" "fixed")
      ("Consolas" "Monaco" "Roboto Mono" "PT Mono" "Terminus" "Monospace")
      ("Monospace Serif" "CMU Typewriter Text" "Courier 10 Pitch" "Monospace")
-     ("Serif" "CMU Serif" "Georgia" "Cambria" "Times New Roman" "DejaVu Serif" "serif")))
+     ("Serif" "Alegreya" "CMU Serif" "Georgia" "Cambria" "Times New Roman" "DejaVu Serif" "serif")))
   :custom-face
-  (variable-pitch ((t (:family "Serif" :height 125))))
+  (variable-pitch ((t (:family "Serif" :height 135))))
   (fixed-pitch ((t (:family "Monospace Serif" :height 125))))
   (default ((t (:family "Monospace Serif" :height 125)))))
-
-
-(use-package fnhh
-  :quelpa
-  (justify-kp :repo "Fuco1/justify-kp" :fetcher github))
-
 
 (use-package font-lock
   :defer t
@@ -390,11 +382,17 @@
   (font-lock-doc-face ((t (:inherit font-lock-doc-face :italic t))))
   (font-lock-string-face ((t (:inherit font-lock-string-face :italic t)))))
 
-(use-package lor-theme
-  :config
-  (load-theme 'lor t)
+(use-package open-color
   :quelpa
-  (lor-theme :repo "a13/lor-theme" :fetcher github :version original))
+  (open-color :repo "a13/open-color.el" :fetcher github :version original))
+
+(use-package lor-oc-theme
+  :config
+  (load-theme 'lor-oc t)
+  :load-path "/home/dk/git/lor-theme"
+  ;; :quelpa
+  ;; (lor-theme :repo "a13/lor-theme" :fetcher github :version original)
+  )
 
 (use-package mwheel
   :custom
@@ -515,8 +513,8 @@
   :custom
   (rainbow-identifiers-cie-l*a*b*-lightness 80)
   (rainbow-identifiers-cie-l*a*b*-saturation 50)
-  (rainbow-identifiers-choose-face-function
-   #'rainbow-identifiers-cie-l*a*b*-choose-face)
+   ;; (rainbow-identifiers-choose-face-function
+   ;;  #'rainbow-identifiers-cie-l*a*b*-choose-face)
   :hook
   (emacs-lisp-mode . rainbow-identifiers-mode) ; actually, turn it off
   (prog-mode . rainbow-identifiers-mode))
@@ -619,8 +617,10 @@
         ("C" .  counsel-world-clock)))
 
 (use-package ivy-rich
+
   :ensure t
   :config
+  (ivy-rich-project-root-cache-mode t)
   (ivy-rich-mode 1))
 
 (use-package helm-make
@@ -979,6 +979,7 @@
   (org-mode . variable-pitch-mode)
   (org-mode . visual-line-mode)
   :custom
+  (org-adapt-indentation t)
   (org-src-tab-acts-natively t))
 
 ;; (use-package org-passwords
@@ -1226,6 +1227,10 @@
   :config
   (avy-flycheck-setup))
 
+(use-package cov
+  :ensure t
+  :defer t)
+
 (use-package lisp
   :hook
   (after-save . check-parens))
@@ -1313,6 +1318,7 @@
   :defer t
   :config
   (define-clojure-indent
+    (pfor 1)
     (if-let-failed? 'defun)
     (if-let-ok? 'defun)
     (when-let-failed? 'defun)
@@ -1590,7 +1596,6 @@
    :url "https://raw.githubusercontent.com/a13/xkb-custom/master/contrib/unipunct-ng.el"))
 
 (use-package reverse-im
-  :defer 0.2
   :ensure t
   :demand t
   :after unipunct-ng char-fold
