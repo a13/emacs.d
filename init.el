@@ -1,10 +1,11 @@
 ;;; -*- lexical-binding: t; -*-
 
 (require 'package)
-(customize-set-variable 'package-archives
-                        `(("melpa" . "https://melpa.org/packages/")
-                          ,@package-archives))
-(customize-set-variable 'package-enable-at-startup nil)
+(setq package-archives
+      '(("melpa" . "https://melpa.org/packages/")
+        ("gnu" . "https://elpa.gnu.org/packages/")
+        ("nongnu" . "https://elpa.nongnu.org/nongnu/")))
+(setq package-enable-at-startup nil)
 (package-initialize)
 
 (unless (package-installed-p 'use-package)
@@ -18,22 +19,33 @@
 
 (use-package use-package-core
   :custom
-  ;; (use-package-verbose t)
-  ;; (use-package-minimum-reported-time 0.005)
+  (use-package-verbose t)
+  (use-package-minimum-reported-time 0.005)
   (use-package-enable-imenu-support t))
+
+(use-package benchmark-init
+  :ensure t
+  :config
+  ;; To disable collection of benchmark data after init is done.
+  (add-hook 'after-init-hook 'benchmark-init/deactivate)
+  )
 
 (use-package gcmh
   :ensure t
   :demand t
+  :custom
+  (gcmh-high-cons-threshold (* 16 1024 1024))
   :config
   (gcmh-mode 1))
 
 (use-package system-packages
   :ensure t
+  :defer t
   :custom
   (system-packages-noconfirm t))
 
-(use-package use-package-ensure-system-package :ensure t)
+;; (use-package use-package-ensure-system-package
+;;   :ensure t)
 
 (use-package quelpa
   :ensure t
@@ -168,8 +180,11 @@
   :custom
   (iqa-user-init-file (locate-user-emacs-file "README.org")
                       "Edit README.org by default.")
-  :config
-  (iqa-setup-default))
+  :bind (:map ctl-x-map
+              ("M-f" . iqa-find-user-init-file)
+              ("M-c" . iqa-find-user-custom-file)
+              ("M-r" . iqa-reload-user-init-file)
+              ("M-d" . iqa-find-user-init-directory)))
 
 (use-package cus-edit
   :defer t
@@ -206,19 +221,52 @@
 
 (use-package sudo-edit
   :ensure t
+  :defer t
   :config (sudo-edit-indicator-mode)
   :bind (:map ctl-x-map
               ("M-s" . sudo-edit)))
 
 (use-package exec-path-from-shell
   :ensure t
-  :defer 0.1
+  ;; :defer t
   :config
-  (exec-path-from-shell-initialize))
+  ;; (let ((inject-env-vars
+  ;;        '("MT2_ENV"
+  ;;          "MT2_CLUSTER"
+  ;;          "LOCAL_CUSTOMER_ID"
+  ;;          "SSH_AUTH_SOCK"
+  ;;          "SSH_AGENT_PID"
+  ;;          "AWS_DEFAULT_REGION"
+  ;;          "AWS_PROFILE"
+  ;;          "AWS_DEFAULT_PROFILE")))
+  ;;   (dolist (var inject-env-vars)
+  ;;     (add-to-list 'exec-path-from-shell-variables var)))
+  (exec-path-from-shell-initialize)
+  )
 
 (use-package xr
   :ensure t
   :defer t)
+
+(use-package doc-view
+  :defer t
+  :custom
+  (doc-view-resolution 200))
+
+(use-package detached
+  :ensure t
+  :init
+  (detached-init)
+  :bind (;; Replace `async-shell-command' with `detached-shell-command'
+         ([remap async-shell-command] . detached-shell-command)
+         ;; Replace `compile' with `detached-compile'
+         ([remap compile] . detached-compile)
+         ([remap recompile] . detached-compile-recompile)
+         ;; Replace built in completion of sessions with `consult'
+         ;; ([remap detached-open-session] . detached-consult-session)
+         )
+  :custom ((detached-show-output-on-attach t)
+           (detached-terminal-data-command system-type)))
 
 (use-package em-smart
   :defer t
@@ -259,7 +307,7 @@
   :bind
   ("M-`" . eshell-toggle))
 
-;; (use-package eshell-fringe-status
+;; (Use-package eshell-fringe-status
 ;;   :ensure t
 ;;   :hook
 ;;   (eshell-mode . eshell-fringe-status-mode))
@@ -364,35 +412,39 @@
               ("C-c $" . flyspell-correct-at-point)))
 
 (use-package faces
+  :demand t
   :custom
   (face-font-family-alternatives
    '(("Monospace" "courier" "fixed")
-     ("Consolas" "Monaco" "Roboto Mono" "PT Mono" "Terminus" "Monospace")
-     ("Monospace Serif" "CMU Typewriter Text" "Courier 10 Pitch" "Monospace")
+     ("Monospace Serif" "Consolas" "Monaco" "Roboto Mono" "PT Mono" "Terminus" "Monospace")
+     ;; ("Monospace Serif" "CMU Typewriter Text" ;; "Courier 10 Pitch")
      ("Serif" "Alegreya" "CMU Serif" "Georgia" "Cambria" "Times New Roman" "DejaVu Serif" "serif")))
   :custom-face
-  (variable-pitch ((t (:family "Serif" :height 135))))
-  (fixed-pitch ((t (:family "Monospace Serif" :height 125))))
-  (default ((t (:family "Monospace Serif" :height 125)))))
+  (default ((t (:family "Consolas" :height 125))))
+  ;; (variable-pitch ((t (:family "Serif" :height 135))))
+  ;; (fixed-pitch ((t (:family "Monospace Serif" :height 125))))
+  )
+;; (use-package font-lock
+;;   :defer t
+;;   :custom-face
+;;   (font-lock-comment-face ((t (:inherit font-lock-comment-face :italic t))))
+;;   (font-lock-doc-face ((t (:inherit font-lock-doc-face :italic t))))
+;;   (font-lock-string-face ((t (:inherit font-lock-string-face :italic t)))))
 
-(use-package font-lock
-  :defer t
-  :custom-face
-  (font-lock-comment-face ((t (:inherit font-lock-comment-face :italic t))))
-  (font-lock-doc-face ((t (:inherit font-lock-doc-face :italic t))))
-  (font-lock-string-face ((t (:inherit font-lock-string-face :italic t)))))
+;; (use-package uni-alphanums
+;;   :defer t
+;;   :quelpa
+;;   (uni-alphanums :repo "Kungsgeten/uni-alphanums" :fetcher github))
 
 (use-package open-color
-  :quelpa
-  (open-color :repo "a13/open-color.el" :fetcher github :version original))
+  :defer t
+  :ensure t)
 
 (use-package lor-oc-theme
   :config
   (load-theme 'lor-oc t)
-  :load-path "/home/dk/git/lor-theme"
-  ;; :quelpa
-  ;; (lor-theme :repo "a13/lor-theme" :fetcher github :version original)
-  )
+  :quelpa
+  (lor-theme :repo "a13/lor-theme" :fetcher github :version original))
 
 (use-package mwheel
   :custom
@@ -428,11 +480,6 @@
   :custom
   (olivetti-body-width 95))
 
-(use-package font-lock+
-  :defer t
-  :quelpa
-  (font-lock+ :repo "emacsmirror/font-lock-plus" :fetcher github))
-
 (use-package all-the-icons
   :ensure t
   :defer t
@@ -464,8 +511,7 @@
   :ensure t
   :custom-face
   (mode-line ((t (:inherit default (:box (:line-width -1 :style released-button))))))
-  :hook
-  (after-init . mood-line-mode))
+  :config (mood-line-mode))
 
 (use-package winner
   :config
@@ -513,8 +559,8 @@
   :custom
   (rainbow-identifiers-cie-l*a*b*-lightness 80)
   (rainbow-identifiers-cie-l*a*b*-saturation 50)
-   ;; (rainbow-identifiers-choose-face-function
-   ;;  #'rainbow-identifiers-cie-l*a*b*-choose-face)
+  ;; (rainbow-identifiers-choose-face-function
+  ;;  #'rainbow-identifiers-cie-l*a*b*-choose-face)
   :hook
   (emacs-lisp-mode . rainbow-identifiers-mode) ; actually, turn it off
   (prog-mode . rainbow-identifiers-mode))
@@ -524,7 +570,7 @@
   :hook '(prog-mode help-mode))
 
 (use-package so-long
-  :quelpa (so-long :url "https://raw.githubusercontent.com/emacs-mirror/emacs/master/lisp/so-long.el" :fetcher url)
+  :ensure t
   :config (global-so-long-mode))
 
 ;; counsel-M-x can use this one
@@ -617,8 +663,9 @@
         ("C" .  counsel-world-clock)))
 
 (use-package ivy-rich
-
   :ensure t
+  :custom
+  (ivy-rich-path-style 'abbrev)
   :config
   (ivy-rich-project-root-cache-mode t)
   (ivy-rich-mode 1))
@@ -643,8 +690,8 @@
                      :fetcher url))
 
 (use-package mb-depth
-  :config
-  (minibuffer-depth-indicate-mode 1))
+  :hook
+  (minibuffer-setup . minibuffer-depth-setup))
 
 (use-package avy
   :ensure t
@@ -737,6 +784,20 @@
   :config
   (electric-pair-mode))
 
+(use-package aggressive-indent
+  :ensure t
+  :after clojure-mode
+  :hook
+  ((clojure-mode lisp-data-mode scheme-mode) . aggressive-indent-mode))
+
+(use-package adjust-parens
+  :ensure t
+  :after clojure-mode company
+  :custom
+  (adjust-parens-fallback-indent-function #'company-indent-or-complete-common)
+  :hook
+  ((clojure-mode lisp-data-mode scheme-mode) . adjust-parens-mode))
+
 (use-package edit-indirect
   :ensure t
   :after expand-region ; to use region-prefix-map
@@ -746,9 +807,7 @@
 
 (use-package clipmon
   :ensure t
-  :defer 0.1
-  :config
-  (clipmon-mode))
+  :hook (after-init . clipmon-mode-start))
 
 (use-package copy-as-format
   :ensure t
@@ -779,6 +838,14 @@
   :hook
   (text-mode . hungry-delete-mode)
   (prog-mode . hungry-delete-mode))
+
+(use-package transform-symbol-at-point
+  :ensure t
+  :custom
+  (transform-symbol-at-point-cursor-after-transform 'next-symbol)
+  :bind
+  (:map mode-specific-map
+        ("C" . transform-symbol-at-point)))
 
 (use-package man
   :defer t
@@ -866,13 +933,13 @@
 ;;   :hook
 ;;   (jabber-chat-mode . point-im-mode))
 
-(use-package slack
-  :ensure t
-  :defer t
-  :commands (slack-start)
-  :custom
-  (slack-buffer-emojify t "enable emoji")
-  (slack-prefer-current-team t))
+;; (use-package slack
+;;   :ensure t
+;;   :defer t
+;;   :commands (slack-start)
+;;   :custom
+;;   (slack-buffer-emojify t "enable emoji")
+;;   (slack-prefer-current-team t))
 
 ;; (use-package secrets-slack
 ;;   :load t
@@ -921,7 +988,6 @@
   (bruh-default-browser #'bruh-chromium-new-app)
   (bruh-videos-browser-function #'bruh-mpv))
 
-
 (use-package webjump
   :bind
   (([S-f5] . webjump))
@@ -966,6 +1032,27 @@
   :ensure t
   :defer t)
 
+(use-package imgur
+  :defer t
+  :quelpa
+  (imgur :repo "larsmagne/imgur.el" :fetcher github))
+
+(use-package meme
+  :defer t
+  :after imgur
+  :quelpa
+  (meme :repo "larsmagne/meme" :fetcher github :files ("*" (:exclude ".*" "README.md"))))
+
+(use-package counsel-chrome-bm
+  :ensure t
+  :defer t
+  :bind
+  (:map counsel-prefix-map
+        ("W" .  counsel-chrome-bm-all))
+  :custom
+  (counsel-chrome-bm-file
+   "/home/dk/snap/chromium/common/chromium/Default/Bookmarks"))
+
 (use-package calendar
   :defer t
   :custom
@@ -976,7 +1063,7 @@
   ;; to be sure we have the latest Org version
   ;; :ensure org-plus-contrib
   :hook
-  (org-mode . variable-pitch-mode)
+  ;; (org-mode . variable-pitch-mode)
   (org-mode . visual-line-mode)
   :custom
   (org-adapt-indentation t)
@@ -1035,6 +1122,29 @@
   :defer t
   :quelpa
   (flycheck-grammarly :repo "jcs-elpa/flycheck-grammarly"  :fetcher github))
+
+(use-package languagetool
+  :ensure t
+  :defer t
+  ;; :commands (languagetool-check
+  ;;            languagetool-clear-suggestions
+  ;;            languagetool-correct-at-point
+  ;;            languagetool-correct-buffer
+  ;;            languagetool-set-language
+  ;;            languagetool-server-mode
+  ;;            languagetool-server-start
+  ;;            languagetool-server-stop)
+  :custom
+  (languagetool-java-arguments '("-Dfile.encoding=UTF-8"))
+  (languagetool-correction-language 'auto)
+  (languagetool-console-command "/snap/languagetool/current/usr/bin/languagetool-commandline.jar")
+  (languagetool-server-command "/snap/languagetool/current/usr/bin/languagetool-server.jar"))
+
+(use-package flycheck-languagetool
+  :ensure t
+  :hook (text-mode . flycheck-languagetool-setup)
+  :custom
+  (flycheck-languagetool-server-jar "/snap/languagetool/current/usr/bin/languagetool-server.jar"))
 
 (use-package ibuffer-vc
   :defer t
@@ -1105,10 +1215,21 @@
   :after magit
   :ensure t)
 
+(use-package github-review
+  :ensure t
+  :defer t
+  :after forge)
+
+(use-package gh-notify
+  :ensure t
+  :defer t
+  :after forge)
+
 (use-package git-timemachine
   :ensure t
   :defer t)
 
+;; git-link?
 (use-package browse-at-remote
   :ensure t
   :after link-hint
@@ -1198,12 +1319,11 @@
   (find-file . auto-insert))
 
 (use-package yasnippet
-  :defer 0.1
   :ensure t
   :custom
   (yas-prompt-functions '(yas-completing-prompt))
-  :config
-  (yas-reload-all)
+  ;; :config
+  ;; (yas-reload-all)
   :hook
   ((prog-mode feature-mode)  . yas-minor-mode))
 
@@ -1223,6 +1343,7 @@
 
 (use-package avy-flycheck
   :ensure t
+  :after avy flycheck
   :defer t
   :config
   (avy-flycheck-setup))
@@ -1255,18 +1376,23 @@
   :hook
   (emacs-lisp-mode . highlight-quoted-mode))
 
-(use-package highlight-sexp
-  :quelpa
-  (highlight-sexp :repo "daimrod/highlight-sexp" :fetcher github :version original)
-  :hook
-  (clojure-mode . highlight-sexp-mode)
-  (emacs-lisp-mode . highlight-sexp-mode)
-  (lisp-mode . highlight-sexp-mode))
+;; (use-package highlight-sexp
+;;   :quelpa
+;;   (highlight-sexp :repo "daimrod/highlight-sexp" :fetcher github :version original)
+;;   :hook
+;;   (clojure-mode . highlight-sexp-mode)
+;;   (emacs-lisp-mode . highlight-sexp-mode)
+;;   (lisp-mode . highlight-sexp-mode))
 
 (use-package eros
   :ensure t
   :hook
   (emacs-lisp-mode . eros-mode))
+
+;; needed for suggest, but doesn't install automatically
+(use-package shut-up
+  :ensure t
+  :defer t)
 
 (use-package suggest
   :ensure t
@@ -1313,22 +1439,30 @@
   :ensure t
   :defer t)
 
+(use-package geiser-guile
+  :ensure t
+  :defer t)
+
 (use-package clojure-mode
   :ensure t
   :defer t
   :config
   (define-clojure-indent
-    (pfor 1)
-    (if-let-failed? 'defun)
-    (if-let-ok? 'defun)
-    (when-let-failed? 'defun)
-    (when-failed 'defun)
-    (when-let-ok? 'defun)
-    (attempt-all 'defun)
-    (alet 'defun)
-    (mlet 'defun)))
+   (p/timer 1)
+   (pdoseq 1)
+   (pfor 1)
+   (if-let-failed? 'defun)
+   (if-let-ok? 'defun)
+   (when-let-failed? 'defun)
+   (when-failed 'defun)
+   (when-let-ok? 'defun)
+   (attempt-all 'defun)
+   (alet 'defun)
+   (mlet 'defun)))
 
 (use-package clj-refactor
+  :hook
+  (clojure-mode . clj-refactor-mode)
   :defer t
   :ensure t)
 
@@ -1340,6 +1474,7 @@
   (clojurec-mode . anakondo-minor-mode))
 
 (use-package flycheck-clj-kondo
+  :after cider
   :ensure t)
 
 (use-package clojure-snippets
@@ -1350,11 +1485,51 @@
   :ensure t
   :defer t
   :custom
+  (cider-comment-prefix "(comment \n")
+  (cider-comment-continued-prefix "  ")
+  (cider-comment-postfix "  \n)")
+  (cider-jack-in-default 'babashka)
   (cider-repl-display-help-banner nil))
+
+(use-package babashka
+  :ensure t
+  :defer t
+  :after detached
+  :custom
+  (babashka-command detached-shell-command))
 
 (use-package kibit-helper
   :ensure t
   :defer t)
+
+(use-package clojars
+  :ensure t
+  :defer t)
+
+;; clojure -Ttools install-latest :lib io.github.seancorfield/deps-new :as new
+;; clojure -Ttools install-latest :lib com.github.seancorfield/clj-new :as clj-new
+(use-package clj-deps-new
+  :ensure t
+  :defer t)
+
+(use-package neil
+  :defer t
+  :ensure t
+  :custom
+  (neil-prompt-for-version-p nil)
+  (neil-inject-dep-to-project-p t))
+
+(use-package cider-storm
+  :defer t
+  :quelpa
+  (cider-storm :fetcher github :repo "flow-storm/cider-storm"))
+
+(use-package data-navigator
+  :defer t
+  :quelpa
+  (data-navigator :fetcher github :repo "a13/data-navigator.el")
+  :config
+  (require 'data-navigator-tap))
 
 (use-package slime
   :ensure t
@@ -1368,6 +1543,7 @@
 
 (use-package erlang
   :ensure t
+  :disabled
   :defer t
   :custom
   (erlang-compile-extra-opts '(debug_info))
@@ -1377,61 +1553,13 @@
 
 (use-package company-erlang
   :ensure t
+  :disabled
   :hook
   (erlang-mode #'company-erlang-init))
-
-(use-package go-mode
-  :ensure t
-  :defer t
-  :bind
-  (:map go-mode-map
-        ("M-." . godef-jump)
-        ("M-]" . next-error)
-        ("M-[" . previous-error))
-  :hook
-  (before-save . gofmt-before-save)
-  :custom
-  (gofmt-command "goimports")
-  :init
-  (setenv "GO111MODULE" "on")
-  (or (getenv "GOPATH")
-      (setenv "GOPATH" (expand-file-name "~/go")))
-  (setenv "PATH" (concat (getenv "GOPATH") "/bin" ":" (getenv "PATH"))))
-
-(use-package company-go
-  :after go-mode
-  :ensure t
-  :defer t
-  :config
-  (push 'company-go company-backends))
-
-(use-package go-guru
-  :ensure t
-  :hook
-  (go-mode . go-guru-hl-identifier-mode))
-
-(use-package flycheck-golangci-lint
-  :ensure t
-  :hook
-  (go-mode . flycheck-golangci-lint-setup))
-
-(use-package go-eldoc
-  :ensure t
-  :hook
-  (go-mode . go-eldoc-setup))
 
 (use-package lua-mode
   :ensure t
   :defer t)
-
-(use-package conkeror-minor-mode
-  :ensure t
-  :disabled
-  :defer t
-  :hook
-  (js-mode . (lambda ()
-               (when (string-match "conkeror" (or (buffer-file-name) ""))
-                 (conkeror-minor-mode 1)))))
 
 (use-package json-mode
   :ensure t
@@ -1445,7 +1573,8 @@
 
 (use-package sh-script
   :mode (("zshecl" . sh-mode)
-         ("\\.zsh\\'" . sh-mode))
+         ("\\.zsh\\'" . sh-mode)
+         ("bash-fc" . sh-mode))
   :custom
   ;; zsh
   (system-uses-terminfo nil))
@@ -1455,11 +1584,12 @@
   (after-save . executable-make-buffer-file-executable-if-script-p))
 
 (use-package apt-sources-list
+  :defer t
   :ensure t)
 
 (use-package ssh-config-mode
   :ensure t
-  :init
+  :init ; do we still need this one?
   (autoload 'ssh-config-mode "ssh-config-mode" t)
   :mode
   (("/\\.ssh/config\\'"     . ssh-config-mode)
@@ -1476,68 +1606,68 @@
          ("\\.md\\'"          . markdown-mode)
          ("\\.markdown\\'"    . markdown-mode))
   :custom
+  (markdown-fontify-code-blocks-natively t)
   (markdown-command "markdown"))
 
-(use-package jira-markup-mode
-  :ensure t
-  :defer t
-  :after atomic-chrome
-  :mode ("\\.confluence$" . jira-markup-mode)
-  :custom-update
-  (atomic-chrome-url-major-mode-alist
-   '(("atlassian\\.net$" . jira-markup-mode))))
+;; (use-package jira-markup-mode
+;;   :ensure t
+;;   :defer t
+;;   :after atomic-chrome
+;;   :mode ("\\.confluence$" . jira-markup-mode)
+;;   :custom-update
+;;   (atomic-chrome-url-major-mode-alist
+;;    '(("atlassian\\.net$" . jira-markup-mode))))
 
 (use-package csv-mode
   :ensure t
   :mode
   (("\\.[Cc][Ss][Vv]\\'" . csv-mode)))
 
-(use-package groovy-mode
-  :defer t
-  :ensure t
-  :custom
-  (groovy-indent-offset 2))
+;; (use-package groovy-mode
+;;   :defer t
+;;   :ensure t
+;;   :custom
+;;   (groovy-indent-offset 2))
 
-(use-package jenkinsfile-mode
-  :defer t
-  :quelpa
-  (jenkinsfile-mode :repo "john2x/jenkinsfile-mode" :fetcher github))
+;; (use-package jenkinsfile-mode
+;;   :defer t
+;;   :quelpa
+;;   (jenkinsfile-mode :repo "john2x/jenkinsfile-mode" :fetcher github))
 
-(use-package aql-mode
-  :defer t
-  :quelpa
-  (aql-mode :repo "a13/aql-mode" :fetcher github)
-  :mode
-  (("\\.arango$" . aql-mode)))
-
+;; (use-package aql-mode
+;;   :defer t
+;;   :quelpa
+;;   (aql-mode :repo "a13/aql-mode" :fetcher github)
+;;   :mode
+;;   (("\\.arango$" . aql-mode)))
 
 (use-package sfz-mode
   :defer t
   :ensure t)
 
-(use-package restclient
-  :ensure t
-  :mode
-  ("\\.http\\'" . restclient-mode))
+;; (use-package restclient
+;;   :ensure t
+;;   :mode
+;;   ("\\.http\\'" . restclient-mode))
 
-(use-package restclient-test
-  :ensure t
-  :hook
-  (restclient-mode-hook . restclient-test-mode))
+;; (use-package restclient-test
+;;   :ensure t
+;;   :hook
+;;   (restclient-mode-hook . restclient-test-mode))
 
-(use-package ob-restclient
-  :ensure t
-  :after org restclient
-  :init
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((restclient . t))))
+;; (use-package ob-restclient
+;;   :ensure t
+;;   :after org restclient
+;;   :init
+;;   (org-babel-do-load-languages
+;;    'org-babel-load-languages
+;;    '((restclient . t))))
 
-(use-package company-restclient
-  :ensure t
-  :after (company restclient)
-  :custom-update
-  (company-backends '(company-restclient)))
+;; (use-package company-restclient
+;;   :ensure t
+;;   :after (company restclient)
+;;   :custom-update
+;;   (company-backends '(company-restclient)))
 
 (use-package net-utils
   :ensure-system-package traceroute
@@ -1557,6 +1687,11 @@
         ("s" . smbclient)
         ("t" . traceroute)))
 
+(use-package bluetooth
+  :defer t
+  :when (eq system-type 'gnu/linux)
+  :ensure t)
+
 (use-package docker
   :ensure t
   :bind
@@ -1573,15 +1708,19 @@
   :ensure t
   :defer t)
 
-(use-package k8s-mode
-  :ensure t
-  :hook (k8s-mode . yas-minor-mode))
+;; (use-package k8s-mode
+;;   :ensure t
+;;   :hook (k8s-mode . yas-minor-mode))
 
-(use-package kubernetes
-  :ensure t
-  :commands (kubernetes-overview))
+;; (use-package kubernetes
+;;   :ensure t
+;;   :commands (kubernetes-overview))
 
-(use-package emamux
+;; (use-package emamux
+;;   :ensure t
+;;   :defer t)
+
+(use-package gptel
   :ensure t
   :defer t)
 
@@ -1602,6 +1741,7 @@
   :bind
   ("M-T" . reverse-im-translate-word)
   :custom
+  (reverse-im-cache-file (locate-user-emacs-file "reverse-im-cache.el"))
   (reverse-im-char-fold t)
   (reverse-im-read-char-advice-function #'reverse-im-read-char-exclude)
   (reverse-im-input-methods '("russian-unipunct-ng"))
